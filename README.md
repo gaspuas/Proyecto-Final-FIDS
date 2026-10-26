@@ -31,7 +31,7 @@ El sistema a desarrollar constará de dos plataformas integradas:
 2. **Integridad de Selección de Butacas:** Una misma butaca no puede venderse dos veces para la misma función. El sistema debe garantizar la disponibilidad en tiempo real.
 3. **Política de Cancelación:** Los clientes pueden cancelar sus compras únicamente hasta un límite de tiempo previo al inicio de la función (ej. 2 horas antes).
 4. **Manejo de Fechas y Horarios:** Todos los horarios de funciones y fechas de compras deben registrarse obligatoriamente en columnas de tipo `DATETIME` (prohibido utilizar columnas separadas para fecha y hora).
-5. **Consumo de API Externa:** Los datos complementarios de las películas (sinopsis, pósters, afiches) se obtendrán mediante integración con una API pública gratuita (OMDb API o TMDb API).
+5. **Consumo de API Externa:** Los datos complementarios de las películas (sinopsis, pósters, afiches) se podrán obtener mediante integración con una API pública gratuita (OMDb API o TMDb API).
 6. **Prohibición Estricta de ORMs:** No se permite el uso de SQLAlchemy, SQLModel ni ningún otro ORM o mapeador objeto-relacional. Todas las interacciones con la base de datos se realizarán mediante **consultas SQL explícitas y puras** utilizando conectores como `mysql-connector-python`.
 7. **Prohibición de Asincronismo en el Navegador (`fetch` / `axios`):** Está prohibido realizar peticiones HTTP asincrónicas desde JavaScript en el navegador hacia el Backend. La comunicación entre el Frontend en Flask y el Backend REST API se realizará exclusivamente en el servidor mediante la librería `requests` de Python.
 8. **Generación y Escaneo de QR:** Cada compra generará un código QR único que será escaneado por el personal de recepción desde el Backoffice para validar el ingreso y cambiar el estado del ticket a `usada`.
@@ -80,6 +80,103 @@ El backlog del proyecto se organiza en 5 épicas principales, descomponiéndose 
 
 ## 3. Esquema de Base de Datos Relacional (DDL SQL - MySQL)
 
+```mermaid
+erDiagram
+    USUARIOS {
+        int id PK
+        string nombre
+        string email
+        string password_hash
+        string rol "ENUM('cliente', 'administrador')"
+        datetime fecha_registro
+    }
+
+    LOCALES_SALAS {
+        int id PK
+        string nombre_local
+        int numero_sala
+        int capacidad_total
+        int filas
+        int columnas
+    }
+
+    PELICULAS {
+        int id PK
+        string api_id
+        string titulo
+        string sinopsis
+        string poster_url
+        int duracion_minutos
+        string clasificacion
+        string genero
+        string director
+        boolean es_reestreno
+    }
+
+    FUNCIONES {
+        int id PK
+        int pelicula_id FK
+        int sala_id FK
+        datetime fecha_hora
+        decimal precio_base
+    }
+
+    COMPRAS {
+        int id PK
+        int usuario_id FK
+        datetime fecha_compra
+        decimal monto_total
+        string codigo_qr
+        string estado_qr "ENUM('activo', 'usado', 'cancelado')"
+    }
+
+    ENTRADAS_DETALLE {
+        int id PK
+        int compra_id FK
+        int funcion_id FK
+        string numero_butaca
+        decimal precio
+    }
+
+    SERVICIOS {
+        int id PK
+        string nombre
+        string categoria "ENUM('comida', 'bebida', 'estacionamiento', 'servicio')"
+        decimal precio
+        string descripcion
+    }
+
+    COMPRAS_SERVICIOS {
+        int id PK
+        int compra_id FK
+        int servicio_id FK
+        int cantidad
+        decimal precio_unitario
+    }
+
+    RESENAS {
+        int id PK
+        int usuario_id FK
+        int pelicula_id FK
+        int compra_id FK
+        int puntuacion
+        string comentario
+        datetime fecha
+    }
+
+    %% Relaciones
+    USUARIOS ||--o{ COMPRAS : "realiza"
+    USUARIOS ||--o{ RESENAS : "escribe"
+    PELICULAS ||--o{ FUNCIONES : "se proyecta en"
+    PELICULAS ||--o{ RESENAS : "recibe"
+    LOCALES_SALAS ||--o{ FUNCIONES : "alberga"
+    FUNCIONES ||--o{ ENTRADAS_DETALLE : "contiene"
+    COMPRAS ||--o{ ENTRADAS_DETALLE : "incluye entradas"
+    COMPRAS ||--o{ COMPRAS_SERVICIOS : "incluye adicionales"
+    SERVICIOS ||--o{ COMPRAS_SERVICIOS : "adquirido en"
+    COMPRAS ||--o| RESENAS : "genera"
+
+```
 
 ---
 
