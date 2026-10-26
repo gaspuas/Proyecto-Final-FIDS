@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS peliculas (
   poster_url VARCHAR(500) NULL,
   duracion_minutos INT NOT NULL,
   clasificacion VARCHAR(20) NULL,
+  genero VARCHAR(100) NULL,
   director VARCHAR(100) NULL,
   es_reestreno BOOLEAN DEFAULT TRUE
 ) ENGINE=InnoDB;
@@ -112,14 +113,31 @@ CREATE TABLE IF NOT EXISTS compras_servicios (
 ) ENGINE=InnoDB;
 
 -- -----------------------------------------------------
+-- 9. Tabla: resenas (Punto Deseable: Calificación por Asistencia)
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS resenas (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  usuario_id INT NOT NULL,
+  pelicula_id INT NOT NULL,
+  compra_id INT NOT NULL,
+  puntuacion INT CHECK (puntuacion BETWEEN 1 AND 5),
+  comentario TEXT NULL,
+  fecha DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_resenas_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+  CONSTRAINT fk_resenas_pelicula FOREIGN KEY (pelicula_id) REFERENCES peliculas(id) ON DELETE CASCADE,
+  CONSTRAINT fk_resenas_compra FOREIGN KEY (compra_id) REFERENCES compras(id) ON DELETE CASCADE,
+  CONSTRAINT uq_usuario_funcion_resena UNIQUE (usuario_id, compra_id)
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------
 -- Carga inicial de datos de prueba
 -- -----------------------------------------------------
-INSERT INTO locales_salas (nombre_local, numero_sala, capacidad_total, filas, columnas) VALUES
+INSERT IGNORE INTO locales_salas (nombre_local, numero_sala, capacidad_total, filas, columnas) VALUES
 ('Paradiso Central', 1, 50, 5, 10),
 ('Paradiso Central', 2, 50, 5, 10),
 ('Paradiso Norte', 1, 40, 4, 10);
 
-INSERT INTO servicios (nombre, categoria, precio, descripcion) VALUES
+INSERT IGNORE INTO servicios (nombre, categoria, precio, descripcion) VALUES
 ('Combo Pochoclos + Bebida', 'comida', 4500.00, 'Pochoclos medianos y gaseosa de 500ml'),
 ('Estacionamiento (3 horas)', 'estacionamiento', 2000.00, 'Válido para el estacionamiento del complejo'),
 ('Acceso Sala VIP', 'servicio', 1500.00, 'Acceso al lounge exclusivo antes de la función');
