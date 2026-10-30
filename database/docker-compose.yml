@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: cine_paradiso_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: cinePass1234
+      MYSQL_DATABASE: cine_paradiso_db
+      MYSQL_USER: cineAdmin
+      MYSQL_PASSWORD: cinePass1234
+    ports:
+      - "3307:3306"
+    volumes:
+      # Monta el esquema SQL para que se ejecute automáticamente la primera vez
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      # Persistencia de datos para no perder registros al apagar el contenedor
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:

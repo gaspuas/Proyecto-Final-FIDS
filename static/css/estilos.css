@@ -1,0 +1,419 @@
+/* ==========================================================================
+   Cine Paradiso - Hoja de Estilos (base.html, inicio.html y cartelera.html)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Variables y Reset Básico
+   -------------------------------------------------------------------------- */
+:root {
+    --bg-principal: #121214;
+    --bg-secundario: #18181c;
+    --bg-tarjeta: #1c1c22;
+    --color-dorado: #d4af37;
+    --color-dorado-hover: #e5b938;
+    --color-texto: #f0f0f3;
+    --color-texto-secundario: #a0a0aa;
+    --color-borde: rgba(212, 175, 55, 0.25);
+    --color-exito: #2e7d32;
+    --ancho-maximo: 1200px;
+    --font-titulos: 'Playfair Display', Georgia, serif;
+    --font-cuerpo: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-principal);
+    color: var(--color-texto);
+    font-family: var(--font-cuerpo);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --------------------------------------------------------------------------
+   2. Header y Navegación Principal (base.html)
+   -------------------------------------------------------------------------- */
+.header-principal {
+    background-color: var(--bg-secundario);
+    border-bottom: 1px solid var(--color-borde);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.nav {
+    max-width: var(--ancho-maximo);
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar__brand {
+    text-decoration: none;
+}
+
+.navbar__brand-name {
+    color: var(--color-dorado);
+    font-family: var(--font-titulos);
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: color 0.2s ease;
+}
+
+.navbar__brand:hover .navbar__brand-name {
+    color: var(--color-dorado-hover);
+}
+
+.nav__menu {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.navbar__link {
+    color: var(--color-texto-secundario);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.navbar__link:hover,
+.navbar__link--active {
+    color: var(--color-dorado);
+    background-color: rgba(212, 175, 55, 0.15);
+}
+
+/* --------------------------------------------------------------------------
+   3. Mensajes Flash y Contenedor Principal (base.html)
+   -------------------------------------------------------------------------- */
+.contenedor-flash {
+    max-width: var(--ancho-maximo);
+    width: 100%;
+    margin: 1rem auto 0 auto;
+    padding: 0 1.5rem;
+}
+
+.alerta {
+    padding: 0.85rem 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.alerta--success {
+    background-color: #1e3a1f;
+    color: #a3e6a1;
+    border: 1px solid #2e7d32;
+}
+
+.alerta--error {
+    background-color: #3e1a1a;
+    color: #f88787;
+    border: 1px solid #c62828;
+}
+
+.contenedor-principal {
+    max-width: var(--ancho-maximo);
+    width: 100%;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --------------------------------------------------------------------------
+   4. Encabezados de Sección (cartelera.html)
+   -------------------------------------------------------------------------- */
+.pagina {
+    width: 100%;
+}
+
+.pagina__cabecera {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--color-borde);
+    padding-bottom: 1rem;
+}
+
+.pagina__titulo {
+    color: var(--color-dorado);
+    font-size: 2.1rem;
+    font-family: var(--font-titulos);
+    font-weight: 700;
+}
+
+.pagina__subtitulo {
+    color: var(--color-texto-secundario);
+    font-size: 0.95rem;
+    margin-top: 0.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   5. Grilla y Tarjetas de Películas (cartelera.html)
+   -------------------------------------------------------------------------- */
+.grilla-peliculas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.75rem;
+}
+
+.tarjeta-pelicula {
+    background-color: var(--bg-tarjeta);
+    border: 1px solid var(--color-borde);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjeta-pelicula:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-dorado);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.25);
+}
+
+.tarjeta-pelicula__poster {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    background-color: #0c0c0e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.tarjeta-pelicula__poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.tarjeta-pelicula__poster-placeholder {
+    font-size: 3.5rem;
+    color: #3a3a42;
+}
+
+.tarjeta-pelicula__badges {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.3rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge--reestreno {
+    background-color: var(--color-dorado);
+    color: #0d0d0f;
+}
+
+.badge--estreno {
+    background-color: var(--color-exito);
+    color: #ffffff;
+}
+
+.badge--clasificacion {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #e0e0e0;
+    border: 1px solid var(--color-borde);
+}
+
+.tarjeta-pelicula__cuerpo {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.tarjeta-pelicula__titulo {
+    font-size: 1.25rem;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+    font-family: var(--font-titulos);
+}
+
+.tarjeta-pelicula__meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--color-texto-secundario);
+}
+
+.tag-genero {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    color: var(--color-texto-secundario);
+}
+
+.duracion {
+    color: var(--color-texto-secundario);
+}
+
+.tarjeta-pelicula__acciones {
+    margin-top: auto;
+    display: flex;
+    gap: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tarjeta-pelicula__acciones .boton {
+    width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   6. Botones Generales y Hero (inicio.html & cartelera.html)
+   -------------------------------------------------------------------------- */
+.boton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--color-dorado);
+    color: #0d0d0f;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.boton:hover,
+.boton--dorado:hover {
+    background-color: var(--color-dorado-hover);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+    transform: translateY(-2px);
+}
+
+.inicio-hero {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-height: 55vh;
+    padding: 2rem 1rem;
+}
+
+.inicio-hero__contenido {
+    max-width: 650px;
+    width: 100%;
+    background-color: var(--bg-tarjeta);
+    border: 1px solid var(--color-borde);
+    border-radius: 16px;
+    padding: 3.5rem 2rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.inicio-hero__titulo {
+    font-family: var(--font-titulos);
+    font-size: 2.3rem;
+    color: var(--color-dorado);
+    margin-bottom: 1rem;
+}
+
+.inicio-hero__subtitulo {
+    color: var(--color-texto-secundario);
+    font-size: 1.1rem;
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+}
+
+.inicio-hero__acciones {
+    display: flex;
+    justify-content: center;
+}
+
+/* --------------------------------------------------------------------------
+   7. Estado Vacío (cartelera.html)
+   -------------------------------------------------------------------------- */
+.vacio {
+    text-align: center;
+    padding: 3.5rem 1rem;
+    color: var(--color-texto-secundario);
+    background-color: var(--bg-tarjeta);
+    border-radius: 12px;
+    border: 1px solid var(--color-borde);
+}
+
+.vacio__icono {
+    font-size: 3.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.vacio__texto {
+    font-size: 1.1rem;
+    color: var(--color-texto);
+}
+
+/* --------------------------------------------------------------------------
+   8. Pie de Página (base.html)
+   -------------------------------------------------------------------------- */
+.footer {
+    background-color: var(--bg-secundario);
+    border-top: 1px solid var(--color-borde);
+    padding: 1.5rem 0;
+    margin-top: auto;
+    text-align: center;
+    color: var(--color-texto-secundario);
+    font-size: 0.85rem;
+}
+
+/* --------------------------------------------------------------------------
+   9. Adaptabilidad Responsive
+   -------------------------------------------------------------------------- */
+@media (max-width: 992px) {
+    .grilla-peliculas {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .nav {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .grilla-peliculas {
+        grid-template-columns: 1fr;
+    }
+
+    .inicio-hero__titulo {
+        font-size: 1.8rem;
+    }
+
+    .inicio-hero__contenido {
+        padding: 2rem 1.5rem;
+    }
+}

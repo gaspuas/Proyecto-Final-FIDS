@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio · Cine Paradiso{% endblock %}
+
+{% block content %}
+
+<section class="inicio-hero">
+    <div class="inicio-hero__contenido">
+        <h1 class="inicio-hero__titulo">Bienvenidos a Cine Paradiso</h1>
+        <p class="inicio-hero__subtitulo">Reviví los mejores clásicos del cine y los grandes reestrenos en pantalla grande.</p>
+        
+        <div class="inicio-hero__acciones">
+            <a class="boton" href="{{ url_for('web.site.peliculas.index') }}">Ver Cartelera</a> 
+            <!-- despues se cambia por link a cartelera o directamente mostramos cartelera en inicio -->
+        </div>
+    </div>
+</section>
+{% endblock %}

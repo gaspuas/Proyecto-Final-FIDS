@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Cine Paradiso{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+    <header class="header-principal">
+        <div class="nav">
+            <a href="{{ url_for('web.site.home.index') }}" class="navbar__brand">
+                <span class="navbar__brand-name">Cine Paradiso</span>
+            </a>
+
+            {% block navbar_menu %}
+            <nav class="nav__menu">
+                <a href="{{ url_for('web.site.home.index') }}"
+                   class="navbar__link {% if request.endpoint == 'web.site.home.index' %}navbar__link--active{% endif %}">Inicio</a>
+                <a href="{{ url_for('web.site.home.index') }}"
+                   class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.site.peliculas') %}navbar__link--active{% endif %}">Cartelera</a>
+                <a href="{{ url_for('web.site.home.index') }}"
+                   class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.site.login') %}navbar__link--active{% endif %}">Login</a>
+            </nav>
+            {% endblock %}
+        </div>
+    </header>
+
+    <!-- Mensajes Flash (Alertas) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="contenedor-flash">
+          {% for category, message in messages %}
+            <div class="alerta alerta--{{ category }}">
+                {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Contenido Dinámico -->
+    <main class="contenedor-principal">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Pie de Página -->
+    <footer class="footer">
+        <p>&copy; 2026 Cine Paradiso — Plataforma de Cine y Reestrenos Clásicos</p>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

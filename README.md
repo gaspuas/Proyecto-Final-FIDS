@@ -36,6 +36,54 @@ El sistema a desarrollar constará de dos plataformas integradas:
 7. **Prohibición de Asincronismo en el Navegador (`fetch` / `axios`):** Está prohibido realizar peticiones HTTP asincrónicas desde JavaScript en el navegador hacia el Backend. La comunicación entre el Frontend en Flask y el Backend REST API se realizará exclusivamente en el servidor mediante la librería `requests` de Python.
 8. **Generación y Escaneo de QR:** Cada compra generará un código QR único que será escaneado por el personal de recepción desde el Backoffice para validar el ingreso y cambiar el estado del ticket a `usada`.
 
+### 1.4 Estructura del proyecto
+
+cine-paradiso/
+├── app.py                        # Entry point único de Flask (Puerto 5000)
+├── requirements.txt              # Dependencias (Flask, mysql-connector-python, etc.)
+├── .env                          # Variables de entorno (DB_HOST, DB_USER, SECRET_KEY)
+├── database/                          # Paquete principal de la aplicación
+|   ├── docker-compose.yml
+│   └── schema.sql                    # Script DDL de la base de datos
+|
+├── web/                          # Paquete principal de la aplicación
+│   ├── config/
+│   │   └── db.py                 # Conexión a MySQL (mysql-connector-python)
+│   │
+│   ├── routes/                   # Capa 1: Controladores / Endpoints / Vistas
+│   │   ├── site/                 # FALTA COMPLETAR TODO ROUTES
+│   │   │   └── home.py
+│   │   │   └── peliculas.py
+│   │   └── admin/                
+│   │       └── peliculas.py
+│   │
+│   ├── validators/               # Capa 2: Validaciones de entrada (JSON / Formularios)
+│   │   ├── validatorsPeliculas.py
+│   │   └── validatorsCompras.py
+│   │
+│   ├── services/                 # Capa 3: Lógica de negocio (reglas, cálculo de montos, QR)
+│   │   ├── servicePeliculas.py
+│   │   └── serviceCompras.py
+│   │
+│   ├── repositories/             # Capa 4: Acceso a datos (Consultas SQL puras a MySQL)
+│   │   ├── repositoryPeliculas.py
+│   │   └── repositoryCompras.py
+│   │
+├── templates/                # Plantillas Jinja2
+│   ├── base.html
+│   ├── 500.html
+│   ├── 404.html
+│   ├── site/
+│   │    ├── inicio.html
+│   │    └── cartelera.html
+│   └── admin/
+|  
+└── static/                   # Recursos estáticos
+    ├── css/
+    │    └── estilos.css
+    └── js/
+    │    └── main.js
+
 ---
 
 ## 2. Backlog de Producto (Épicas e Historias de Usuario)
@@ -223,3 +271,15 @@ Se adoptará la convención de *Conventional Commits* vinculada a los *Issues* d
 * `feat(auth): agrega endpoint POST /api/auth/register #1`
 * `fix(db): corrige foreign key en tabla funciones #5`
 * `docs(readme): actualiza instrucciones de ejecucion en init.sh #12`
+
+## Configuracion
+```bash
+cp .env.base .env            # los defaults ya funcionan en local
+
+python -m venv .venv
+.venv\Scripts\activate          # Windows
+# source .venv/bin/activate     # Linux/macOS
+pip install -r requirements.txt
+
+python app.py                   # http://localhost:5001
+```

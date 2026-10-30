@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Cartelera · Cine Paradiso{% endblock %}
+
+{% block content %}
+<section class="pagina pagina--site">
+    <div class="pagina__cabecera">
+        <div>
+            <h1 class="pagina__titulo">Cartelera de Cine</h1>
+            <p class="pagina__subtitulo">Explorá los grandes reestrenos clásicos y los mejores estrenos en pantalla grande</p>
+        </div>
+    </div>
+
+    {% if peliculas %}
+    <div class="grilla-peliculas">
+        {% for pelicula in peliculas %}
+        <article class="tarjeta-pelicula">
+            <div class="tarjeta-pelicula__poster">
+                {% if pelicula.poster_url %}
+                    <img src="{{ pelicula.poster_url }}" alt="{{ pelicula.titulo }}">
+                {% else %}
+                    <div class="tarjeta-pelicula__poster-placeholder">🎬</div>
+                {% endif %}
+                <div class="tarjeta-pelicula__badges">
+                    {% if pelicula.es_reestreno %}
+                        <span class="badge badge--reestreno">Reestreno</span>
+                    {% else %}
+                        <span class="badge badge--estreno">Estreno</span>
+                    {% endif %}
+                    {% if pelicula.clasificacion %}
+                        <span class="badge badge--clasificacion">{{ pelicula.clasificacion }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="tarjeta-pelicula__cuerpo">
+                <h2 class="tarjeta-pelicula__titulo">{{ pelicula.titulo }}</h2>
+                
+                <div class="tarjeta-pelicula__meta">
+                    <span class="tag-genero">{{ pelicula.genero if pelicula.genero else 'Clásico' }}</span>
+                    <span class="duracion">⏱ {{ pelicula.duracion_minutos }} min</span>
+                </div>
+
+                <div class="tarjeta-pelicula__acciones">
+                    <a class="boton boton--dorado" href="{{ url_for('web.site.peliculas.detalle', pelicula_id=pelicula.id) if 'web.site.peliculas.detalle' in config else '#' }}">
+                        🎟️ Ver Funciones
+                    </a>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="vacio">
+        <p class="vacio__icono">🎬</p>
+        <p class="vacio__texto">No hay películas disponibles en cartelera en este momento.</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
