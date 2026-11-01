@@ -3,18 +3,14 @@ from backend.src.validators.auth_validators import *
 from backend.src.services.auth_services import *
 from backend.src.utils.api_responses import *
 
-# Definición del Blueprint para las rutas de autenticación
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
 @auth_bp.route('/register', methods=['POST'])
-def register():
-    # Obtener el Body: {nombre, email, password}
+def registrar():
     data = request.get_json(silent=True)
 
-    # 1. Validar la entrada
     es_valido, mensaje_error = validar_registro(data)
     if not es_valido:
-        # Se utiliza el helper del archivo api_responses.py para el 400 Bad Request
         return generar_respuesta_error(
             code="VALIDATION_ERROR",
             message="Los datos proporcionados no son válidos.",
@@ -22,9 +18,8 @@ def register():
             status_code=400
         )
 
-    # 2. Procesar el registro (Llamada al servicio)
     try:
-        exito = registrar_cliente_service(data)
+        exito = registrar_cliente_servicio(data)
         if not exito:
             return generar_respuesta_error(
                 code="EMAIL_ALREADY_EXISTS",
@@ -33,7 +28,6 @@ def register():
                 status_code=400
             )
             
-        # Retorna 201 Created para el caso de éxito
         return jsonify({
             "status": "success",
             "message": "Usuario cliente registrado exitosamente."
@@ -45,4 +39,26 @@ def register():
             message="Error inesperado en el servidor.",
             description=str(e),
             status_code=500
+        )
+
+@auth_bp.route('/login', methods=['POST'])
+def iniciar_sesion():
+    data = request.get_json(silent=True)
+    
+    resultado = procesar_login(data)
+    
+    if resultado['exito']:
+        return jsonify({
+            "status": "success",
+            "message": resultado['mensaje'],
+            "data": resultado['datos']
+        }), 200
+    else:
+        codigo_http = 401 if resultado.get('tipo_error') == 'UNAUTHORIZED' else 400
+        
+        return generar_respuesta_error(
+            code=resultado.get('tipo_error', 'AUTH_ERROR'),
+            message="Error en la autenticación.",
+            description=resultado['mensaje'],
+            status_code=codigo_http
         )

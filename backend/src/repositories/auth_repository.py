@@ -1,26 +1,63 @@
+import mysql.connector
 from backend.src.utils.db_connection import get_db_connection
 
 def crear_usuario_cliente(nombre, email, password_hash):
-    conexion = get_db_connection()
-    cursor = conexion.cursor()
+    conn = get_db_connection()
+    if not conn:
+        return False
+        
+    cursor = None
     try:
-        # Verificar si el email ya existe
+        cursor = conn.cursor()
+        
         cursor.execute("SELECT id FROM USUARIOS WHERE email = %s", (email,))
         if cursor.fetchone():
-            return False  # El usuario ya existe
+            return False  
 
-        # Inserción con SQL puro (Regla 6)
         query = """
             INSERT INTO USUARIOS (nombre, email, password_hash, rol, fecha_registro)
             VALUES (%s, %s, %s, %s, NOW())
         """
-        # Se fuerza el rol a 'cliente' por defecto para este endpoint
         cursor.execute(query, (nombre, email, password_hash, 'cliente'))
-        conexion.commit()
+        conn.commit()
         return True
-    except Exception as e:
-        conexion.rollback()
-        raise e
+        
+    except mysql.connector.Error as err:
+        print(f"Error de base de datos al crear usuario: {err}")
+        if conn and conn.is_connected():
+            conn.rollback()
+        raise err  
+        
     finally:
-        cursor.close()
-        conexion.close()
+        if cursor:
+            cursor.close()
+        if conn and conn.is_connected():
+            conn.close()
+
+def obtener_usuario_por_email(email):
+    conn = get_db_connection()
+    if not conn:
+        return None
+        
+    cursor = None
+    try:
+        cursor = conn.cursor(dictionary=True)
+        
+        query = """
+            SELECT id, nombre, email, password_hash, rol 
+            FROM USUARIOS 
+            WHERE email = %s
+        """
+        cursor.execute(query, (email,))
+        usuario = cursor.fetchone()
+        return usuario
+        
+    except mysql.connector.Error as err:
+        print(f"Error de Base de Datos en obtener_usuario_por_email: {err}")
+        return None
+        
+    finally:
+        if cursor:
+            cursor.close()
+        if conn and conn.is_connected():
+            conn.close()
