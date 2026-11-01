@@ -42,9 +42,41 @@ cine-paradiso/
 ├── app.py                        # Entry point único de Flask (Puerto 5000)
 ├── requirements.txt              # Dependencias (Flask, mysql-connector-python, etc.)
 ├── .env                          # Variables de entorno (DB_HOST, DB_USER, SECRET_KEY)
-├── database/                          # Paquete principal de la aplicación
+├── database/                     # Paquete principal de la aplicación
 |   ├── docker-compose.yml
-│   └── schema.sql                    # Script DDL de la base de datos
+│   └── schema.sql                # Script DDL de la base de datos
+|
+├── backend/                      # API REST y lógica del servidor
+│   ├── src/                      
+│   │   ├── repositories/         
+│   │   │   ├── auth_repository.py 
+│   │   │   ├── compras_repository.py 
+│   │   │   ├── funciones_repository.py 
+│   │   │   ├── peliculas_repository.py 
+│   │   │   └── servicios_repository.py 
+│   │   ├── routes/               
+│   │   │   ├── admin.py          
+│   │   │   ├── auth.py           
+│   │   │   ├── compras.py        
+│   │   │   ├── funciones.py      
+│   │   │   ├── peliculas.py      
+│   │   │   └── servicios.py      
+│   │   ├── services/             
+│   │   │   ├── admin_services.py 
+│   │   │   ├── auth_services.py  
+│   │   │   ├── compras_services.py 
+│   │   │   ├── funciones_services.py 
+│   │   │   ├── peliculas_services.py 
+│   │   │   └── servicios_services.py 
+│   │   ├── utils/                
+│   │   │   ├── api_responses.py  
+│   │   │   ├── db_connection.py  
+│   │   │   └── qr_generator.py   
+│   │   └── validators/           
+│   │       ├── admin_validators.py 
+│   │       ├── auth_validators.py 
+│   │       └── compras_validators.py 
+│   └── app.py                    
 |
 ├── web/                          # Paquete principal de la aplicación
 │   ├── config/
