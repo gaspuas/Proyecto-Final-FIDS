@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="seccion-reserva">
+    <div class="contenedor reserva-layout">
+        
+        <!-- Columna Izquierda: Sala de Cine y Butacas -->
+        <div class="reserva-sala">
+            <h1 class="reserva-sala__titulo">
+                {{ funcion.pelicula_titulo if funcion.pelicula_titulo else 'Cinema Paradiso' }} · {{ funcion.fecha_hora }} hs
+            </h1>
+
+            <!-- Pantalla simulada -->
+            <div class="reserva-sala__pantalla">
+                PANTALLA
+            </div>
+
+            <!-- Formulario de Selección de Butacas (Nativo) -->
+            <form action="{{ url_for('web.site.reserva.procesar') if 'web.site.reserva.procesar' in config else '#' }}" method="POST" id="form-butacas">
+                <input type="hidden" name="funcion_id" value="{{ funcion.id }}">
+
+                <!-- Grilla de Asientos de Cine con Pasillos -->
+                <div class="mapa-cine">
+                    {% set filas = ['A', 'B', 'C', 'D', 'E'] %}
+                    {% for fila in filas %}
+                        <div class="mapa-cine__fila">
+                            <span class="mapa-cine__letra">{{ fila }}</span>
+                            
+                            <!-- Bloque Izquierdo (Columnas 1 y 2) -->
+                            <div class="mapa-cine__bloque">
+                                {% for col in range(1, 3) %}
+                                    {% set codigo = fila ~ col %}
+                                    {% set es_ocupada = codigo in asientos_ocupados %}
+                                    <label class="butaca {% if es_ocupada %}butaca--ocupada{% endif %}">
+                                        <input type="checkbox" name="asientos" value="{{ codigo }}" {% if es_ocupada %}disabled{% endif %}>
+                                        <span class="butaca__cuadro"></span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Pasillo 1 -->
+                            <div class="mapa-cine__pasillo"></div>
+
+                            <!-- Bloque Centro (Columnas 3 a 8) -->
+                            <div class="mapa-cine__bloque">
+                                {% for col in range(3, 9) %}
+                                    {% set codigo = fila ~ col %}
+                                    {% set es_ocupada = codigo in asientos_ocupados %}
+                                    <label class="butaca {% if es_ocupada %}butaca--ocupada{% endif %}">
+                                        <input type="checkbox" name="asientos" value="{{ codigo }}" {% if es_ocupada %}disabled{% endif %}>
+                                        <span class="butaca__cuadro"></span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Pasillo 2 -->
+                            <div class="mapa-cine__pasillo"></div>
+
+                            <!-- Bloque Derecho (Columnas 9 y 10) -->
+                            <div class="mapa-cine__bloque">
+                                {% for col in range(9, 11) %}
+                                    {% set codigo = fila ~ col %}
+                                    {% set es_ocupada = codigo in asientos_ocupados %}
+                                    <label class="butaca {% if es_ocupada %}butaca--ocupada{% endif %}">
+                                        <input type="checkbox" name="asientos" value="{{ codigo }}" {% if es_ocupada %}disabled{% endif %}>
+                                        <span class="butaca__cuadro"></span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Referencias / Leyendas -->
+                <div class="reserva-leyenda">
+                    <div class="reserva-leyenda__item">
+                        <span class="butaca__cuadro butaca__cuadro--libre"></span> Libre
+                    </div>
+                    <div class="reserva-leyenda__item">
+                        <span class="butaca__cuadro butaca__cuadro--ocupada"></span> Ocupada
+                    </div>
+                    <div class="reserva-leyenda__item">
+                        <span class="butaca__cuadro butaca__cuadro--seleccionada"></span> Seleccionada
+                    </div>
+                </div>
+
+        </div>
+
+        <!-- Columna Derecha: Tarjeta de Resumen -->
+        <div class="reserva-resumen">
+            <div class="tarjeta-resumen">
+                <h2 class="tarjeta-resumen__titulo">Tu selección</h2>
+                
+                <p class="tarjeta-resumen__sede">
+                    {{ funcion.nombre_local }} · Sala {{ funcion.numero_sala }}
+                </p>
+                
+                <p class="tarjeta-resumen__precio">
+                    Precio base: <strong>${{ "%.2f"|format(funcion.precio_base) }}</strong> por butaca
+                </p>
+
+                <button type="submit" class="boton boton--dorado tarjeta-resumen__btn">
+                    Continuar
+                </button>
+            </div>
+            </form>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
