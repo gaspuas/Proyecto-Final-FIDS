@@ -75,7 +75,8 @@ cine-paradiso/
 │   │   └── validators/           
 │   │       ├── admin_validators.py 
 │   │       ├── auth_validators.py 
-│   │       └── compras_validators.py 
+│   │       └── compras_validators.py
+│   │       └── peliculas_validators.py 
 │   └── app.py                    
 |
 ├── web/                          # Paquete principal de la aplicación
