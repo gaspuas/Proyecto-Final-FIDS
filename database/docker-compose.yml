@@ -14,7 +14,7 @@ services:
       - "3307:3306"
     volumes:
       # Monta el esquema SQL para que se ejecute automáticamente la primera vez
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
       # Persistencia de datos para no perder registros al apagar el contenedor
       - mysql_data:/var/lib/mysql
 
