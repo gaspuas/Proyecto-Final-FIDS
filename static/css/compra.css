@@ -1,0 +1,281 @@
+/* ==========================================================================
+   Cine Paradiso - Servicios adicionales y confirmacion
+   (servicios.html y confirmacion.html)
+   Los colores y medidas salen del mockup. Las variables quedan acotadas a
+   .compra para no afectar al resto del sitio.
+   ========================================================================== */
+
+.compra {
+    --compra-ambar: #e8a33c;
+    --compra-ambar-hover: #f0b252;
+    --compra-tarjeta: #222127;
+    --compra-borde: #2d2c32;
+    --compra-campo: #16151a;
+    --compra-borde-campo: #55545c;
+    --compra-borde-secundario: #838183;
+    --compra-texto-suave: #b3b2b8;
+
+    width: 100%;
+    margin-top: 8px;
+}
+
+.compra__tarjeta {
+    background-color: var(--compra-tarjeta);
+    border: 1px solid var(--compra-borde);
+    border-radius: 14px;
+    padding: 21px;
+}
+
+.compra__titulo {
+    color: #ffffff;
+    font-size: 25px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+/* Botones: se pisan los estilos generales de .boton solo dentro de .compra */
+.compra .boton {
+    height: 44px;
+    padding: 0 21px;
+    background-color: var(--compra-ambar);
+    color: #16151a;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.compra .boton:hover {
+    background-color: var(--compra-ambar-hover);
+    box-shadow: none;
+    transform: none;
+}
+
+.compra .boton:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
+}
+
+.compra .boton--secundario {
+    background-color: transparent;
+    color: #ffffff;
+    border-color: var(--compra-borde-secundario);
+}
+
+.compra .boton--secundario:hover {
+    background-color: #303036;
+}
+
+/* --------------------------------------------------------------------------
+   Servicios adicionales y resumen (servicios.html)
+   -------------------------------------------------------------------------- */
+.compra__servicios {
+    display: grid;
+    grid-template-columns: 1fr 345px;
+    gap: 33px;
+    align-items: stretch;
+}
+
+.servicios-lista {
+    list-style: none;
+    margin-top: 9px;
+}
+
+.servicios-lista__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 7px 0 14px;
+    border-bottom: 1px solid var(--compra-borde);
+}
+
+.servicios-lista__item + .servicios-lista__item {
+    padding-top: 14px;
+}
+
+.servicios-lista__nombre {
+    display: block;
+    color: var(--color-texto);
+    font-size: 16px;
+    line-height: 1.35;
+}
+
+.servicios-lista__precio {
+    color: var(--compra-texto-suave);
+    font-size: 14px;
+    line-height: 1.35;
+}
+
+.servicios-lista__cantidad {
+    flex-shrink: 0;
+    width: 81px;
+    height: 44px;
+    padding: 0 12px;
+    background-color: var(--compra-campo);
+    color: var(--color-texto);
+    border: 1px solid var(--compra-borde-campo);
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 15px;
+}
+
+.servicios-lista__cantidad:focus {
+    outline: none;
+    border-color: var(--compra-ambar);
+    box-shadow: 0 0 0 2px rgba(232, 163, 60, 0.35);
+}
+
+.resumen__titulo {
+    color: #ffffff;
+    font-size: 19px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.resumen__detalle,
+.resumen__importes {
+    color: var(--compra-texto-suave);
+    font-size: 14px;
+}
+
+.resumen__importes {
+    margin-top: 9px;
+    line-height: 1.4;
+}
+
+.resumen__total {
+    color: #ffffff;
+    font-size: 25px;
+    font-weight: 700;
+    margin: 14px 0 15px;
+}
+
+.resumen .boton {
+    width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   Confirmacion de compra (confirmacion.html)
+   -------------------------------------------------------------------------- */
+.confirmacion {
+    max-width: 426px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.confirmacion__detalle {
+    color: var(--compra-texto-suave);
+    font-size: 14px;
+    margin-top: 6px;
+}
+
+.confirmacion__qr {
+    display: block;
+    width: 183px;
+    max-width: 100%;
+    height: auto;
+    margin: 15px auto 0;
+    transition: opacity 0.2s ease;
+}
+
+.confirmacion__demo {
+    color: var(--compra-ambar);
+    font-size: 12px;
+    font-weight: 600;
+    margin: 8px 0 6px;
+}
+
+.confirmacion__importes {
+    margin: 12px 0 16px;
+    padding-top: 10px;
+    border-top: 1px solid var(--compra-borde);
+    color: var(--compra-texto-suave);
+    font-size: 14px;
+    text-align: left;
+}
+
+.confirmacion__importes div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.confirmacion__importes .confirmacion__total {
+    margin-top: 4px;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.confirmacion__nota {
+    color: var(--compra-texto-suave);
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+#confirmacion-cancelada .boton {
+    margin-top: 14px;
+}
+
+.confirmacion--cancelada .confirmacion__qr {
+    opacity: 0.25;
+}
+
+.confirmacion--cancelada .confirmacion__demo {
+    visibility: hidden;
+}
+
+/* Dialogo de cancelacion. El reset global (margin: 0) le quita el centrado */
+.dialogo {
+    width: min(400px, calc(100% - 32px));
+    margin: auto;
+    padding: 21px;
+    background-color: var(--compra-tarjeta);
+    color: var(--color-texto);
+    border: 1px solid var(--compra-borde-campo);
+    border-radius: 14px;
+}
+
+.dialogo::backdrop {
+    background-color: rgba(0, 0, 0, 0.65);
+}
+
+.dialogo__titulo {
+    color: #ffffff;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.dialogo__texto {
+    color: var(--compra-texto-suave);
+    font-size: 14px;
+    margin: 8px 0 18px;
+}
+
+.dialogo__acciones {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* --------------------------------------------------------------------------
+   Adaptabilidad Responsive
+   -------------------------------------------------------------------------- */
+@media (max-width: 860px) {
+    .compra__servicios {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* 16px evita que iOS haga zoom al enfocar un campo */
+    .servicios-lista__cantidad {
+        width: 72px;
+        font-size: 16px;
+    }
+
+    .dialogo__acciones .boton {
+        flex: 1 1 100%;
+    }
+}
