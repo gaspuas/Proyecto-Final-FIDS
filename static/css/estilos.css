@@ -494,3 +494,326 @@ body {
         margin: 20px auto;
     }
 }
+/* --------------------------------------------------------------------------
+   10. Botones Generales, Horarios y Ficha de Película (pelicula_detalle.html)
+   -------------------------------------------------------------------------- */
+
+/* Layout general a dos columnas */
+.detalle-pelicula__layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 2.5rem;
+    padding: 2.5rem 0;
+    align-items: start;
+}
+
+/* Columna izquierda: Póster y Placeholder */
+.detalle-pelicula__poster-img,
+.detalle-pelicula__poster-placeholder {
+    width: 100%;
+    height: 480px;
+    border-radius: 12px;
+    object-fit: cover;
+    background-color: #242430;
+    border: 1px solid #2a2a38;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8a8a9a;
+    font-size: 1.1rem;
+}
+
+/* Columna derecha: Detalles del título y meta */
+.detalle-pelicula__titulo {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+
+.detalle-pelicula__meta {
+    font-size: 0.95rem;
+    color: #a0a0b0;
+    margin-bottom: 1.2rem;
+}
+
+.detalle-pelicula__sinopsis {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #d0d0e0;
+    margin-bottom: 2rem;
+}
+
+/* Contenedor "Dónde y cuándo verla" */
+.tarjeta-funciones {
+    background-color: #1a1a24;
+    border: 1px solid #2a2a38;
+    border-radius: 12px;
+    padding: 1.8rem;
+    margin-top: 1.5rem;
+}
+
+.tarjeta-funciones__titulo {
+    font-size: 1.4rem;
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.tarjeta-funciones__sede {
+    margin-bottom: 1.2rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid #2a2a38;
+}
+
+.tarjeta-funciones__sede-nombre {
+    font-size: 1.1rem;
+    color: #ffffff;
+    margin-bottom: 0.8rem;
+}
+
+.tarjeta-funciones__horarios {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+/* Botones de selección de horarios */
+.boton-horario {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    background-color: #242430;
+    border: 1px solid #3a3a4c;
+    border-radius: 8px;
+    color: #ffffff;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+}
+
+.boton-horario:hover {
+    border-color: #f39c12;
+    color: #f39c12;
+    background-color: rgba(243, 156, 18, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Footer de la tarjeta con precio y CTA principal */
+.tarjeta-funciones__footer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+}
+
+.tarjeta-funciones__precio {
+    font-size: 1.05rem;
+    color: #cccccc;
+}
+
+.tarjeta-funciones__precio strong {
+    color: #ffffff;
+    font-size: 1.2rem;
+}
+
+.tarjeta-funciones__nota {
+    font-size: 0.85rem;
+    color: #7a7a8c;
+}
+
+/* Radio buttons estilizados como botones */
+.opcion-horario input[type="radio"] {
+    display: none;
+}
+
+.opcion-horario__texto {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    background-color: #242430;
+    border: 1px solid #3a3a4c;
+    border-radius: 8px;
+    color: #ffffff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.opcion-horario input[type="radio"]:checked + .opcion-horario__texto {
+    background-color: #f39c12;
+    color: #121212;
+    border-color: #f39c12;
+    font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   11. Vista de Reserva y Mapa de Butacas (reserva_butacas.html)
+   -------------------------------------------------------------------------- */
+
+.seccion-reserva {
+    padding: 2.5rem 0;
+}
+
+.reserva-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 2rem;
+    align-items: start;
+}
+
+/* Contenedor Principal de la Sala */
+.reserva-sala {
+    background-color: #1a1a24;
+    border: 1px solid #2a2a38;
+    border-radius: 12px;
+    padding: 2rem;
+}
+
+.reserva-sala__titulo {
+    font-size: 1.5rem;
+    color: #ffffff;
+    margin-bottom: 2rem;
+}
+
+/* Pantalla del cine */
+.reserva-sala__pantalla {
+    width: 100%;
+    background-color: #2e2e3d;
+    color: #8a8a9e;
+    text-align: center;
+    padding: 0.6rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    margin-bottom: 2.5rem;
+}
+
+/* Estructura del Mapa de Cine con Pasillos */
+.mapa-cine {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    width: 100%; /* Asegura usar el 100% del contenedor */
+}
+
+.mapa-cine__fila {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Empuja el bloque izq y der a los extremos */
+    width: 100%;
+}
+
+.mapa-cine__letra {
+    width: 20px;
+    color: #8a8a9e;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.mapa-cine__bloque {
+    display: flex;
+    gap: 0.6rem; /* Espaciado entre las butacas de un mismo bloque */
+}
+
+.mapa-cine__pasillo {
+    flex-grow: 1; /* Permite que los pasillos absorban el espacio sobrante de forma pareja */
+    min-width: 20px;
+}
+
+/* Botones de Butacas (Checkbox nativo estilizado) */
+.butaca input[type="checkbox"] {
+    display: none;
+}
+
+.butaca__cuadro {
+    display: inline-block;
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    border: 1.5px solid #4a4a5e;
+    background-color: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Butaca Libre Hover */
+.butaca:hover input:not(:disabled) + .butaca__cuadro {
+    border-color: #f39c12;
+}
+
+/* Butaca Ocupada (Gris) */
+.butaca--ocupada .butaca__cuadro,
+.butaca__cuadro--ocupada {
+    background-color: #383848;
+    border-color: #383848;
+    cursor: not-allowed;
+}
+
+/* Butaca Seleccionada (Ámbar / Dorado) */
+.butaca input[type="checkbox"]:checked + .butaca__cuadro,
+.butaca__cuadro--seleccionada {
+    background-color: #f39c12;
+    border-color: #f39c12;
+}
+
+.butaca__cuadro--libre {
+    background-color: transparent;
+    border-color: #4a4a5e;
+}
+
+/* Leyenda inferior */
+.reserva-leyenda {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.85rem;
+    color: #a0a0b0;
+    margin-top: 1rem;
+}
+
+.reserva-leyenda__item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.reserva-leyenda__item .butaca__cuadro {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+}
+
+/* Panel Lateral de Resumen */
+.tarjeta-resumen {
+    background-color: #1a1a24;
+    border: 1px solid #2a2a38;
+    border-radius: 12px;
+    padding: 1.8rem;
+}
+
+.tarjeta-resumen__titulo {
+    font-size: 1.3rem;
+    color: #ffffff;
+    margin-bottom: 1rem;
+}
+
+.tarjeta-resumen__sede {
+    color: #a0a0b0;
+    font-size: 0.95rem;
+    margin-bottom: 0.8rem;
+}
+
+.tarjeta-resumen__precio {
+    font-size: 0.95rem;
+    color: #a0a0b0;
+    margin-bottom: 1.5rem;
+}
+
+.tarjeta-resumen__precio strong {
+    color: #ffffff;
+}
+
+.tarjeta-resumen__btn {
+    width: 100%;
+}
