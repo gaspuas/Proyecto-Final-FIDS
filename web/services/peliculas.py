@@ -4,7 +4,7 @@ En la rama `integracion-api` estos mismos services consumen la API
 store-api via HTTP; aca devuelven los datos de ejemplo de
 web/constants.py con la misma forma que los DTOs de la API.
 """
-from web.constants import PELICULAS_EJEMPLO
+from backend.constants import PELICULAS_EJEMPLO
 
 
 
