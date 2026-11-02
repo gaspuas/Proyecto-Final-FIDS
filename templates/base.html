@@ -18,11 +18,13 @@
             {% block navbar_menu %}
             <nav class="nav__menu">
                 <a href="{{ url_for('web.site.home.index') }}"
-                   class="navbar__link {% if request.endpoint == 'web.site.home.index' %}navbar__link--active{% endif %}">Inicio</a>
-                <a href="{{ url_for('web.site.home.index') }}"
-                   class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.site.peliculas') %}navbar__link--active{% endif %}">Cartelera</a>
-                <a href="{{ url_for('web.site.home.index') }}"
-                   class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.site.login') %}navbar__link--active{% endif %}">Login</a>
+                class="navbar__link {% if request.endpoint == 'web.site.home.index' %}navbar__link--active{% endif %}">Inicio</a>
+                
+                <a href="{{ url_for('web.site.peliculas.index') }}"
+                class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.site.peliculas') %}navbar__link--active{% endif %}">Cartelera</a>
+                
+                <a href="{{ url_for('web.site.login.index') }}"
+                class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.site.login') %}navbar__link--active{% endif %}">Login</a>
             </nav>
             {% endblock %}
         </div>

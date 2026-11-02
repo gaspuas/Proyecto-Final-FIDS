@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="detalle-pelicula">
+    <div class="contenedor detalle-pelicula__layout">
+        
+        <!-- Columna Izquierda: Póster de la película -->
+        <div class="detalle-pelicula__poster-col">
+            {% if pelicula.poster_url %}
+                <img src="{{ pelicula.poster_url }}" alt="{{ pelicula.titulo }}" class="detalle-pelicula__poster-img">
+            {% else %}
+                <div class="detalle-pelicula__poster-placeholder">
+                    <span>Póster</span>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Columna Derecha: Información y Horarios -->
+        <div class="detalle-pelicula__info-col">
+            <h1 class="detalle-pelicula__titulo">{{ pelicula.titulo }}</h1>
+            
+            <p class="detalle-pelicula__meta">
+                {{ pelicula.duracion_minutos }} min · {{ pelicula.clasificacion }} · {{ pelicula.genero }} · Dir. {{ pelicula.director }}
+            </p>
+
+            <p class="detalle-pelicula__sinopsis">
+                {{ pelicula.sinopsis }}
+            </p>
+
+            <!-- Bloque: Dónde y cuándo verla -->
+           <div class="tarjeta-funciones">
+                <h2 class="tarjeta-funciones__titulo">Dónde y cuándo verla</h2>
+
+                <!-- Formulario nativo -->
+                <form action="{{ url_for('web.site.reserva.butacas') }}" method="POST">
+                    
+                    <input type="hidden" name="pelicula_id" value="{{ pelicula.id }}">
+
+                    {% for funcion in funciones %}
+                        <div class="tarjeta-funciones__sede">
+                            <h3 class="tarjeta-funciones__sede-nombre">{{ funcion.nombre_local }}</h3>
+                            <div class="tarjeta-funciones__horarios">
+                                
+                                <!-- Radio Button Oculto + Label estilizado como botón -->
+                                <label class="opcion-horario">
+                                    <input type="radio" 
+                                        name="funcion_id" 
+                                        value="{{ funcion.id }}" 
+                                        {% if loop.first %}checked{% endif %} 
+                                        required>
+                                    <span class="opcion-horario__texto">
+                                        {{ funcion.fecha_hora.split(' ')[1] if funcion.fecha_hora is string else funcion.fecha_hora.strftime('%H:%M') }} hs
+                                    </span>
+                                </label>
+
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="tarjeta-funciones__vacio">No hay funciones disponibles por el momento.</p>
+                    {% endfor %}
+
+                    <div class="tarjeta-funciones__footer">
+                        <p class="tarjeta-funciones__precio">
+                            Entrada: <strong>${{ "%.2f"|format(funciones[0].precio_base if funciones else 0) }}</strong>
+                        </p>
+                        
+                        {% if funciones %}
+                            <!-- Botón visible de Comprar entradas -->
+                            <button type="submit" class="boton boton--dorado">
+                                Comprar entradas
+                            </button>
+                        {% endif %}
+                        
+                        <span class="tarjeta-funciones__nota">Al continuar te pediremos ingresar o registrarte.</span>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Sección opcional: Reseñas -->
+            {% if resenas %}
+                <div class="detalle-pelicula__resenas">
+                    <h3 class="detalle-pelicula__resenas-titulo">Opiniones de los Espectadores</h3>
+                    {% for resena in resenas %}
+                        <div class="resena-card">
+                            <strong>{{ resena.nombre_usuario }}</strong> ⭐ {{ resena.puntuacion }}/5
+                            <p>{{ resena.comentario }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+</section>
+{% endblock %}

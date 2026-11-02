@@ -77,7 +77,6 @@ cine-paradiso/
 │   │       ├── auth_validators.py 
 │   │       └── compras_validators.py
 │   │       └── peliculas_validators.py 
-│   └── app.py                    
 |
 ├── web/                          # Paquete principal de la aplicación
 │   ├── config/
@@ -316,5 +315,9 @@ python -m venv .venv
 # source .venv/bin/activate     # Linux/macOS
 pip install -r requirements.txt
 
-python app.py                   # http://localhost:5001
+python app.py                   # http://localhost:5000 (web + API)
 ```
+
+El único punto de entrada Flask es `app.py` en la raíz. La web y la API REST
+se ejecutan en el mismo servidor; por ejemplo, la API de películas está en
+`/api/peliculas` y el inicio web en `/`.
