@@ -14,3 +14,22 @@ def procesar_obtener_cartelera(sede_id, fecha):
         
     except Exception as e:
         return {'exito': False, 'mensaje': str(e), 'tipo_error': 'INTERNAL_ERROR'}
+
+def procesar_obtener_pelicula(pelicula_id):
+    es_valido, mensaje_error = validar_id_pelicula(pelicula_id)
+    if not es_valido:
+        return {'exito': False, 'mensaje': mensaje_error, 'tipo_error': 'VALIDATION'}
+
+    try:
+        pelicula = obtener_pelicula_por_id(pelicula_id)
+        if not pelicula:
+            return {'exito': False, 'mensaje': 'Película no encontrada en el sistema.', 'tipo_error': 'NOT_FOUND'}
+            
+        return {
+            'exito': True, 
+            'mensaje': 'Detalle de la película obtenido exitosamente.', 
+            'datos': pelicula
+        }
+        
+    except Exception as e:
+        return {'exito': False, 'mensaje': str(e), 'tipo_error': 'INTERNAL_ERROR'}

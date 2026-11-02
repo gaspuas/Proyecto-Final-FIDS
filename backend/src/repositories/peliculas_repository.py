@@ -47,3 +47,34 @@ def listar_peliculas_cartelera(sede_id=None, fecha=None):
             cursor.close()
         if conn and conn.is_connected():
             conn.close()
+
+def obtener_pelicula_por_id(pelicula_id):
+    conn = get_db_connection()
+    if not conn:
+        raise Exception("Fallo en la conexión a la base de datos.")
+        
+    cursor = None
+    try:
+        # Se retorna un diccionario para mapearlo directamente a JSON
+        cursor = conn.cursor(dictionary=True)
+        query = """
+            SELECT id, api_id, titulo, sinopsis, poster_url, 
+                   duracion_minutos, clasificacion, genero, 
+                   director, es_reestreno
+            FROM PELICULAS 
+            WHERE id = %s
+        """
+        # Ejecución segura previniendo inyección SQL
+        cursor.execute(query, (pelicula_id,))
+        pelicula = cursor.fetchone()
+        return pelicula
+        
+    except mysql.connector.Error as err:
+        print(f"Error de base de datos en obtener_pelicula_por_id: {err}")
+        raise err  
+        
+    finally:
+        if cursor:
+            cursor.close()
+        if conn and conn.is_connected():
+            conn.close()
