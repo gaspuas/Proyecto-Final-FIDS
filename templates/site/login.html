@@ -1,43 +1,69 @@
-
 {% extends "base.html" %}
 
 {% block title %}Ingresar · Cine Paradiso{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
 
 {% block content %}
 
 <section class="autenticacion">
 
     <div class="autenticacion__tarjeta">
-        <h2>Iniciar sesión</h2>
+        <h2 class="autenticacion__titulo">Iniciar sesión</h2>
 
         <form method="POST">
-            <label for="login-email">Email</label>
-            <input type="email" id="login-email" name="email" required>
+            <div class="autenticacion__campo">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" name="email" autocomplete="email" aria-describedby="login-email-error" required>
+                <p class="autenticacion__error" id="login-email-error" hidden></p>
+            </div>
 
-            <label for="login-password">Contraseña</label>
-            <input type="password" id="login-password" name="password" required>
+            <div class="autenticacion__campo">
+                <label for="login-password">Contraseña</label>
+                <input type="password" id="login-password" name="password" autocomplete="current-password" aria-describedby="login-password-error" required>
+                <p class="autenticacion__error" id="login-password-error" hidden></p>
+            </div>
 
             <button type="submit" class="boton">Ingresar</button>
+
+            <p class="autenticacion__aviso" role="status" hidden>Demostración: los datos son válidos, pero todavía no se inicia sesión.</p>
         </form>
     </div>
 
     <div class="autenticacion__tarjeta">
-        <h2>Crear cuenta</h2>
+        <h2 class="autenticacion__titulo">Crear cuenta</h2>
 
         <form method="POST">
-            <label for="registro-nombre">Nombre</label>
-            <input type="text" id="registro-nombre" name="nombre" required>
+            <div class="autenticacion__campo">
+                <label for="registro-nombre">Nombre</label>
+                <input type="text" id="registro-nombre" name="nombre" autocomplete="name" aria-describedby="registro-nombre-error" required>
+                <p class="autenticacion__error" id="registro-nombre-error" hidden></p>
+            </div>
 
-            <label for="registro-email">Email</label>
-            <input type="email" id="registro-email" name="email" required>
+            <div class="autenticacion__campo">
+                <label for="registro-email">Email</label>
+                <input type="email" id="registro-email" name="email" autocomplete="email" aria-describedby="registro-email-error" required>
+                <p class="autenticacion__error" id="registro-email-error" hidden></p>
+            </div>
 
-            <label for="registro-password">Contraseña</label>
-            <input type="password" id="registro-password" name="password" required>
+            <div class="autenticacion__campo">
+                <label for="registro-password">Contraseña</label>
+                <input type="password" id="registro-password" name="password" autocomplete="new-password" minlength="6" aria-describedby="registro-password-error" required>
+                <p class="autenticacion__error" id="registro-password-error" hidden></p>
+            </div>
 
             <button type="submit" class="boton boton--secundario">Registrarme</button>
+
+            <p class="autenticacion__aviso" role="status" hidden>Demostración: los datos son válidos, pero todavía no se crea la cuenta.</p>
         </form>
     </div>
 
 </section>
 
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
 {% endblock %}

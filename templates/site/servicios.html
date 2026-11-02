@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Servicios adicionales · Cine Paradiso{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/compra.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<section class="compra">
+    <form class="compra__servicios" id="form-servicios" method="GET" action="{{ url_for('web.site.compra.confirmacion') }}" data-total-entradas="{{ total_entradas }}">
+
+        <div class="compra__tarjeta">
+            <h1 class="compra__titulo">Servicios adicionales</h1>
+
+            <ul class="servicios-lista">
+                {% for servicio in servicios %}
+                <li class="servicios-lista__item">
+                    <div>
+                        <label class="servicios-lista__nombre" for="servicio-{{ servicio.id }}">{{ servicio.nombre }}</label>
+                        <p class="servicios-lista__precio">${{ servicio.precio }}</p>
+                    </div>
+                    <input class="servicios-lista__cantidad" type="number" id="servicio-{{ servicio.id }}" name="servicio_{{ servicio.id }}" value="0" min="0" max="{{ cantidad_maxima }}" step="1" inputmode="numeric" data-precio="{{ servicio.precio }}">
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <aside class="compra__tarjeta resumen">
+            <h2 class="resumen__titulo">Resumen</h2>
+            <p class="resumen__detalle">{{ compra.pelicula }} · Butacas {{ compra.butacas|join(', ') }}</p>
+
+            <div class="resumen__importes">
+                <p>Entradas: ${{ total_entradas }}</p>
+                <p>Servicios: $<span id="resumen-servicios">0</span></p>
+            </div>
+
+            <p class="resumen__total" aria-live="polite">Total $<span id="resumen-total">{{ total_entradas }}</span></p>
+
+            <button type="submit" class="boton">Confirmar compra</button>
+        </aside>
+
+    </form>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/servicios.js') }}"></script>
+{% endblock %}
