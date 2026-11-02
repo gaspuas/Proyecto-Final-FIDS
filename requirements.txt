@@ -5,3 +5,4 @@ Jinja2==3.1.2
 MarkupSafe==2.1.5
 python-dotenv==1.0.1
 mysql-connector-python
+request=2.34.2

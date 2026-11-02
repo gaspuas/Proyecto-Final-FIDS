@@ -1,18 +1,66 @@
 {% extends "base.html" %}
-
 {% block title %}Inicio · Cine Paradiso{% endblock %}
 
 {% block content %}
+<!-- Carrusel: primero en el body. Contenido recibido de Flask mediante requests. -->
+<section class="novedades" aria-label="Novedades de Cine Paradiso">
+    <div class="novedades__encabezado">
+        <div>
+            <p class="novedades__eyebrow">CINE PARADISO / ACTUALIDAD</p>
+            <h1 class="novedades__titulo">En primera fila</h1>
+        </div>
+        {% if novedades|length > 1 %}
+        <div class="novedades__controles">
+            <button class="novedades__flecha" type="button" data-carrusel-anterior aria-label="Novedad anterior">&#8592;</button>
+            <button class="novedades__flecha" type="button" data-carrusel-siguiente aria-label="Siguiente novedad">&#8594;</button>
+        </div>
+        {% endif %}
+    </div>
 
+    {% if novedades %}
+    <div class="carrusel" data-carrusel aria-roledescription="carrusel" aria-label="Novedades y promociones">
+        <div class="carrusel__pista">
+            {% for novedad in novedades %}
+            <article class="carrusel__slide{% if loop.first %} carrusel__slide--activo{% endif %}" data-carrusel-slide aria-roledescription="diapositiva" aria-label="{{ loop.index }} de {{ novedades|length }}" aria-hidden="{{ 'false' if loop.first else 'true' }}">
+                <img class="carrusel__imagen" src="{{ novedad.imagen_url }}" alt="" {% if loop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}>
+                <div class="carrusel__degradado"></div>
+                <div class="carrusel__contenido">
+                    <span class="carrusel__etiqueta">{{ novedad.tipo|upper }}</span>
+                    <h2>{{ novedad.titulo }}</h2>
+                    {% if novedad.descripcion %}<p>{{ novedad.descripcion }}</p>{% endif %}
+                    {% if novedad.enlace %}<a class="boton" href="{{ novedad.enlace }}" {% if novedad.enlace.startswith('http') %}rel="noopener noreferrer"{% endif %}>Descubrir más <span aria-hidden="true">↗</span></a>{% endif %}
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% if novedades|length > 1 %}
+        <div class="carrusel__indicadores" aria-label="Elegir novedad">
+            {% for novedad in novedades %}<button type="button" class="carrusel__punto{% if loop.first %} carrusel__punto--activo{% endif %}" data-carrusel-indice="{{ loop.index0 }}" aria-label="Ir a novedad {{ loop.index }}" aria-current="{{ 'true' if loop.first else 'false' }}"></button>{% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% else %}
+    <!-- PENDIENTE BACKEND: al publicar novedades aparecerán automáticamente aquí. -->
+    <div class="novedades__vacio">
+        <span class="novedades__vacio-icono" aria-hidden="true">✦</span>
+        <p>Próximamente, novedades y promociones de Cine Paradiso.</p>
+        <span>Mientras tanto, explorá nuestra cartelera.</span>
+    </div>
+    {% endif %}
+</section>
+
+<!-- Contenido previo conservado debajo del carrusel: se llega con scroll normal. -->
 <section class="inicio-hero">
     <div class="inicio-hero__contenido">
-        <h1 class="inicio-hero__titulo">Bienvenidos a Cine Paradiso</h1>
+        <h2 class="inicio-hero__titulo">Bienvenidos a Cine Paradiso</h2>
         <p class="inicio-hero__subtitulo">Reviví los mejores clásicos del cine y los grandes reestrenos en pantalla grande.</p>
-        
         <div class="inicio-hero__acciones">
-            <a class="boton" href="{{ url_for('web.site.peliculas.index') }}">Ver Cartelera</a> 
-            <!-- despues se cambia por link a cartelera o directamente mostramos cartelera en inicio -->
+            <a class="boton" href="{{ url_for('web.site.peliculas.index') }}">Ver Cartelera</a>
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 {% endblock %}
