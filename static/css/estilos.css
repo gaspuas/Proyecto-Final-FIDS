@@ -740,3 +740,40 @@ body {
 .tarjeta-resumen__btn {
     width: 100%;
 }
+/* Carrusel de novedades de Cine Paradiso 
+   12. Carrusel de novedades en Home (contenido dinámico de la API)
+   -------------------------------------------------------------------------- */
+.novedades { width: 100%; margin-bottom: 1.5rem; }
+.novedades__encabezado { display:flex; justify-content:space-between; align-items:end; gap:1rem; margin-bottom:1rem; }
+.novedades__eyebrow { font-size:.73rem; font-weight:700; letter-spacing:.2em; color:var(--color-dorado); margin-bottom:.25rem; }
+.novedades__titulo { font:700 clamp(1.6rem,3vw,2.4rem)/1.2 var(--font-titulos); }
+.novedades__controles { display:flex; gap:.5rem; }
+.novedades__flecha { width:42px; height:42px; border-radius:50%; border:1px solid var(--color-borde); background:var(--bg-tarjeta); color:var(--color-texto); cursor:pointer; font-size:1.15rem; }
+.novedades__flecha:hover { color:var(--color-dorado); border-color:var(--color-dorado); }
+.carrusel { position:relative; overflow:hidden; border:1px solid var(--color-borde); border-radius:18px; background:var(--bg-tarjeta); }
+.carrusel__pista { position:relative; height:clamp(280px,35vw,420px); }
+.carrusel__slide { position:absolute; inset:0; opacity:0; visibility:hidden; pointer-events:none; transition:opacity .55s ease, visibility .55s; overflow:hidden; }
+.carrusel__slide--activo { opacity:1; visibility:visible; pointer-events:auto; z-index:1; }
+.carrusel__imagen { width:100%; height:100%; object-fit:cover; display:block; }
+.carrusel__degradado { position:absolute; inset:0; background:linear-gradient(90deg,rgba(8,8,11,.94) 0%,rgba(8,8,11,.72) 44%,rgba(8,8,11,.12) 100%); }
+.carrusel__contenido { position:absolute; left:clamp(1.5rem,5vw,4rem); bottom:clamp(2.5rem,5vw,4rem); width:min(560px,80%); z-index:2; }
+.carrusel__etiqueta { display:inline-block; color:var(--color-dorado); font-weight:800; font-size:.75rem; letter-spacing:.17em; margin-bottom:.5rem; }
+.carrusel__contenido h2 { font:700 clamp(1.7rem,4vw,3.1rem)/1.13 var(--font-titulos); margin-bottom:.7rem; }
+.carrusel__contenido p { max-width:46ch; color:#e2e2e6; margin-bottom:1.3rem; }
+.carrusel__indicadores { position:absolute; z-index:3; right:1.5rem; bottom:1.25rem; display:flex; gap:.55rem; }
+.carrusel__punto { width:22px; height:5px; border:0; background:rgba(255,255,255,.45); border-radius:30px; cursor:pointer; transition:background .2s,width .2s; }
+.carrusel__punto--activo { background:var(--color-dorado); width:40px; }
+.novedades__vacio { min-height:170px; padding:2rem; border-radius:18px; border:1px dashed var(--color-borde); background:linear-gradient(135deg,#222027,#121214); display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center; gap:.35rem; }
+.novedades__vacio-icono { color:var(--color-dorado); font-size:1.75rem; }
+.novedades__vacio p { font-weight:650; }
+.novedades__vacio span:last-child { font-size:.9rem; color:var(--color-texto-secundario); }
+.inicio-hero { flex:none; min-height:auto; padding:2.25rem 1rem 3.5rem; }
+@media(max-width:600px) {
+  .novedades__titulo { font-size:1.6rem; }
+  .carrusel__pista { height:340px; }
+  .carrusel__contenido { left:1.25rem; bottom:2.6rem; width:calc(100% - 2.5rem); }
+  .carrusel__contenido h2 { font-size:1.8rem; }
+  .carrusel__degradado { background:linear-gradient(0deg,rgba(8,8,11,.94),rgba(8,8,11,.45) 75%); }
+  .carrusel__indicadores { right:1.25rem; bottom:.85rem; }
+}
+@media(prefers-reduced-motion:reduce) { .carrusel__slide { transition:none; } }
