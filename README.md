@@ -199,6 +199,8 @@ erDiagram
         int sala_id FK
         datetime fecha_hora
         decimal precio_base
+        string idioma
+        string formato
     }
 
     COMPRAS {

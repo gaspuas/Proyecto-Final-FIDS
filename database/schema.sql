@@ -57,6 +57,8 @@ CREATE TABLE IF NOT EXISTS funciones (
   sala_id INT NOT NULL,
   fecha_hora DATETIME NOT NULL,
   precio_base DECIMAL(10,2) NOT NULL,
+  idioma VARCHAR(15) NOT NULL,
+  formato VARCHAR(15) NOT NULL,
   CONSTRAINT fk_funciones_pelicula FOREIGN KEY (pelicula_id) REFERENCES peliculas(id) ON DELETE CASCADE,
   CONSTRAINT fk_funciones_sala FOREIGN KEY (sala_id) REFERENCES locales_salas(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
