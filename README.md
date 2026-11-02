@@ -75,7 +75,8 @@ cine-paradiso/
 │   │   └── validators/           
 │   │       ├── admin_validators.py 
 │   │       ├── auth_validators.py 
-│   │       └── compras_validators.py 
+│   │       └── compras_validators.py
+│   │       └── peliculas_validators.py 
 │   └── app.py                    
 |
 ├── web/                          # Paquete principal de la aplicación
@@ -199,6 +200,8 @@ erDiagram
         int sala_id FK
         datetime fecha_hora
         decimal precio_base
+        string idioma
+        string formato
     }
 
     COMPRAS {
