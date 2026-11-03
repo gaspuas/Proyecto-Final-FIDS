@@ -39,7 +39,7 @@ El sistema a desarrollar constará de dos plataformas integradas:
 ### 1.4 Estructura del proyecto
 
 cine-paradiso/
-├── app.py                        # Entry point único de Flask (Puerto 5000)
+├── app.py                        # Aplicación Flask única: frontend + API
 ├── requirements.txt              # Dependencias (Flask, mysql-connector-python, etc.)
 ├── .env                          # Variables de entorno (DB_HOST, DB_USER, SECRET_KEY)
 ├── database/                     # Paquete principal de la aplicación
@@ -78,7 +78,7 @@ cine-paradiso/
 │   │       └── compras_validators.py
 │   │       └── peliculas_validators.py 
 |
-├── web/                          # Paquete principal de la aplicación
+├── frontend/web/                 # Rutas web y cliente HTTP de la API
 │   ├── config/
 │   │   └── db.py                 # Conexión a MySQL (mysql-connector-python)
 │   │
@@ -101,7 +101,7 @@ cine-paradiso/
 │   │   ├── repositoryPeliculas.py
 │   │   └── repositoryCompras.py
 │   │
-├── templates/                # Plantillas Jinja2
+├── frontend/templates/       # Plantillas Jinja2
 │   ├── base.html
 │   ├── 500.html
 │   ├── 404.html
@@ -110,7 +110,7 @@ cine-paradiso/
 │   │    └── cartelera.html
 │   └── admin/
 |  
-└── static/                   # Recursos estáticos
+└── frontend/static/          # Recursos estáticos
     ├── css/
     │    └── estilos.css
     └── js/
@@ -310,14 +310,24 @@ Se adoptará la convención de *Conventional Commits* vinculada a los *Issues* d
 ```bash
 cp .env.base .env            # los defaults ya funcionan en local
 
-python -m venv .venv
-.venv\Scripts\activate          # Windows
-# source .venv/bin/activate     # Linux/macOS
-pip install -r requirements.txt
-
-python app.py                   # http://localhost:5000 (web + API)
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python app.py     # Frontend y API en http://localhost:5000
 ```
 
-El único punto de entrada Flask es `app.py` en la raíz. La web y la API REST
-se ejecutan en el mismo servidor; por ejemplo, la API de películas está en
-`/api/peliculas` y el inicio web en `/`.
+En Windows, usar los comandos equivalentes:
+
+```powershell
+py -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+.venv\Scripts\python.exe app.py
+```
+
+El proyecto tiene un único proceso y una única aplicación Flask (`app.py`):
+registra las rutas web y la API REST. El frontend renderiza sus plantillas y
+consume la cartelera solicitando `GET {BACKEND_URL}/api/peliculas` mediante
+Python `requests`; el backend procesa esa API y es el único que accede a MySQL.
+`BACKEND_URL` es opcional; por defecto apunta a `http://127.0.0.1:5000`, la
+misma aplicación. Por ahora, el catálogo de películas consume datos del
+backend; funciones, reservas y servicios del flujo de compra continúan usando
+datos de demostración.

@@ -10,7 +10,7 @@ def insertar_pelicula_db(titulo, sinopsis, duracion_minutos, poster_url, api_id=
     try:
         cursor = conn.cursor()
         query = """
-            INSERT INTO PELICULAS (api_id, titulo, sinopsis, poster_url, duracion_minutos, clasificacion, genero, director, es_reestreno)
+            INSERT INTO peliculas (api_id, titulo, sinopsis, poster_url, duracion_minutos, clasificacion, genero, director, es_reestreno)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         valores = (api_id, titulo, sinopsis, poster_url, duracion_minutos, clasificacion, genero, director, es_reestreno)
@@ -40,7 +40,7 @@ def insertar_funcion_db(pelicula_id, sala_id, fecha_hora, precio_base, idioma="E
     try:
         cursor = conn.cursor()
         query = """
-            INSERT INTO FUNCIONES (pelicula_id, sala_id, fecha_hora, precio_base, idioma, formato)
+            INSERT INTO funciones (pelicula_id, sala_id, fecha_hora, precio_base, idioma, formato)
             VALUES (%s, %s, %s, %s, %s, %s)
         """
         valores = (pelicula_id, sala_id, fecha_hora, precio_base, idioma, formato)
@@ -70,7 +70,7 @@ def validar_y_marcar_qr_db(codigo_qr):
     try:
         cursor = conn.cursor(dictionary=True)
         
-        query = "SELECT id, estado_qr FROM COMPRAS WHERE codigo_qr = %s"
+        query = "SELECT id, estado_qr FROM compras WHERE codigo_qr = %s"
         cursor.execute(query, (codigo_qr,))
         compra = cursor.fetchone()
         
@@ -83,7 +83,7 @@ def validar_y_marcar_qr_db(codigo_qr):
         if compra['estado_qr'] == 'cancelado':
             return {"valido": False, "razon": "CANCELLED", "mensaje": "La compra asociada a este QR fue cancelada"}
             
-        query_actualizar = "UPDATE COMPRAS SET estado_qr = 'usado' WHERE id = %s"
+        query_actualizar = "UPDATE compras SET estado_qr = 'usado' WHERE id = %s"
         cursor.execute(query_actualizar, (compra['id'],))
         conn.commit()
         
@@ -112,7 +112,7 @@ def obtener_metricas_dashboard_db(desde, hasta):
         
         query = """
             SELECT id, monto_total
-            FROM COMPRAS
+            FROM compras
             WHERE DATE(fecha_compra) >= %s 
               AND DATE(fecha_compra) <= %s 
               AND estado_qr != 'cancelado'

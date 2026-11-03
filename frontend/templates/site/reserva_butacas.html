@@ -16,7 +16,7 @@
             </div>
 
             <!-- Formulario de Selección de Butacas (Nativo) -->
-            <form action="{{ url_for('web.site.reserva.procesar') if 'web.site.reserva.procesar' in config else '#' }}" method="POST" id="form-butacas">
+            <form action="{{ url_for('web.site.reserva.procesar') }}" method="POST" id="form-butacas">
                 <input type="hidden" name="funcion_id" value="{{ funcion.id }}">
 
                 <!-- Grilla de Asientos de Cine con Pasillos -->

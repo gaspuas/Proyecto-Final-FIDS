@@ -1,7 +1,7 @@
 """Blueprint padre para la zona de administracion (sin login, a proposito)."""
 from flask import Blueprint, redirect, url_for
 
-from web.routes.admin.peliculas import peliculas_bp
+from frontend.web.routes.admin.peliculas import peliculas_bp
 
 admin_bp = Blueprint('admin', __name__)
 

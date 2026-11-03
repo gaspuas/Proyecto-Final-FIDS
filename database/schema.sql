@@ -143,3 +143,44 @@ INSERT IGNORE INTO servicios (nombre, categoria, precio, descripcion) VALUES
 ('Combo Pochoclos + Bebida', 'comida', 4500.00, 'Pochoclos medianos y gaseosa de 500ml'),
 ('Estacionamiento (3 horas)', 'estacionamiento', 2000.00, 'Válido para el estacionamiento del complejo'),
 ('Acceso Sala VIP', 'servicio', 1500.00, 'Acceso al lounge exclusivo antes de la función');
+
+INSERT INTO peliculas (
+    api_id, 
+    titulo, 
+    sinopsis, 
+    poster_url, 
+    duracion_minutos, 
+    clasificacion, 
+    genero, 
+    director, 
+    es_reestreno
+) VALUES 
+('tt0111161', 'The Shawshank Redemption', 'Dos hombres encarcelados entablan una fuerte amistad a lo largo de los años.', 'https://tmdb.org', 142, 'R', 'Drama', 'Frank Darabont', FALSE),
+('tt0068646', 'The Godfather', 'El envejecido patriarca de una dinastía del crimen organizado transfiere el control a su reacio hijo.', 'https://tmdb.org', 175, 'R', 'Crimen, Drama', 'Francis Ford Coppola', FALSE),
+('tt0468569', 'The Dark Knight', 'Cuando la amenaza conocida como el Joker causa estragos en Gotham, Batman debe aceptarla.', 'https://tmdb.org', 152, 'PG-13', 'Acción, Crimen', 'Christopher Nolan', TRUE),
+('tt0137523', 'Fight Club', 'Un oficinista insomne y un desapegado fabricante de jabones forman un club de lucha subterráneo.', 'https://tmdb.org', 139, 'R', 'Drama', 'David Fincher', FALSE),
+('tt0109830', 'Forrest Gump', 'Las presidencias de Kennedy y Johnson, los eventos de Vietnam y Watergate se desarrollan desde la perspectiva de un hombre de Alabama.', 'https://tmdb.org', 142, 'PG-13', 'Drama, Romance', 'Robert Zemeckis', TRUE),
+('tt0133093', 'The Matrix', 'Un hacker descubre la verdadera naturaleza de su realidad y su rol en la guerra contra sus controladores.', 'https://tmdb.org', 136, 'R', 'Ciencia Ficción', 'Lana Wachowski', TRUE),
+('tt0110912', 'Pulp Fiction', 'Las vidas de dos asesinos a sueldo, un boxeador, la esposa de un gángster y un par de bandidos se entrelazan.', 'https://tmdb.org', 154, 'R', 'Crimen, Drama', 'Quentin Tarantino', FALSE),
+('tt0120737', 'The Lord of the Rings: The Fellowship of the Ring', 'Un manso hobbit de la Comarca y ocho compañeros se embarcan en un viaje para destruir el Anillo Único.', 'https://tmdb.org', 178, 'PG-13', 'Aventura, Fantasía', 'Peter Jackson', TRUE),
+('tt0816692', 'Interstellar', 'Un equipo de exploradores viaja a través de un agujero de gusano en el espacio en un intento por asegurar la supervivencia de la humanidad.', 'https://tmdb.org', 169, 'PG-13', 'Ciencia Ficción, Drama', 'Christopher Nolan', FALSE),
+('tt1375666', 'Inception', 'A un ladrón que roba secretos corporativos a través del uso de la tecnología de compartir sueños se le da la tarea inversa.', 'https://tmdb.org', 148, 'PG-13', 'Acción, Ciencia Ficción', 'Christopher Nolan', TRUE);
+
+INSERT INTO funciones (
+    pelicula_id, 
+    sala_id, 
+    fecha_hora, 
+    precio_base, 
+    idioma, 
+    formato
+) VALUES 
+(1, 1, '2026-11-05 16:00:00', 4500.00, 'Subtitulada', '2D'),
+(1, 2, '2026-11-05 19:30:00', 4500.00, 'Doblada', '2D'),
+(2, 1, '2026-11-05 21:00:00', 4500.00, 'Subtitulada', '2D'),
+(3, 3, '2026-11-06 14:00:00', 5800.00, 'Subtitulada', 'IMAX 3D'),
+(3, 3, '2026-11-06 18:30:00', 5800.00, 'Doblada', 'IMAX 3D'),
+(5, 2, '2026-11-06 15:00:00', 4500.00, 'Doblada', '2D'),
+(6, 1, '2026-11-07 22:45:00', 5200.00, 'Subtitulada', '4XD'),
+(8, 3, '2026-11-07 17:00:00', 5800.00, 'Subtitulada', 'IMAX 2D'),
+(9, 2, '2026-11-08 20:00:00', 4500.00, 'Subtitulada', '2D'),
+(10, 1, '2026-11-08 18:00:00', 5200.00, 'Doblada', '4XD');

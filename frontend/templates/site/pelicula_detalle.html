@@ -32,7 +32,7 @@
                 <h2 class="tarjeta-funciones__titulo">Dónde y cuándo verla</h2>
 
                 <!-- Formulario nativo -->
-                <form action="{{ url_for('web.site.reserva.butacas') }}" method="POST">
+                <form action="{{ url_for('web.site.reserva.procesar') }}" method="POST">
                     
                     <input type="hidden" name="pelicula_id" value="{{ pelicula.id }}">
 

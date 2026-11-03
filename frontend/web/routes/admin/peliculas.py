@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template
-from web.services.peliculas import (
+from frontend.web.services.peliculas import (
     obtener_peliculas,
     
 )
