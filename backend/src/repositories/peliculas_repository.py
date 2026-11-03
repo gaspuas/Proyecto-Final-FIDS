@@ -17,9 +17,9 @@ def listar_peliculas_cartelera(sede_id=None, fecha=None):
             SELECT DISTINCT p.id, p.api_id, p.titulo, p.sinopsis, 
                             p.poster_url, p.duracion_minutos, 
                             p.clasificacion, p.genero, p.director, p.es_reestreno
-            FROM PELICULAS p
-            INNER JOIN FUNCIONES f ON p.id = f.pelicula_id
-            INNER JOIN LOCALES_SALAS ls ON f.sala_id = ls.id
+            FROM peliculas p
+            INNER JOIN funciones f ON p.id = f.pelicula_id
+            INNER JOIN locales_salas ls ON f.sala_id = ls.id
             WHERE 1=1
         """
         
@@ -61,7 +61,7 @@ def obtener_pelicula_por_id(pelicula_id):
             SELECT id, api_id, titulo, sinopsis, poster_url, 
                    duracion_minutos, clasificacion, genero, 
                    director, es_reestreno
-            FROM PELICULAS 
+            FROM peliculas
             WHERE id = %s
         """
         # Ejecución segura previniendo inyección SQL

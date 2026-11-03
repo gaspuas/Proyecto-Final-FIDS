@@ -27,7 +27,11 @@ def obtener_novedades():
     en forma de lista, o {"novedades": [...]}. El endpoint debe filtrar
     activo/fechas y ordenar por `orden`. Ver docs/CARRUSEL_BACKEND.md.
     """
-    base_url = os.getenv('BACKEND_URL', 'http://127.0.0.1:5001').rstrip('/')
+    default_port = os.getenv('PORT', '5000')
+    base_url = os.getenv(
+        'BACKEND_URL',
+        f'http://127.0.0.1:{default_port}',
+    ).rstrip('/')
     try:
         response = requests.get(f'{base_url}/api/novedades', timeout=3)
         response.raise_for_status()

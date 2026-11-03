@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template
-from web.services.novedades import obtener_novedades
+from frontend.web.services.novedades import obtener_novedades
 
 home_bp = Blueprint('home', __name__)
 

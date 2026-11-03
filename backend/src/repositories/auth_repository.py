@@ -10,12 +10,12 @@ def crear_usuario_cliente(nombre, email, password_hash):
     try:
         cursor = conn.cursor()
         
-        cursor.execute("SELECT id FROM USUARIOS WHERE email = %s", (email,))
+        cursor.execute("SELECT id FROM usuarios WHERE email = %s", (email,))
         if cursor.fetchone():
             return False  
 
         query = """
-            INSERT INTO USUARIOS (nombre, email, password_hash, rol, fecha_registro)
+            INSERT INTO usuarios (nombre, email, password_hash, rol, fecha_registro)
             VALUES (%s, %s, %s, %s, NOW())
         """
         cursor.execute(query, (nombre, email, password_hash, 'cliente'))
@@ -45,7 +45,7 @@ def obtener_usuario_por_email(email):
         
         query = """
             SELECT id, nombre, email, password_hash, rol 
-            FROM USUARIOS 
+            FROM usuarios
             WHERE email = %s
         """
         cursor.execute(query, (email,))

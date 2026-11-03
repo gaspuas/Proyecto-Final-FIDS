@@ -1,51 +1,58 @@
 import os
-from flask import Flask, render_template
+from pathlib import Path
+
 from dotenv import load_dotenv
-from backend.src.routes import web_bp
-from backend.src.routes.auth import auth_bp
-from backend.src.routes.compras import compras_bp
-from backend.src.routes.funciones import funciones_bp
-from backend.src.routes.peliculas import peliculas_bp
+from flask import Flask, jsonify, render_template
 
-load_dotenv()
+from backend.src.routes import register_api_routes
+from frontend.web.routes import web_bp
+from frontend.web.services.peliculas import BackendAPIError
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = Path(__file__).resolve().parent
+FRONTEND_DIR = BASE_DIR / 'frontend'
+
+load_dotenv(BASE_DIR / '.env')
 
 app = Flask(
     __name__,
-    template_folder=os.path.join(BASE_DIR, "templates"),
-    static_folder=os.path.join(BASE_DIR, "static"),
+    template_folder=str(FRONTEND_DIR / 'templates'),
+    static_folder=str(FRONTEND_DIR / 'static'),
 )
-
 app.json.sort_keys = False
-app.config["SECRET_KEY"] = os.getenv(
-    "SECRET_KEY", "cine_paradiso_secret_key_2026"
+app.config['SECRET_KEY'] = os.getenv(
+    'SECRET_KEY', 'cine_paradiso_secret_key_2026'
 )
 
+register_api_routes(app)
 app.register_blueprint(web_bp)
-app.register_blueprint(auth_bp)
-app.register_blueprint(compras_bp)
-app.register_blueprint(funciones_bp)
-app.register_blueprint(peliculas_bp)
+
+
+@app.get('/health')
+def health():
+    return jsonify({'status': 'success', 'message': 'Cine Paradiso activo'}), 200
 
 
 @app.errorhandler(404)
-def page_not_found(e):
-    if os.path.exists(os.path.join(BASE_DIR, "templates", "404.html")):
-        return render_template("404.html"), 404
-    return "Página no encontrada", 404
+def page_not_found(error):
+    return render_template('404.html', error_message=error.description), 404
 
 
 @app.errorhandler(500)
-def internal_server_error(e):
-    if os.path.exists(os.path.join(BASE_DIR, "templates", "500.html")):
-        return render_template("500.html"), 500
-    return "Error interno del servidor", 500
+def internal_server_error(error):
+    return render_template('500.html', error_message=error.description), 500
+
+
+@app.errorhandler(BackendAPIError)
+def backend_unavailable(error):
+    return render_template(
+        '500.html',
+        error_title='503 · Backend no disponible',
+        error_message=str(error),
+    ), 503
 
 
 if __name__ == '__main__':
-    port = int(os.getenv("PORT", 5000))
-    debug = os.getenv("FLASK_DEBUG", "True").lower() in ["true", "1", "t"]
-
-    print(f"Servidor Cine Paradiso iniciado en http://localhost:{port}")
-    app.run(host="0.0.0.0", port=port, debug=debug)
+    port = int(os.getenv('PORT', 5000))
+    debug = os.getenv('FLASK_DEBUG', 'True').lower() in ('true', '1', 't')
+    print(f'Cine Paradiso iniciado en http://localhost:{port}')
+    app.run(host='0.0.0.0', port=port, debug=debug, threaded=True)
