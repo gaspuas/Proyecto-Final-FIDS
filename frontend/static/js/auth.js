@@ -1,5 +1,4 @@
-/* Validacion de los formularios de login y registro.
-   Solo es una demostracion de frontend: no envia datos ni inicia sesion. */
+/* Validacion de los formularios de login y registro. */
 
 const MENSAJES_CAMPO_VACIO = {
     nombre: 'Ingresá tu nombre.',
@@ -22,8 +21,10 @@ function obtenerError(campo) {
 
 function mostrarError(campo, mensaje) {
     const elementoError = document.getElementById(`${campo.id}-error`);
-    elementoError.textContent = mensaje || '';
-    elementoError.hidden = !mensaje;
+    if (elementoError) {
+        elementoError.textContent = mensaje || '';
+        elementoError.hidden = !mensaje;
+    }
 
     if (mensaje) {
         campo.setAttribute('aria-invalid', 'true');
@@ -40,32 +41,24 @@ function validarCampo(campo) {
 
 document.querySelectorAll('.autenticacion form').forEach((formulario) => {
     const campos = Array.from(formulario.querySelectorAll('input'));
-    const aviso = formulario.querySelector('.autenticacion__aviso');
-
-    // Con JavaScript activo, los errores se muestran debajo de cada campo
-    formulario.noValidate = true;
-
-    campos.forEach((campo) => {
-        campo.addEventListener('input', () => {
-            aviso.hidden = true;
-            if (campo.hasAttribute('aria-invalid')) {
-                validarCampo(campo);
-            }
-        });
-    });
 
     formulario.addEventListener('submit', (evento) => {
-        // Pendiente de integracion: hoy el envio siempre se detiene aca
-        evento.preventDefault();
+        // Validamos únicamente los campos de ESTE formulario
+        let esValido = true;
+        campos.forEach((campo) => {
+            if (!validarCampo(campo)) {
+                esValido = false;
+            }
+        });
 
-        const invalidos = campos.filter((campo) => !validarCampo(campo));
-        if (invalidos.length > 0) {
-            aviso.hidden = true;
-            invalidos[0].focus();
+        if (!esValido) {
+            evento.preventDefault();
+            const primerInvalido = campos.find((c) => c.hasAttribute('aria-invalid'));
+            if (primerInvalido) primerInvalido.focus();
             return;
         }
 
-        formulario.querySelector('input[type="password"]').value = '';
-        aviso.hidden = false;
+        // Si es válido, enviamos explícitamente el formulario
+        formulario.submit();
     });
 });

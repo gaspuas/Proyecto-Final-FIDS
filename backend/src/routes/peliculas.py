@@ -59,3 +59,46 @@ def obtener_pelicula(pelicula_id):
             description=resultado['mensaje'],
             status_code=codigo_http
         )
+
+@peliculas_bp.route('/<int:pelicula_id>/resenas', methods=['GET'])
+def obtener_resenas_pelicula(pelicula_id: int):
+    conexion = None
+    try:
+        conexion = get_db_connection()
+        cursor = conexion.cursor(dictionary=True)
+
+        # Hacemos JOIN con usuarios para obtener el nombre de quien reseñó
+        query = """
+            SELECT 
+                r.id,
+                r.usuario_id,
+                u.nombre AS usuario_nombre,
+                r.pelicula_id,
+                r.compra_id,
+                r.puntuacion,
+                r.comentario,
+                r.fecha
+            FROM resenas r
+            INNER JOIN usuarios u ON r.usuario_id = u.id
+            WHERE r.pelicula_id = %s
+            ORDER BY r.fecha DESC
+        """
+        cursor.execute(query, (pelicula_id,))
+        resenas = cursor.fetchall()
+        cursor.close()
+
+        # Serializamos la fecha a formato string para JSON
+        for r in resenas:
+            if 'fecha' in r and r['fecha']:
+                r['fecha'] = str(r['fecha'])
+            # Aseguramos compatibilidad si el frontend busca 'calificacion' o 'puntuacion'
+            r['calificacion'] = r['puntuacion']
+
+        return jsonify(resenas), 200
+
+    except Exception as e:
+        print(f'Error al obtener reseñas en MySQL: {e}')
+        return jsonify([]), 200
+    finally:
+        if conexion and conexion.is_connected():
+            conexion.close()

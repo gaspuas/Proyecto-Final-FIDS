@@ -1,10 +1,8 @@
+import uuid
 from datetime import datetime
 
-from backend.src.repositories.funciones_repository import (
-    obtener_butacas_ocupadas_db,
-    obtener_funciones_db,
-    obtener_funcion_por_id_db,
-)
+from backend.src.repositories.funciones_repository import *
+
 
 
 def _serializar_fecha(valor):
@@ -65,40 +63,111 @@ def listar_funciones_service(
     return funciones_response, None, 200
 
 
-def consultar_butacas_funcion_service(id_funcion: int):
-    """Retorna el estado de cada butaca para una función específica."""
-    if not isinstance(id_funcion, int) or isinstance(id_funcion, bool) or id_funcion <= 0:
+
+def crear_reserva_service(usuario_id: int, id_funcion: int, asientos: list, servicios: list):
+    """Crea una reserva en MySQL registrando cabecera, asientos y combos opcionales."""
+    # 1. Validaciones básicas de entrada
+    if not isinstance(id_funcion, int) or id_funcion <= 0:
         return None, "El ID de la función debe ser un entero positivo.", 400
 
+    if not asientos or not isinstance(asientos, list):
+        return None, "Debe seleccionar al menos un asiento.", 400
+
+    # 2. Verificar existencia de la función
     funcion = obtener_funcion_por_id_db(id_funcion)
     if not funcion:
         return None, f"Función con ID {id_funcion} no encontrada.", 404
 
-    capacidad_total = int(funcion['capacidad_total'])
-    ocupadas = obtener_butacas_ocupadas_db(id_funcion)
+    # 3. Comprobar solapamiento de butacas ocupadas
+    ocupadas_db = obtener_butacas_ocupadas_db(id_funcion)
+    # Convertimos a string por seguridad para comparar (ej: '1' o 'A1')
+    ocupadas_set = {str(b) for b in ocupadas_db}
+    solapadas = [a for a in asientos if str(a) in ocupadas_set]
 
-    butacas = []
-    ocupadas_lista = []
-    libres_lista = []
+    if solapadas:
+        return None, f"Las siguientes butacas ya están ocupadas: {', '.join(map(str, solapadas))}", 409
 
-    for numero in range(1, capacidad_total + 1):
-        valor = str(numero)
-        estado = 'ocupada' if valor in ocupadas else 'libre'
-        if estado == 'ocupada':
-            ocupadas_lista.append(numero)
-        else:
-            libres_lista.append(numero)
+    # 4. Transacción e inserción en MySQL
+    cursor = mysql.connection.cursor()
+    try:
+        codigo_reserva = f"RES-{id_funcion}-{uuid.uuid4().hex[:6].upper()}"
 
-        butacas.append({
-            'numero': numero,
-            'estado': estado,
-            'libre': estado == 'libre',
-        })
+        # A. Insertar cabecera de reserva
+        query_reserva = """
+            INSERT INTO reservas (usuario_id, funcion_id, codigo_reserva, estado)
+            VALUES (%s, %s, %s, 'CONFIRMADA')
+        """
+        cursor.execute(query_reserva, (usuario_id, id_funcion, codigo_reserva))
+        reserva_id = cursor.lastrowid
+
+        # B. Insertar cada asiento reservado
+        query_asiento = """
+            INSERT INTO reserva_asientos (reserva_id, codigo_asiento)
+            VALUES (%s, %s)
+        """
+        for asiento in asientos:
+            cursor.execute(query_asiento, (reserva_id, str(asiento)))
+
+        # C. Insertar servicios opcionales (Candy Bar)
+        if servicios:
+            query_servicio = """
+                INSERT INTO reserva_servicios (reserva_id, servicio_id, cantidad, precio_unitario)
+                VALUES (%s, %s, %s, %s)
+            """
+            for s in servicios:
+                cursor.execute(
+                    query_servicio,
+                    (
+                        reserva_id,
+                        s.get('id'),
+                        s.get('cantidad', 1),
+                        s.get('precio', 0.0)
+                    )
+                )
+
+        mysql.connection.commit()
+        cursor.close()
+
+        # 5. Cálculo de totales y respuesta de éxito
+        precio_unitario = float(funcion.get('precio_entrada', 4500.0))
+        total_entradas = len(asientos) * precio_unitario
+        total_servicios = sum(float(s.get('precio', 0)) * int(s.get('cantidad', 1)) for s in servicios)
+
+        resultado = {
+            'compra': {
+                'codigo': codigo_reserva,
+                'pelicula': funcion.get('pelicula', 'Película Seleccionada'),
+                'fecha_hora': f"{funcion.get('fecha', 'Hoy')} {funcion.get('horario', '19:30 hs')}",
+                'butacas': asientos
+            },
+            'total_entradas': total_entradas,
+            'elegidos': servicios,
+            'total': total_entradas + total_servicios
+        }
+
+        return resultado, None, 201
+
+    except Exception as e:
+        mysql.connection.rollback()
+        cursor.close()
+        raise e
+
+def consultar_butacas_funcion_service(id_funcion: int):
+    if (
+        not isinstance(id_funcion, int)
+        or isinstance(id_funcion, bool)
+        or id_funcion <= 0
+    ):
+        return None, 'El ID de la función debe ser un entero positivo.', 400
+
+    funcion = obtener_funcion_por_id_db(id_funcion)
+    if not funcion:
+        return None, f'Función con ID {id_funcion} no encontrada.', 404
+
+    # Obtenemos la lista directa de códigos string guardados en MySQL (ej: ['A1', 'A2'])
+    ocupadas_lista = [str(b) for b in obtener_butacas_ocupadas_db(id_funcion)]
 
     return {
         'funcion_id': id_funcion,
-        'capacidad_total': capacidad_total,
         'ocupadas': ocupadas_lista,
-        'libres': libres_lista,
-        'butacas': butacas,
     }, None, 200

@@ -9,7 +9,7 @@
 {% block content %}
 
 <section class="compra">
-    <form class="compra__servicios" id="form-servicios" method="GET" action="{{ url_for('web.site.compra.confirmacion') }}" data-total-entradas="{{ total_entradas }}">
+    <form class="compra__servicios" id="form-servicios" method="POST" action="{{ url_for('web.site.reserva.servicios') }}" data-total-entradas="{{ total_entradas }}">
 
         <div class="compra__tarjeta">
             <h1 class="compra__titulo">Servicios adicionales</h1>

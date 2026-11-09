@@ -10,10 +10,16 @@
 
 <section class="autenticacion">
 
+    <!-- FORMULARIO DE LOGIN -->
     <div class="autenticacion__tarjeta">
         <h2 class="autenticacion__titulo">Iniciar sesión</h2>
 
-        <form method="POST">
+        <form method="POST" action="{{ url_for('web.site.login.index', next=next) }}">
+            <input type="hidden" name="action_type" value="login">
+            {% if next %}
+                <input type="hidden" name="next" value="{{ next }}">
+            {% endif %}
+
             <div class="autenticacion__campo">
                 <label for="login-email">Email</label>
                 <input type="email" id="login-email" name="email" autocomplete="email" aria-describedby="login-email-error" required>
@@ -32,10 +38,16 @@
         </form>
     </div>
 
+    <!-- FORMULARIO DE REGISTRO -->
     <div class="autenticacion__tarjeta">
         <h2 class="autenticacion__titulo">Crear cuenta</h2>
 
-        <form method="POST">
+        <form method="POST" action="{{ url_for('web.site.login.index', next=next) }}">
+            <input type="hidden" name="action_type" value="registro">
+            {% if next %}
+                <input type="hidden" name="next" value="{{ next }}">
+            {% endif %}
+
             <div class="autenticacion__campo">
                 <label for="registro-nombre">Nombre</label>
                 <input type="text" id="registro-nombre" name="nombre" autocomplete="name" aria-describedby="registro-nombre-error" required>

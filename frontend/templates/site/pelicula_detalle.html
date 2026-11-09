@@ -49,7 +49,7 @@
                                         {% if loop.first %}checked{% endif %} 
                                         required>
                                     <span class="opcion-horario__texto">
-                                        {{ funcion.fecha_hora.split(' ')[1] if funcion.fecha_hora is string else funcion.fecha_hora.strftime('%H:%M') }} hs
+                                        {{ funcion.hora }} hs
                                     </span>
                                 </label>
 
@@ -61,7 +61,9 @@
 
                     <div class="tarjeta-funciones__footer">
                         <p class="tarjeta-funciones__precio">
-                            Entrada: <strong>${{ "%.2f"|format(funciones[0].precio_base if funciones else 0) }}</strong>
+                            {# Usamos (funciones|first) para obtener el primer elemento de forma segura #}
+                            {% set primera_funcion = funciones|first if funciones else none %}
+                            Entrada: <strong>${{ "%.2f"|format(primera_funcion.precio_base if primera_funcion and primera_funcion.precio_base is defined else 0) }}</strong>
                         </p>
                         
                         {% if funciones %}
@@ -82,10 +84,14 @@
                 <div class="detalle-pelicula__resenas">
                     <h3 class="detalle-pelicula__resenas-titulo">Opiniones de los Espectadores</h3>
                     {% for resena in resenas %}
-                        <div class="resena-card">
-                            <strong>{{ resena.nombre_usuario }}</strong> ⭐ {{ resena.puntuacion }}/5
-                            <p>{{ resena.comentario }}</p>
-                        </div>
+                    <div class="resena-card">
+                        <strong>{{ resena.usuario_nombre }}</strong>
+                        <span>Puntuación: {{ resena.puntuacion }}/5 ★</span>
+                        <p>{{ resena.comentario }}</p>
+                        <small>{{ resena.fecha }}</small>
+                    </div>
+                    {% else %}
+                    <p>Todavía no hay reseñas para esta película.</p>
                     {% endfor %}
                 </div>
             {% endif %}

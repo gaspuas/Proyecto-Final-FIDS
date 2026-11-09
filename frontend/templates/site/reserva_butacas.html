@@ -16,8 +16,9 @@
             </div>
 
             <!-- Formulario de Selección de Butacas (Nativo) -->
-            <form action="{{ url_for('web.site.reserva.procesar') }}" method="POST" id="form-butacas">
-                <input type="hidden" name="funcion_id" value="{{ funcion.id }}">
+            <form method="POST" action="{{ url_for('web.site.reserva.procesar') }}">
+            <!-- Campo oculto para enviar el ID real de la función activa -->
+            <input type="hidden" name="funcion_id" value="{{ funcion.id }}">
 
                 <!-- Grilla de Asientos de Cine con Pasillos -->
                 <div class="mapa-cine">
@@ -100,9 +101,7 @@
                     Precio base: <strong>${{ "%.2f"|format(funcion.precio_base) }}</strong> por butaca
                 </p>
 
-                <button type="submit" class="boton boton--dorado tarjeta-resumen__btn">
-                    Continuar
-                </button>
+                <button type="submit" class="boton">Continuar a servicios</button>
             </div>
             </form>
         </div>

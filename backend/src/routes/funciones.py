@@ -1,13 +1,53 @@
+import mysql.connector
 from flask import Blueprint, jsonify, request
-
-from backend.src.services.funciones_services import (
-    consultar_butacas_funcion_service,
-    listar_funciones_service,
-)
-from backend.src.utils.api_responses import generar_respuesta_error
-
+from backend.src.services.funciones_services import *
+from backend.src.utils.api_responses import *
+from backend.src.utils.db_connection import get_db_connection
 funciones_bp = Blueprint('funciones', __name__, url_prefix='/api/funciones')
 
+@funciones_bp.route('/<int:id_funcion>', methods=['GET'])
+def obtener_funcion(id_funcion: int):
+    try:
+        conexion = get_db_connection()
+        cursor = conexion.cursor(dictionary=True)
+        # Cambiamos la query quitando la columna 'fecha'
+        query = """
+            SELECT id, pelicula_id, sala_id, fecha_hora, precio_base, idioma, formato 
+            FROM funciones 
+            WHERE id = %s
+        """
+        cursor.execute(query, (id_funcion,))
+        fila = cursor.fetchone()
+        cursor.close()
+
+        if not fila:
+            return (
+                jsonify({'error': f'Función {id_funcion} no encontrada'}),
+                404,
+            )
+
+        fecha_dt = fila['fecha_hora']
+
+        funcion_data = {
+            'id': fila['id'],
+            'pelicula_id': fila['pelicula_id'],
+            'fecha_hora': str(fecha_dt),  # "2026-11-10 18:30:00"
+            'hora': (
+                fecha_dt.strftime('%H:%M')
+                if hasattr(fecha_dt, 'strftime')
+                else str(fecha_dt)[11:16]
+            ),  # "18:30"
+            'precio_base': float(fila['precio_base']),
+        }
+
+        return jsonify(funcion_data), 200
+
+    except Exception as e:
+        print(f'Error al consultar función en MySQL: {e}')
+        return jsonify({'error': 'Error interno'}), 500
+    finally:
+        if conexion and conexion.is_connected():
+            conexion.close()
 
 @funciones_bp.route('', methods=['GET'])
 def listar_funciones():
@@ -61,22 +101,41 @@ def listar_funciones():
         )
 
 
-@funciones_bp.route('/<int:id_funcion>/butacas', methods=['GET'])
-def consultar_butacas_funcion(id_funcion: int):
+@funciones_bp.route('/<int:id_funcion>/reservar', methods=['POST'])
+def crear_reserva_funcion(id_funcion: int):
     try:
-        mapa_butacas, err_negocio, status = consultar_butacas_funcion_service(id_funcion)
+        data = request.get_json() or {}
+        usuario_id = data.get('usuario_id')
+        asientos = data.get('asientos', [])
+        servicios = data.get('servicios', [])
+
+        if not usuario_id or not asientos:
+            return generar_respuesta_error(
+                'ERROR_VALIDACION',
+                'Faltan datos requeridos (usuario_id o asientos)',
+                ['usuario_id y asientos son obligatorios'],
+                400,
+            )
+
+        # Invocamos la lógica en la capa de servicios
+        reserva, err_negocio, status = crear_reserva_service(
+            usuario_id, id_funcion, asientos, servicios
+        )
 
         if err_negocio:
-            code = 'RECURSO_NO_ENCONTRADO' if status == 404 else 'ERROR_VALIDACION'
-            message = 'Función no encontrada' if status == 404 else 'ID inválido'
-            return generar_respuesta_error(code, message, err_negocio, status)
+            return generar_respuesta_error(
+                'ERROR_RESERVA',
+                'No se pudo completar la reserva',
+                err_negocio,
+                status,
+            )
 
-        return jsonify(mapa_butacas), 200
+        return jsonify(reserva), 201
 
     except Exception as e:
         return generar_respuesta_error(
             'ERROR_INTERNO',
-            'Error al consultar el mapa de butacas',
+            'Error al procesar la reserva',
             str(e),
             500,
         )
