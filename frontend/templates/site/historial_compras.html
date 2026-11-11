@@ -18,8 +18,11 @@
                 {% for entrada in compra.entradas %}
                 <p>{{ entrada.pelicula_titulo }} · {{ entrada.fecha_hora }} · Butaca {{ entrada.numero_butaca }} · {{ entrada.nombre_local }} Sala {{ entrada.numero_sala }}</p>
                 {% endfor %}
+                <a class="boton" href="{{ url_for('web.site.compra.detalle', compra_id=compra.id) }}">Ver comprobante</a>
                 {% if compra.estado_qr == 'activo' %}
                 <form action="{{ url_for('web.site.compra.cancelar', compra_id=compra.id) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="next" value="{{ url_for('web.site.compra.historial') }}">
                     <button class="boton boton--secundario" type="submit">Cancelar compra</button>
                 </form>
                 {% endif %}

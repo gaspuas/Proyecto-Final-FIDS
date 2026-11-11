@@ -9,19 +9,22 @@
 {% block content %}
 
 <section class="compra">
-    <form class="compra__servicios" id="form-servicios" method="POST" action="{{ url_for('web.site.compra.servicios') }}" data-total-entradas="{{ total_entradas }}">
+    <form class="compra__servicios" id="form-servicios" method="POST" action="{{ url_for('web.site.compra.confirmar') }}" data-total-entradas="{{ total_entradas }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
         <div class="compra__tarjeta">
             <h1 class="compra__titulo">Servicios adicionales</h1>
-            <p>{{ funcion.pelicula_titulo }} · {{ funcion.fecha_hora }} · Butacas {{ butacas|join(', ') }}</p>
-            {% if error %}<p class="alerta alerta--error" role="alert">{{ error }}</p>{% endif %}
+
+            {% if error_catalogo %}
+            <p class="compra__aviso" role="alert">{{ error_catalogo }}</p>
+            {% endif %}
 
             <ul class="servicios-lista">
                 {% for servicio in servicios %}
                 <li class="servicios-lista__item">
                     <div>
                         <label class="servicios-lista__nombre" for="servicio-{{ servicio.id }}">{{ servicio.nombre }}</label>
-                        <p class="servicios-lista__precio">${{ servicio.precio }}</p>
+                        <p class="servicios-lista__precio">{{ servicio.precio|precio }}</p>
                     </div>
                     <input class="servicios-lista__cantidad" type="number" id="servicio-{{ servicio.id }}" name="servicio_{{ servicio.id }}" value="0" min="0" max="{{ cantidad_maxima }}" step="1" inputmode="numeric" data-precio="{{ servicio.precio }}">
                 </li>
@@ -31,14 +34,16 @@
 
         <aside class="compra__tarjeta resumen">
             <h2 class="resumen__titulo">Resumen</h2>
-            <p class="resumen__detalle">{{ funcion.nombre_local }} · Sala {{ funcion.numero_sala }}</p>
+            <p class="resumen__detalle">{{ funcion.pelicula_titulo }} · Butacas {{ butacas|join(', ') }}</p>
+            <p class="resumen__detalle">{{ funcion.nombre_local }} · Sala {{ funcion.numero_sala }} · {{ funcion.fecha_hora|fecha_hora }}</p>
 
             <div class="resumen__importes">
-                <p>Entradas: ${{ total_entradas }}</p>
+                <p>Entradas ({{ butacas|length }} × {{ precio_entrada|precio }}): {{ total_entradas|precio }}</p>
                 <p>Servicios: $<span id="resumen-servicios">0</span></p>
             </div>
 
-            <p class="resumen__total" aria-live="polite">Total $<span id="resumen-total">{{ total_entradas }}</span></p>
+            <p class="resumen__total" aria-live="polite">Total estimado $<span id="resumen-total">{{ total_entradas|importe }}</span></p>
+            <p class="resumen__nota">El importe final lo calcula el sistema al confirmar la compra.</p>
 
             <button type="submit" class="boton">Confirmar compra</button>
         </aside>

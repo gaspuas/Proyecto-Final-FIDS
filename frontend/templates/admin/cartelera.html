@@ -13,7 +13,6 @@
             <a class="boton boton--dorado" href="{{ url_for('web.admin.peliculas.nueva') }}">Agregar película</a>
         </div>
     </div>
-    
     {% if peliculas %}
     <div class="grilla-peliculas">
         {% for pelicula in peliculas %}
@@ -38,7 +37,7 @@
 
             <div class="tarjeta-pelicula__cuerpo">
                 <h2 class="tarjeta-pelicula__titulo">{{ pelicula.titulo }}</h2>
-                
+
                 <div class="tarjeta-pelicula__meta">
                     <span class="tag-genero">{{ pelicula.genero if pelicula.genero else 'Clásico' }}</span>
                     <span class="duracion">⏱ {{ pelicula.duracion_minutos }} min</span>

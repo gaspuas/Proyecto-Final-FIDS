@@ -1,4 +1,5 @@
-/* Validacion local previa al envio de login y registro al servidor. */
+/* Validacion de los formularios de login y registro antes de enviarlos.
+   El envio es un POST normal del formulario: JavaScript no hace peticiones. */
 
 const MENSAJES_CAMPO_VACIO = {
     nombre: 'Ingresá tu nombre.',
@@ -38,7 +39,9 @@ function validarCampo(campo) {
 }
 
 document.querySelectorAll('.autenticacion form').forEach((formulario) => {
-    const campos = Array.from(formulario.querySelectorAll('input'));
+    const campos = Array.from(formulario.querySelectorAll('input:not([type="hidden"])'));
+    const boton = formulario.querySelector('button[type="submit"]');
+
     // Con JavaScript activo, los errores se muestran debajo de cada campo
     formulario.noValidate = true;
 
@@ -55,6 +58,9 @@ document.querySelectorAll('.autenticacion form').forEach((formulario) => {
         if (invalidos.length > 0) {
             evento.preventDefault();
             invalidos[0].focus();
+            return;
         }
+        // Evita un segundo envio por doble clic mientras responde el servidor
+        boton.disabled = true;
     });
 });

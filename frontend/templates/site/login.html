@@ -13,11 +13,17 @@
     <div class="autenticacion__tarjeta">
         <h2 class="autenticacion__titulo">Iniciar sesión</h2>
 
-        <form method="POST" action="{{ url_for('web.site.login.index', next=request.args.get('next')) }}">
-            <input type="hidden" name="accion" value="login">
+        <form method="POST" action="{{ url_for('web.site.login.index') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+
+            {% if error_login %}
+            <p class="autenticacion__alerta" role="alert">{{ error_login }}</p>
+            {% endif %}
+
             <div class="autenticacion__campo">
                 <label for="login-email">Email</label>
-                <input type="email" id="login-email" name="email" autocomplete="email" aria-describedby="login-email-error" required>
+                <input type="email" id="login-email" name="email" value="{{ form.email if error_login else '' }}" autocomplete="email" aria-describedby="login-email-error" required>
                 <p class="autenticacion__error" id="login-email-error" hidden></p>
             </div>
 
@@ -28,24 +34,29 @@
             </div>
 
             <button type="submit" class="boton">Ingresar</button>
-
         </form>
     </div>
 
     <div class="autenticacion__tarjeta">
         <h2 class="autenticacion__titulo">Crear cuenta</h2>
 
-        <form method="POST" action="{{ url_for('web.site.login.index') }}">
-            <input type="hidden" name="accion" value="registro">
+        <form method="POST" action="{{ url_for('web.site.login.registro') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+
+            {% if error_registro %}
+            <p class="autenticacion__alerta" role="alert">{{ error_registro }}</p>
+            {% endif %}
+
             <div class="autenticacion__campo">
                 <label for="registro-nombre">Nombre</label>
-                <input type="text" id="registro-nombre" name="nombre" autocomplete="name" aria-describedby="registro-nombre-error" required>
+                <input type="text" id="registro-nombre" name="nombre" value="{{ form.nombre if error_registro else '' }}" autocomplete="name" aria-describedby="registro-nombre-error" required>
                 <p class="autenticacion__error" id="registro-nombre-error" hidden></p>
             </div>
 
             <div class="autenticacion__campo">
                 <label for="registro-email">Email</label>
-                <input type="email" id="registro-email" name="email" autocomplete="email" aria-describedby="registro-email-error" required>
+                <input type="email" id="registro-email" name="email" value="{{ form.email if error_registro else '' }}" autocomplete="email" aria-describedby="registro-email-error" required>
                 <p class="autenticacion__error" id="registro-email-error" hidden></p>
             </div>
 
@@ -56,7 +67,6 @@
             </div>
 
             <button type="submit" class="boton boton--secundario">Registrarme</button>
-
         </form>
     </div>
 

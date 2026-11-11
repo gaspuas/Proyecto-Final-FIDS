@@ -23,12 +23,21 @@
                 <a href="{{ url_for('web.site.peliculas.index') }}"
                 class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.site.peliculas') %}navbar__link--active{% endif %}">Cartelera</a>
                 
-                {% if session.get('usuario') %}
-                <span class="navbar__link">Hola, {{ session['usuario']['nombre'] }}</span>
-                <a class="navbar__link" href="{{ url_for('web.site.compra.historial') }}">Mis compras</a>
-                <form action="{{ url_for('web.site.login.logout') }}" method="POST">
-                    <button class="navbar__link" type="submit">Cerrar sesión</button>
-                </form>
+                {% if usuario_sesion %}
+                    <span class="navbar__link">Hola, {{ usuario_sesion.nombre }}</span>
+
+                    <a href="{{ url_for('web.site.compra.historial') }}"
+                    class="navbar__link {% if request.endpoint == 'web.site.compra.historial' %}navbar__link--active{% endif %}">Mis compras</a>
+
+                    {% if usuario_es_admin %}
+                    <a href="{{ url_for('web.admin.index') }}"
+                    class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.admin') %}navbar__link--active{% endif %}">Backoffice</a>
+                    {% endif %}
+
+                    <form class="navbar__form" method="POST" action="{{ url_for('web.site.login.logout') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="navbar__link navbar__boton">Cerrar sesión</button>
+                    </form>
                 {% else %}
                 <a href="{{ url_for('web.site.login.index') }}"
                 class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.site.login') %}navbar__link--active{% endif %}">Ingresar</a>
