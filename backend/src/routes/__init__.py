@@ -6,6 +6,7 @@ def register_api_routes(app: Flask) -> None:
     from backend.src.routes.auth import auth_bp
     from backend.src.routes.compras import compras_bp
     from backend.src.routes.funciones import funciones_bp
+    from backend.src.routes.novedades import novedades_bp
     from backend.src.routes.peliculas import peliculas_bp
     from backend.src.routes.servicios import servicios_bp
 
@@ -14,6 +15,7 @@ def register_api_routes(app: Flask) -> None:
         auth_bp,
         compras_bp,
         funciones_bp,
+        novedades_bp,
         peliculas_bp,
         servicios_bp,
     ):
