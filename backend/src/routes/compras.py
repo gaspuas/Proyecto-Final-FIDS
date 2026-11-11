@@ -10,6 +10,7 @@ from backend.src.services.compras_services import (
     listar_compras_usuario_service,
     cancelar_compra_service,
 )
+from backend.src.utils.qr_generator import generar_qr_base64
 
 compras_bp = Blueprint('compras', __name__, url_prefix='/api/compras')
 
@@ -30,6 +31,7 @@ def crear_compra():
             msg = "Recurso no encontrado" if status == 404 else "No se pudo crear la compra"
             return generar_respuesta_error(code, msg, err_negocio, status)
 
+        compra['qr_data_uri'] = generar_qr_base64(compra['codigo_qr'])
         return jsonify(compra), 201
 
     except Exception as e:

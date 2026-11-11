@@ -6,7 +6,7 @@ from flask import Flask, jsonify, render_template
 
 from backend.src.routes import register_api_routes
 from frontend.web.routes import web_bp
-from frontend.web.services.peliculas import BackendAPIError
+from frontend.web.services.api_client import BackendAPIError
 
 BASE_DIR = Path(__file__).resolve().parent
 FRONTEND_DIR = BASE_DIR / 'frontend'
@@ -48,7 +48,7 @@ def backend_unavailable(error):
         '500.html',
         error_title='503 · Backend no disponible',
         error_message=str(error),
-    ), 503
+    ), error.status_code if 400 <= error.status_code < 500 else 503
 
 
 if __name__ == '__main__':

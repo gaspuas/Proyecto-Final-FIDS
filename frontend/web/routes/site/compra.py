@@ -1,5 +1,6 @@
-"""Servicios adicionales, confirmacion y cancelacion de compras.
+"""Servicios adicionales, confirmacion, comprobante con QR, cancelacion e historial.
 
+La reserva en curso la guarda reserva.procesar en session['checkout'].
 Los importes que se muestran como definitivos salen siempre de la API.
 """
 import base64
@@ -21,42 +22,20 @@ from flask import (
 )
 
 from frontend.web.services import compras
-from frontend.web.services.api import ErrorApi
-from frontend.web.sesion import csrf_requerido, login_requerido, usuario_actual
+from frontend.web.services.api_client import BackendAPIError
+from frontend.web.services.funciones import obtener_funcion
+from frontend.web.services.servicios import obtener_servicios
+from frontend.web.sesion import (
+    csrf_requerido,
+    destino_seguro,
+    login_requerido,
+    usuario_actual,
+)
 
 compra_bp = Blueprint('compra', __name__)
 
 CANTIDAD_MAXIMA = 10
-
-# La API numera las butacas de 1 a capacidad_total. La grilla de
-# reserva_butacas.html usa filas A, B, C... de 10 butacas cada una.
-BUTACAS_POR_FILA = 10
-PATRON_BUTACA = re.compile(r'([A-Z])(\d{1,2})')
 PATRON_SERVICIO = re.compile(r'servicio_(\d+)')
-
-
-def codigo_a_numero(codigo):
-    """'C5' -> 25. Devuelve None si el codigo no es valido."""
-    coincidencia = PATRON_BUTACA.fullmatch(codigo or '')
-    if not coincidencia:
-        return None
-    fila = ord(coincidencia.group(1)) - ord('A')
-    columna = int(coincidencia.group(2))
-    if not 1 <= columna <= BUTACAS_POR_FILA:
-        return None
-    return fila * BUTACAS_POR_FILA + columna
-
-
-def numero_a_codigo(numero):
-    """25 -> 'C5'."""
-    try:
-        indice = int(numero) - 1
-    except (TypeError, ValueError):
-        return str(numero)
-    if indice < 0:
-        return str(numero)
-    fila, columna = divmod(indice, BUTACAS_POR_FILA)
-    return f'{chr(ord("A") + fila)}{columna + 1}'
 
 
 def _decimal(valor):
@@ -94,24 +73,18 @@ def _qr_data_uri(codigo_qr):
     return 'data:image/svg+xml;base64,' + base64.b64encode(svg).decode('ascii')
 
 
-def _reserva_en_curso():
-    """Funcion y butacas elegidas en la pantalla de reserva, o None."""
-    reserva = session.get('reserva_temp')
-    if not isinstance(reserva, dict):
+def _checkout_en_curso():
+    """Funcion y butacas (numeros como texto) elegidas en la reserva, o None."""
+    checkout = session.get('checkout')
+    if not isinstance(checkout, dict):
         return None
-    funcion_id = reserva.get('funcion_id')
-    asientos = reserva.get('asientos')
-    if not isinstance(funcion_id, int) or funcion_id <= 0 or not isinstance(asientos, list):
+    id_funcion = checkout.get('id_funcion')
+    butacas = checkout.get('butacas')
+    if not isinstance(id_funcion, int) or id_funcion <= 0 or not isinstance(butacas, list):
         return None
-    if not asientos or any(codigo_a_numero(asiento) is None for asiento in asientos):
+    if not butacas or not all(isinstance(b, str) and b.isdigit() and int(b) > 0 for b in butacas):
         return None
-    return {'funcion_id': funcion_id, 'asientos': asientos}
-
-
-def _pagina_no_disponible(mensaje):
-    return render_template(
-        '500.html', error_title='503 · Servicio no disponible', error_message=mensaje
-    ), 503
+    return checkout
 
 
 def _volver_a_cartelera(mensaje):
@@ -119,54 +92,35 @@ def _volver_a_cartelera(mensaje):
     return redirect(url_for('web.site.peliculas.index'))
 
 
-@compra_bp.route('/iniciar', methods=['POST'])
-def iniciar():
-    """Recibe el formulario de reserva_butacas.html (funcion_id y asientos)."""
-    try:
-        funcion_id = int(request.form.get('funcion_id', ''))
-    except ValueError:
-        funcion_id = 0
-    asientos = list(dict.fromkeys(request.form.getlist('asientos')))
-
-    if funcion_id <= 0:
-        return _volver_a_cartelera('Elegí una función para continuar.')
-    if not asientos or any(codigo_a_numero(asiento) is None for asiento in asientos):
-        flash('Elegí al menos una butaca válida.', 'error')
-        return redirect(url_for('web.site.reserva.butacas', funcion_id=funcion_id))
-
-    session['reserva_temp'] = {'funcion_id': funcion_id, 'asientos': asientos}
-    return redirect(url_for('web.site.compra.servicios'))
-
-
 @compra_bp.route('/servicios')
 @login_requerido
 def servicios():
-    reserva = _reserva_en_curso()
-    if reserva is None:
+    checkout = _checkout_en_curso()
+    if checkout is None:
         return _volver_a_cartelera('Elegí una función y tus butacas para continuar.')
 
     try:
-        funcion = compras.obtener_funcion(reserva['funcion_id'])
-    except ErrorApi as error:
-        return _pagina_no_disponible(error.mensaje)
-    if funcion is None:
-        session.pop('reserva_temp', None)
+        funcion = obtener_funcion(checkout['id_funcion'])
+    except BackendAPIError as error:
+        if error.status_code != 404:
+            raise
+        session.pop('checkout', None)
         return _volver_a_cartelera('La función elegida ya no está disponible.')
 
     try:
-        catalogo = compras.listar_servicios()
+        catalogo = obtener_servicios()
         error_catalogo = None
-    except ErrorApi as error:
+    except BackendAPIError as error:
         catalogo = []
-        error_catalogo = f'{error.mensaje} Podés confirmar solo las entradas.'
+        error_catalogo = f'{error} Podés confirmar solo las entradas.'
 
     precio_entrada = _decimal(funcion.get('precio_base'))
     return render_template(
         'site/servicios.html',
         funcion=funcion,
-        butacas=reserva['asientos'],
+        butacas=checkout['butacas'],
         precio_entrada=precio_entrada,
-        total_entradas=precio_entrada * len(reserva['asientos']),
+        total_entradas=precio_entrada * len(checkout['butacas']),
         servicios=catalogo,
         error_catalogo=error_catalogo,
         cantidad_maxima=CANTIDAD_MAXIMA,
@@ -192,8 +146,8 @@ def _servicios_elegidos(formulario):
 @login_requerido
 @csrf_requerido
 def confirmar():
-    reserva = _reserva_en_curso()
-    if reserva is None:
+    checkout = _checkout_en_curso()
+    if checkout is None:
         return _volver_a_cartelera('No hay una compra en curso. Elegí una función para empezar.')
 
     servicios_elegidos = _servicios_elegidos(request.form)
@@ -204,36 +158,40 @@ def confirmar():
     try:
         compra = compras.crear_compra(
             id_usuario=usuario_actual()['id'],
-            id_funcion=reserva['funcion_id'],
-            butacas=[str(codigo_a_numero(asiento)) for asiento in reserva['asientos']],
+            id_funcion=checkout['id_funcion'],
+            butacas=checkout['butacas'],
             servicios=servicios_elegidos,
         )
-    except ErrorApi as error:
-        flash(error.mensaje, 'error')
+    except BackendAPIError as error:
+        flash(str(error), 'error')
         return redirect(url_for('web.site.compra.servicios'))
 
     # Se descarta la reserva para que recargar o reenviar no repita la compra
-    session.pop('reserva_temp', None)
-    if not isinstance(compra.get('id'), int):
+    session.pop('checkout', None)
+    if not isinstance(compra, dict) or not isinstance(compra.get('id'), int):
         return _volver_a_cartelera(
-            'La compra se registró, pero no pudimos mostrar el comprobante. Revisá tus compras más tarde.'
+            'La compra se registró, pero no pudimos mostrar el comprobante. Revisá "Mis compras".'
         )
     flash('¡Listo! Tu compra quedó confirmada.', 'success')
     return redirect(url_for('web.site.compra.detalle', compra_id=compra['id']))
 
 
-def _armar_comprobante(compra, funcion):
+def _armar_comprobante(compra):
     entradas = compra.get('entradas') or []
+    primera = entradas[0] if entradas else {}
     estado = compra.get('estado_qr')
     return {
         'id': compra['id'],
         'codigo': f"CP-{compra['id']:04d}",
         'estado': estado,
         'activa': estado == 'activo',
-        'pelicula': funcion.get('pelicula_titulo') if funcion else None,
-        'sede': f"{funcion['nombre_local']} · Sala {funcion['numero_sala']}" if funcion else None,
-        'fecha_hora': entradas[0].get('fecha_hora') if entradas else None,
-        'butacas': [numero_a_codigo(entrada.get('numero_butaca')) for entrada in entradas],
+        'pelicula': primera.get('pelicula_titulo'),
+        'sede': (
+            f"{primera['nombre_local']} · Sala {primera['numero_sala']}"
+            if primera.get('nombre_local') else None
+        ),
+        'fecha_hora': primera.get('fecha_hora'),
+        'butacas': [str(entrada.get('numero_butaca')) for entrada in entradas],
         'total_entradas': sum((_decimal(entrada.get('precio')) for entrada in entradas), Decimal('0')),
         'servicios': compra.get('servicios') or [],
         'total': compra.get('monto_total'),
@@ -244,23 +202,10 @@ def _armar_comprobante(compra, funcion):
 @compra_bp.route('/<int:compra_id>')
 @login_requerido
 def detalle(compra_id):
-    try:
-        compra = compras.obtener_compra(usuario_actual()['id'], compra_id)
-    except ErrorApi as error:
-        return _pagina_no_disponible(error.mensaje)
+    compra = compras.obtener_compra(usuario_actual()['id'], compra_id)
     if compra is None:
         abort(404)
-
-    funcion = None
-    entradas = compra.get('entradas') or []
-    if entradas:
-        try:
-            # Solo se encuentra si la funcion todavia no paso
-            funcion = compras.obtener_funcion(entradas[0].get('funcion_id'))
-        except ErrorApi:
-            funcion = None
-
-    return render_template('site/confirmacion.html', compra=_armar_comprobante(compra, funcion))
+    return render_template('site/confirmacion.html', compra=_armar_comprobante(compra))
 
 
 @compra_bp.route('/<int:compra_id>/cancelar', methods=['POST'])
@@ -272,8 +217,16 @@ def cancelar(compra_id):
         if compras.obtener_compra(usuario_actual()['id'], compra_id) is None:
             abort(404)
         compras.cancelar_compra(compra_id)
-    except ErrorApi as error:
-        flash(error.mensaje, 'error')
+    except BackendAPIError as error:
+        flash(str(error), 'error')
     else:
         flash('Cancelamos tu compra. Las entradas ya no son válidas.', 'success')
-    return redirect(url_for('web.site.compra.detalle', compra_id=compra_id))
+    por_defecto = url_for('web.site.compra.detalle', compra_id=compra_id)
+    return redirect(destino_seguro(request.form.get('next'), por_defecto))
+
+
+@compra_bp.route('/historial')
+@login_requerido
+def historial():
+    compras_usuario = compras.obtener_compras_usuario(usuario_actual()['id'])
+    return render_template('site/historial_compras.html', compras=compras_usuario)

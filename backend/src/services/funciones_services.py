@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 
 from backend.src.repositories.funciones_repository import (
     obtener_butacas_ocupadas_db,
@@ -21,6 +22,8 @@ def _serializar_funcion(funcion):
     funcion_serializada = dict(funcion)
     if 'fecha_hora' in funcion_serializada:
         funcion_serializada['fecha_hora'] = _serializar_fecha(funcion_serializada['fecha_hora'])
+    if isinstance(funcion_serializada.get('precio_base'), Decimal):
+        funcion_serializada['precio_base'] = float(funcion_serializada['precio_base'])
     return funcion_serializada
 
 
@@ -98,7 +101,19 @@ def consultar_butacas_funcion_service(id_funcion: int):
     return {
         'funcion_id': id_funcion,
         'capacidad_total': capacidad_total,
+        'filas': int(funcion['filas']),
+        'columnas': int(funcion['columnas']),
         'ocupadas': ocupadas_lista,
         'libres': libres_lista,
         'butacas': butacas,
     }, None, 200
+
+
+def consultar_funcion_service(id_funcion: int):
+    """Returns one function with its room details, if it exists."""
+    if not isinstance(id_funcion, int) or isinstance(id_funcion, bool) or id_funcion <= 0:
+        return None, "El ID de la función debe ser un entero positivo.", 400
+    funcion = obtener_funcion_por_id_db(id_funcion)
+    if not funcion:
+        return None, f"Función con ID {id_funcion} no encontrada.", 404
+    return _serializar_funcion(funcion), None, 200

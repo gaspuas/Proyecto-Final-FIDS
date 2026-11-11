@@ -1,5 +1,5 @@
-from backend.src.repositories.admin_repository import insertar_pelicula_db
 from backend.src.repositories.admin_repository import (
+    listar_salas_db,
     insertar_pelicula_db, 
     insertar_funcion_db, 
     validar_y_marcar_qr_db,
@@ -137,3 +137,7 @@ def obtener_dashboard_service(desde, hasta):
         }
     }
     return respuesta, None
+
+
+def listar_salas_service():
+    return listar_salas_db()

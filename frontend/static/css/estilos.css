@@ -626,9 +626,10 @@ body {
 
 /* Estructura del Mapa de Cine con Pasillos */
 .mapa-cine {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(var(--columnas, 10), minmax(30px, 1fr));
+    justify-items: center;
+    gap: 0.6rem;
     margin-bottom: 2rem;
     width: 100%; /* Asegura usar el 100% del contenedor */
 }
@@ -664,9 +665,11 @@ body {
 }
 
 .butaca__cuadro {
-    display: inline-block;
+    display: inline-flex;
     width: 34px;
     height: 34px;
+    align-items: center;
+    justify-content: center;
     border-radius: 6px;
     border: 1.5px solid #4a4a5e;
     background-color: transparent;

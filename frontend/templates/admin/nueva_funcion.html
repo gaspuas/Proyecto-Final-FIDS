@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Programar función · Cine Paradiso{% endblock %}
+
+{% block content %}
+<section class="pagina">
+    <div class="pagina__cabecera">
+        <h1 class="pagina__titulo">Programar función</h1>
+    </div>
+    {% if error %}<p class="alerta alerta--error" role="alert">{{ error }}</p>{% endif %}
+    {% if not peliculas or not salas %}
+    <p>Para programar una función primero debe haber películas y salas registradas.</p>
+    {% else %}
+    <form method="POST" class="formulario-admin">
+        <label for="pelicula_id">Película</label>
+        <select id="pelicula_id" name="pelicula_id" required>
+            {% for pelicula in peliculas %}
+            <option value="{{ pelicula.id }}">{{ pelicula.titulo }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="sala_id">Sala</label>
+        <select id="sala_id" name="sala_id" required>
+            {% for sala in salas %}
+            <option value="{{ sala.id }}">{{ sala.nombre_local }} · Sala {{ sala.numero_sala }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="fecha_hora">Fecha y hora</label>
+        <input id="fecha_hora" name="fecha_hora" type="datetime-local" required>
+
+        <label for="precio_base">Precio base</label>
+        <input id="precio_base" name="precio_base" type="number" min="0.01" step="0.01" required>
+
+        <label for="idioma">Idioma</label>
+        <input id="idioma" name="idioma" value="Español" required>
+
+        <label for="formato">Formato</label>
+        <input id="formato" name="formato" value="2D" required>
+
+        <button class="boton boton--dorado" type="submit">Guardar función</button>
+        <a class="boton boton--secundario" href="{{ url_for('web.admin.peliculas.index') }}">Volver</a>
+    </form>
+    {% endif %}
+</section>
+{% endblock %}

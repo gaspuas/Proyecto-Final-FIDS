@@ -12,7 +12,7 @@ from flask import redirect, render_template, request, session, url_for
 ROL_ADMIN = 'administrador'
 
 # La reserva en curso sobrevive al login para poder continuar la compra
-CLAVES_QUE_SOBREVIVEN_AL_LOGIN = ('reserva_temp',)
+CLAVES_QUE_SOBREVIVEN_AL_LOGIN = ('checkout',)
 
 
 def usuario_actual():
