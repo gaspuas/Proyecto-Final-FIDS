@@ -1,9 +1,27 @@
 from flask import Blueprint, request, jsonify
 from backend.src.validators.peliculas_validators import *
-from backend.src.services.peliculas_services import *
+from backend.src.services.peliculas_services import (
+    procesar_listar_resenas,
+    procesar_obtener_cartelera,
+    procesar_obtener_pelicula,
+)
 from backend.src.utils.api_responses import *
 
 peliculas_bp = Blueprint('peliculas', __name__, url_prefix='/api/peliculas')
+
+
+@peliculas_bp.route('/<int:pelicula_id>/resenas', methods=['GET'])
+def listar_resenas(pelicula_id):
+    resultado = procesar_listar_resenas(pelicula_id)
+    if resultado['exito']:
+        return jsonify({'resenas': resultado['datos']}), 200
+    status_code = 400 if resultado.get('tipo_error') == 'VALIDATION' else 500
+    return generar_respuesta_error(
+        resultado.get('tipo_error', 'INTERNAL_SERVER_ERROR'),
+        'Error al consultar las reseñas.',
+        resultado['mensaje'],
+        status_code,
+    )
 
 @peliculas_bp.route('', methods=['GET'])
 def obtener_cartelera():

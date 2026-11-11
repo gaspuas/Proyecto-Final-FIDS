@@ -1,20 +1,19 @@
-from flask import Blueprint, abort, render_template, request
+from flask import Blueprint, abort, flash, redirect, render_template, request, session, url_for
 
-from frontend.web.constants import ASIENTOS_OCUPADOS_DEMO, FUNCIONES_DEMO, SERVICIOS_DEMO
+from frontend.web.services.funciones import obtener_butacas, obtener_funcion
 
 reserva_bp = Blueprint('reserva', __name__)
 
 
-def _render_reserva(funcion_id):
-    funcion = next(
-        (funcion for funcion in FUNCIONES_DEMO if funcion['id'] == funcion_id),
-        FUNCIONES_DEMO[0],
-    )
+def _render_reserva(funcion_id, seleccionadas=None):
+    funcion = obtener_funcion(funcion_id)
+    mapa = obtener_butacas(funcion_id)
     return render_template(
         'site/reserva_butacas.html',
         funcion=funcion,
-        asientos_ocupados=ASIENTOS_OCUPADOS_DEMO,
-        servicios=SERVICIOS_DEMO,
+        butacas=mapa['butacas'],
+        columnas=mapa['columnas'],
+        seleccionadas=seleccionadas or [],
     )
 
 
@@ -23,13 +22,29 @@ def butacas(funcion_id):
     return _render_reserva(funcion_id)
 
 
-@reserva_bp.route('/butacas', methods=['GET', 'POST'])
+@reserva_bp.route('/butacas', methods=['POST'])
 def procesar():
-    funcion_id = 101
-    if request.method == 'POST':
-        try:
-            funcion_id = int(request.form.get('funcion_id', funcion_id))
-        except ValueError:
-            abort(400)
+    try:
+        funcion_id = int(request.form.get('funcion_id', ''))
+    except ValueError:
+        abort(400)
 
-    return _render_reserva(funcion_id)
+    if request.method == 'GET':
+        return _render_reserva(funcion_id)
+
+    asientos = request.form.getlist('asientos')
+    if not asientos:
+        return redirect(url_for('.butacas', funcion_id=funcion_id))
+    if any(not asiento.isdigit() or int(asiento) <= 0 for asiento in asientos):
+        abort(400)
+    if len(set(asientos)) != len(asientos):
+        abort(400)
+
+    mapa = obtener_butacas(funcion_id)
+    libres = {str(butaca['numero']) for butaca in mapa['butacas'] if butaca['libre']}
+    if not set(asientos).issubset(libres):
+        flash('Una o más butacas ya no están disponibles. Elegí otras.', 'error')
+        return _render_reserva(funcion_id, seleccionadas=asientos)
+
+    session['checkout'] = {'id_funcion': funcion_id, 'butacas': asientos}
+    return redirect(url_for('web.site.compra.servicios'))

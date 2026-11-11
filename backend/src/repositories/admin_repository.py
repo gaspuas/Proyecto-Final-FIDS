@@ -137,3 +137,27 @@ def obtener_metricas_dashboard_db(desde, hasta):
             cursor.close()
         if conn:
             conn.close()
+
+
+def listar_salas_db():
+    conn = get_db_connection()
+    if not conn:
+        raise Exception("Fallo en la conexión a la base de datos.")
+
+    cursor = None
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT id, nombre_local, numero_sala, capacidad_total, filas, columnas
+            FROM locales_salas
+            ORDER BY nombre_local, numero_sala
+        """)
+        return cursor.fetchall()
+    except mysql.connector.Error as err:
+        print(f"Error al consultar salas: {err}")
+        raise
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()

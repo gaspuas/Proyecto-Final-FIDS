@@ -20,6 +20,8 @@ def obtener_funciones_db(
                 s.nombre_local,
                 s.numero_sala,
                 s.capacidad_total,
+                s.filas,
+                s.columnas,
                 f.fecha_hora,
                 f.precio_base,
                 f.formato,
@@ -69,6 +71,8 @@ def obtener_funcion_por_id_db(id_funcion: int):
                 s.nombre_local,
                 s.numero_sala,
                 s.capacidad_total,
+                s.filas,
+                s.columnas,
                 f.fecha_hora,
                 f.precio_base
             FROM funciones AS f
