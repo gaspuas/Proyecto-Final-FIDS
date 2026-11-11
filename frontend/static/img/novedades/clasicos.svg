@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="600" viewBox="0 0 1600 600" role="img" aria-label="Fondo abstracto ilustrativo para novedad de Cine Paradiso">
+ <defs><linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#0d0f15"/><stop offset="1" stop-color="#3c2c24"/></linearGradient><radialGradient id="glow"><stop stop-color="#b98e55" stop-opacity=".55"/><stop offset="1" stop-color="#b98e55" stop-opacity="0"/></radialGradient></defs>
+ <rect width="1600" height="600" fill="url(#bg)"/><ellipse cx="1180" cy="290" rx="450" ry="460" fill="url(#glow)"/>
+ <g opacity=".25" fill="none" stroke="#b98e55" stroke-width="15"><circle cx="1190" cy="290" r="210"/><circle cx="1190" cy="290" r="130"/><circle cx="1190" cy="290" r="48"/></g>
+ <g opacity=".3" stroke="#ffffff" stroke-width="3"><path d="M940 120 L1450 490 M940 490 L1450 120"/></g>
+ </svg>
