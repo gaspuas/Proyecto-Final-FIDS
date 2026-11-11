@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva película · Cine Paradiso{% endblock %}
+
+{% block content %}
+<section class="pagina">
+    <div class="pagina__cabecera">
+        <h1 class="pagina__titulo">Agregar película</h1>
+    </div>
+    {% if error %}<p class="alerta alerta--error" role="alert">{{ error }}</p>{% endif %}
+    <form method="POST" class="formulario-admin">
+        <label for="titulo">Título</label>
+        <input id="titulo" name="titulo" required value="{{ request.form.get('titulo', '') }}">
+
+        <label for="sinopsis">Sinopsis</label>
+        <textarea id="sinopsis" name="sinopsis" required>{{ request.form.get('sinopsis', '') }}</textarea>
+
+        <label for="duracion_minutos">Duración en minutos</label>
+        <input id="duracion_minutos" name="duracion_minutos" type="number" min="1" required value="{{ request.form.get('duracion_minutos', '') }}">
+
+        <label for="poster_url">URL del póster</label>
+        <input id="poster_url" name="poster_url" type="url" value="{{ request.form.get('poster_url', '') }}">
+
+        <label for="clasificacion">Clasificación</label>
+        <input id="clasificacion" name="clasificacion" value="{{ request.form.get('clasificacion', '') }}">
+
+        <label for="genero">Género</label>
+        <input id="genero" name="genero" value="{{ request.form.get('genero', '') }}">
+
+        <label for="director">Director</label>
+        <input id="director" name="director" value="{{ request.form.get('director', '') }}">
+
+        <label><input type="checkbox" name="es_reestreno"> Es reestreno</label>
+
+        <button class="boton boton--dorado" type="submit">Guardar película</button>
+        <a class="boton boton--secundario" href="{{ url_for('web.admin.peliculas.index') }}">Volver</a>
+    </form>
+</section>
+{% endblock %}

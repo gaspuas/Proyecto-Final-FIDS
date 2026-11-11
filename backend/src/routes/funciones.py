@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 
 from backend.src.services.funciones_services import (
     consultar_butacas_funcion_service,
+    consultar_funcion_service,
     listar_funciones_service,
 )
 from backend.src.utils.api_responses import generar_respuesta_error
@@ -78,5 +79,26 @@ def consultar_butacas_funcion(id_funcion: int):
             'ERROR_INTERNO',
             'Error al consultar el mapa de butacas',
             str(e),
+            500,
+        )
+
+
+@funciones_bp.route('/<int:id_funcion>', methods=['GET'])
+def obtener_funcion(id_funcion: int):
+    try:
+        funcion, error, status = consultar_funcion_service(id_funcion)
+        if error:
+            return generar_respuesta_error(
+                'RECURSO_NO_ENCONTRADO' if status == 404 else 'ERROR_VALIDACION',
+                'Función no encontrada' if status == 404 else 'ID inválido',
+                error,
+                status,
+            )
+        return jsonify({'funcion': funcion}), 200
+    except Exception as error:
+        return generar_respuesta_error(
+            'ERROR_INTERNO',
+            'Error al consultar la función',
+            str(error),
             500,
         )

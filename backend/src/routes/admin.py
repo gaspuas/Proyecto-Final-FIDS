@@ -4,10 +4,38 @@ from backend.src.services.admin_services import (
     crear_pelicula_service, 
     crear_funcion_service, 
     validar_qr_service,
-    obtener_dashboard_service
+    obtener_dashboard_service,
+    listar_salas_service,
 )
+from backend.src.services.peliculas_services import procesar_listar_todas_las_peliculas
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/api/admin')
+
+
+@admin_bp.route('/salas', methods=['GET'])
+def listar_salas():
+    try:
+        return jsonify({'data': listar_salas_service()}), 200
+    except Exception as error:
+        return generar_respuesta_error(
+            'INTERNAL_SERVER_ERROR',
+            'Error al consultar las salas.',
+            str(error),
+            500,
+        )
+
+
+@admin_bp.route('/peliculas', methods=['GET'])
+def listar_todas_las_peliculas():
+    resultado = procesar_listar_todas_las_peliculas()
+    if resultado['exito']:
+        return jsonify({'data': resultado['datos']}), 200
+    return generar_respuesta_error(
+        resultado.get('tipo_error', 'INTERNAL_SERVER_ERROR'),
+        'Error al consultar las películas.',
+        resultado['mensaje'],
+        500,
+    )
 
 @admin_bp.route('/peliculas', methods=['POST'])
 def alta_pelicula():

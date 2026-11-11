@@ -20,7 +20,7 @@ def listar_peliculas_cartelera(sede_id=None, fecha=None):
             FROM peliculas p
             INNER JOIN funciones f ON p.id = f.pelicula_id
             INNER JOIN locales_salas ls ON f.sala_id = ls.id
-            WHERE 1=1
+            WHERE f.fecha_hora >= NOW()
         """
         
         parametros = []
@@ -73,6 +73,57 @@ def obtener_pelicula_por_id(pelicula_id):
         print(f"Error de base de datos en obtener_pelicula_por_id: {err}")
         raise err  
         
+    finally:
+        if cursor:
+            cursor.close()
+        if conn and conn.is_connected():
+            conn.close()
+
+
+def listar_todas_las_peliculas():
+    conn = get_db_connection()
+    if not conn:
+        raise Exception("Fallo en la conexión a la base de datos.")
+
+    cursor = None
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT id, api_id, titulo, sinopsis, poster_url,
+                   duracion_minutos, clasificacion, genero, director, es_reestreno
+            FROM peliculas
+            ORDER BY titulo ASC
+        """)
+        return cursor.fetchall()
+    except mysql.connector.Error as err:
+        print(f"Error de base de datos en listar_todas_las_peliculas: {err}")
+        raise
+    finally:
+        if cursor:
+            cursor.close()
+        if conn and conn.is_connected():
+            conn.close()
+
+
+def listar_resenas_pelicula(pelicula_id):
+    conn = get_db_connection()
+    if not conn:
+        raise Exception("Fallo en la conexión a la base de datos.")
+
+    cursor = None
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT u.nombre AS nombre_usuario, r.puntuacion, r.comentario, r.fecha
+            FROM resenas AS r
+            INNER JOIN usuarios AS u ON u.id = r.usuario_id
+            WHERE r.pelicula_id = %s
+            ORDER BY r.fecha DESC, r.id DESC
+        """, (pelicula_id,))
+        return cursor.fetchall()
+    except mysql.connector.Error as err:
+        print(f"Error de base de datos en listar_resenas_pelicula: {err}")
+        raise
     finally:
         if cursor:
             cursor.close()

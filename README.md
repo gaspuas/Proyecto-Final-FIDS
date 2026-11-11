@@ -325,9 +325,14 @@ py -m venv .venv
 
 El proyecto tiene un único proceso y una única aplicación Flask (`app.py`):
 registra las rutas web y la API REST. El frontend renderiza sus plantillas y
-consume la cartelera solicitando `GET {BACKEND_URL}/api/peliculas` mediante
-Python `requests`; el backend procesa esa API y es el único que accede a MySQL.
-`BACKEND_URL` es opcional; por defecto apunta a `http://127.0.0.1:5000`, la
-misma aplicación. Por ahora, el catálogo de películas consume datos del
-backend; funciones, reservas y servicios del flujo de compra continúan usando
-datos de demostración.
+consume los datos mediante peticiones HTTP a la API REST (`/api/*`); el backend
+procesa esas peticiones y es el único que accede a MySQL. `BACKEND_URL` es
+opcional; por defecto apunta a `http://127.0.0.1:5000`, la misma aplicación.
+La cartelera, el detalle de películas, funciones, butacas, servicios,
+autenticación, compras, cancelaciones e historial consultan el backend.
+
+El recorrido de compra usa la sesión web para conservar las butacas elegidas,
+requiere iniciar sesión y registra la compra por la API. El alta de películas
+y la programación de funciones también consumen los endpoints administrativos
+disponibles. Los datos dependen de que la base esté inicializada y contenga los
+registros necesarios en `database/schema.sql`.

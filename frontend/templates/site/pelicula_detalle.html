@@ -20,7 +20,7 @@
             <h1 class="detalle-pelicula__titulo">{{ pelicula.titulo }}</h1>
             
             <p class="detalle-pelicula__meta">
-                {{ pelicula.duracion_minutos }} min · {{ pelicula.clasificacion }} · {{ pelicula.genero }} · Dir. {{ pelicula.director }}
+                {{ pelicula.duracion_minutos }} min · {{ pelicula.clasificacion or 'Sin clasificación' }} · {{ pelicula.genero or 'Género no informado' }} · Dir. {{ pelicula.director or 'No informado' }}
             </p>
 
             <p class="detalle-pelicula__sinopsis">
@@ -49,7 +49,7 @@
                                         {% if loop.first %}checked{% endif %} 
                                         required>
                                     <span class="opcion-horario__texto">
-                                        {{ funcion.fecha_hora.split(' ')[1] if funcion.fecha_hora is string else funcion.fecha_hora.strftime('%H:%M') }} hs
+                                        {{ funcion.fecha_hora }} hs · {{ funcion.formato }} · ${{ "%.2f"|format(funcion.precio_base) }}
                                     </span>
                                 </label>
 

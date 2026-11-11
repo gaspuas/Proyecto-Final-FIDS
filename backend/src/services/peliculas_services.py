@@ -1,4 +1,9 @@
-from backend.src.repositories.peliculas_repository import *
+from backend.src.repositories.peliculas_repository import (
+    listar_peliculas_cartelera,
+    listar_resenas_pelicula,
+    listar_todas_las_peliculas,
+    obtener_pelicula_por_id,
+)
 from backend.src.validators.peliculas_validators import *
 
 def procesar_obtener_cartelera(sede_id, fecha):
@@ -31,5 +36,22 @@ def procesar_obtener_pelicula(pelicula_id):
             'datos': pelicula
         }
         
+    except Exception as e:
+        return {'exito': False, 'mensaje': str(e), 'tipo_error': 'INTERNAL_ERROR'}
+
+
+def procesar_listar_todas_las_peliculas():
+    try:
+        return {'exito': True, 'datos': listar_todas_las_peliculas()}
+    except Exception as e:
+        return {'exito': False, 'mensaje': str(e), 'tipo_error': 'INTERNAL_ERROR'}
+
+
+def procesar_listar_resenas(pelicula_id):
+    es_valido, mensaje_error = validar_id_pelicula(pelicula_id)
+    if not es_valido:
+        return {'exito': False, 'mensaje': mensaje_error, 'tipo_error': 'VALIDATION'}
+    try:
+        return {'exito': True, 'datos': listar_resenas_pelicula(pelicula_id)}
     except Exception as e:
         return {'exito': False, 'mensaje': str(e), 'tipo_error': 'INTERNAL_ERROR'}

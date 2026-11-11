@@ -1,7 +1,11 @@
-from flask import Blueprint, abort, render_template, request
+from flask import Blueprint, render_template, request
 
-from frontend.web.constants import FUNCIONES_DEMO, RESENAS_DEMO
-from frontend.web.services.peliculas import obtener_peliculas
+from frontend.web.services.funciones import obtener_funciones
+from frontend.web.services.peliculas import (
+    obtener_pelicula,
+    obtener_peliculas,
+    obtener_resenas,
+)
 
 peliculas_bp = Blueprint('peliculas', __name__)
 
@@ -17,16 +21,10 @@ def index():
 
 @peliculas_bp.route('/pelicula/<int:pelicula_id>')
 def detalle(pelicula_id):
-    pelicula = next(
-        (pelicula for pelicula in obtener_peliculas() if pelicula['id'] == pelicula_id),
-        None,
-    )
-    if pelicula is None:
-        abort(404)
-
+    pelicula = obtener_pelicula(pelicula_id)
     return render_template(
         'site/pelicula_detalle.html',
         pelicula=pelicula,
-        funciones=FUNCIONES_DEMO,
-        resenas=RESENAS_DEMO,
+        funciones=obtener_funciones(pelicula_id),
+        resenas=obtener_resenas(pelicula_id),
     )

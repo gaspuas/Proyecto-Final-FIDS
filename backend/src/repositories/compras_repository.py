@@ -153,9 +153,14 @@ def obtener_entradas_por_compra_db(id_compra: int):
                 ed.numero_butaca,
                 ed.precio,
                 f.fecha_hora,
-                f.sala_id
+                f.sala_id,
+                p.titulo AS pelicula_titulo,
+                s.nombre_local,
+                s.numero_sala
             FROM entradas_detalle AS ed
             INNER JOIN funciones AS f ON f.id = ed.funcion_id
+            INNER JOIN peliculas AS p ON p.id = f.pelicula_id
+            INNER JOIN locales_salas AS s ON s.id = f.sala_id
             WHERE ed.compra_id = %s
             ORDER BY ed.id
         """

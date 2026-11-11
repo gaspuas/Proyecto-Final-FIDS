@@ -23,8 +23,16 @@
                 <a href="{{ url_for('web.site.peliculas.index') }}"
                 class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.site.peliculas') %}navbar__link--active{% endif %}">Cartelera</a>
                 
+                {% if session.get('usuario') %}
+                <span class="navbar__link">Hola, {{ session['usuario']['nombre'] }}</span>
+                <a class="navbar__link" href="{{ url_for('web.site.compra.historial') }}">Mis compras</a>
+                <form action="{{ url_for('web.site.login.logout') }}" method="POST">
+                    <button class="navbar__link" type="submit">Cerrar sesión</button>
+                </form>
+                {% else %}
                 <a href="{{ url_for('web.site.login.index') }}"
-                class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.site.login') %}navbar__link--active{% endif %}">Login</a>
+                class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.site.login') %}navbar__link--active{% endif %}">Ingresar</a>
+                {% endif %}
             </nav>
             {% endblock %}
         </div>

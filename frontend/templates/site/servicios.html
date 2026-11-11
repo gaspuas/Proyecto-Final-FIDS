@@ -9,10 +9,12 @@
 {% block content %}
 
 <section class="compra">
-    <form class="compra__servicios" id="form-servicios" method="GET" action="{{ url_for('web.site.compra.confirmacion') }}" data-total-entradas="{{ total_entradas }}">
+    <form class="compra__servicios" id="form-servicios" method="POST" action="{{ url_for('web.site.compra.servicios') }}" data-total-entradas="{{ total_entradas }}">
 
         <div class="compra__tarjeta">
             <h1 class="compra__titulo">Servicios adicionales</h1>
+            <p>{{ funcion.pelicula_titulo }} · {{ funcion.fecha_hora }} · Butacas {{ butacas|join(', ') }}</p>
+            {% if error %}<p class="alerta alerta--error" role="alert">{{ error }}</p>{% endif %}
 
             <ul class="servicios-lista">
                 {% for servicio in servicios %}
@@ -29,7 +31,7 @@
 
         <aside class="compra__tarjeta resumen">
             <h2 class="resumen__titulo">Resumen</h2>
-            <p class="resumen__detalle">{{ compra.pelicula }} · Butacas {{ compra.butacas|join(', ') }}</p>
+            <p class="resumen__detalle">{{ funcion.nombre_local }} · Sala {{ funcion.numero_sala }}</p>
 
             <div class="resumen__importes">
                 <p>Entradas: ${{ total_entradas }}</p>
