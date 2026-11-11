@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Compra confirmada · Cine Paradiso{% endblock %}
+{% set titulos = {'activo': 'Compra confirmada', 'cancelado': 'Compra cancelada', 'usado': 'Entrada utilizada'} %}
+
+{% block title %}{{ titulos.get(compra.estado, 'Tu compra') }} · Cine Paradiso{% endblock %}
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/compra.css') }}">
@@ -9,55 +11,64 @@
 {% block content %}
 
 <section class="compra">
-    <div class="compra__tarjeta confirmacion" id="confirmacion">
-        <h1 class="compra__titulo" id="confirmacion-titulo">Compra confirmada</h1>
-        <p class="confirmacion__detalle">{{ compra.pelicula }} · {{ compra.fecha_hora }} · Butacas {{ compra.butacas|join(', ') }}</p>
+    <div class="compra__tarjeta confirmacion{% if not compra.activa %} confirmacion--inactiva{% endif %}">
+        <h1 class="compra__titulo">{{ titulos.get(compra.estado, 'Tu compra') }}</h1>
+        <p class="confirmacion__detalle">
+            {{ compra.pelicula or 'Función' }}{% if compra.fecha_hora %} · {{ compra.fecha_hora|fecha_hora }}{% endif %} · Butacas {{ compra.butacas|join(', ') }}
+        </p>
+        {% if compra.sede %}<p class="confirmacion__detalle">{{ compra.sede }}</p>{% endif %}
 
-        <img class="confirmacion__qr" id="confirmacion-qr" src="{{ url_for('static', filename='img/qr-ejemplo.svg') }}" alt="Código QR de demostración" width="183" height="183">
-        <p class="confirmacion__demo">QR de demostración: no sirve para ingresar a la sala</p>
+        {% if compra.qr %}
+        <img class="confirmacion__qr" src="{{ compra.qr }}" alt="Código QR de la compra {{ compra.codigo }}" width="183" height="183">
+        {% endif %}
+        {% if not compra.activa %}
+        <p class="confirmacion__estado">Este código QR ya no habilita el ingreso.</p>
+        {% endif %}
 
         <p class="confirmacion__detalle">Código: {{ compra.codigo }}</p>
 
         <dl class="confirmacion__importes">
             <div>
                 <dt>Entradas ({{ compra.butacas|length }})</dt>
-                <dd>${{ total_entradas }}</dd>
+                <dd>{{ compra.total_entradas|precio }}</dd>
             </div>
-            {% for servicio in elegidos %}
+            {% for servicio in compra.servicios %}
             <div>
-                <dt>{{ servicio.nombre }} × {{ servicio.cantidad }}</dt>
-                <dd>${{ servicio.precio * servicio.cantidad }}</dd>
+                <dt>{{ servicio.nombre }} × {{ servicio.cant }}</dt>
+                <dd>{{ servicio.subtotal|precio }}</dd>
             </div>
             {% endfor %}
             <div class="confirmacion__total">
                 <dt>Total</dt>
-                <dd>${{ total }}</dd>
+                <dd>{{ compra.total|precio }}</dd>
             </div>
         </dl>
 
-        <div id="confirmacion-acciones">
-            <button type="button" class="boton boton--secundario" id="abrir-cancelacion">Cancelar compra</button>
-            <p class="confirmacion__nota">Cancelable hasta 2 h antes de la función</p>
-        </div>
-
-        <div id="confirmacion-cancelada" hidden>
-            <p class="confirmacion__nota" role="status">Demostración: la compra se canceló solo en esta pantalla. Si recargás, vuelve a su estado inicial.</p>
-            <a class="boton boton--secundario" href="{{ url_for('web.site.home.index') }}">Volver al inicio</a>
-        </div>
+        {% if compra.activa %}
+        <button type="button" class="boton boton--secundario" id="abrir-cancelacion">Cancelar compra</button>
+        <p class="confirmacion__nota">Cancelable hasta 2 h antes de la función</p>
+        {% else %}
+        <a class="boton boton--secundario" href="{{ url_for('web.site.peliculas.index') }}">Ver cartelera</a>
+        {% endif %}
     </div>
 
+    {% if compra.activa %}
     <dialog class="dialogo" id="dialogo-cancelacion" aria-labelledby="dialogo-titulo">
         <h2 class="dialogo__titulo" id="dialogo-titulo">¿Cancelar la compra?</h2>
-        <p class="dialogo__texto">Vas a cancelar la compra {{ compra.codigo }}. Esta acción es solo una demostración.</p>
-        <div class="dialogo__acciones">
+        <p class="dialogo__texto">Vas a cancelar la compra {{ compra.codigo }}. Las entradas dejarán de ser válidas.</p>
+        <form class="dialogo__acciones" id="form-cancelacion" method="POST" action="{{ url_for('web.site.compra.cancelar', compra_id=compra.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="button" class="boton boton--secundario" id="cerrar-cancelacion">Volver</button>
-            <button type="button" class="boton" id="confirmar-cancelacion">Sí, cancelar</button>
-        </div>
+            <button type="submit" class="boton">Sí, cancelar</button>
+        </form>
     </dialog>
+    {% endif %}
 </section>
 
 {% endblock %}
 
 {% block extra_js %}
+{% if compra.activa %}
 <script src="{{ url_for('static', filename='js/confirmacion.js') }}"></script>
+{% endif %}
 {% endblock %}

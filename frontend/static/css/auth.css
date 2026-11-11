@@ -13,7 +13,6 @@
     --auth-borde-campo: #55545c;
     --auth-borde-secundario: #838183;
     --auth-error: #f88787;
-    --auth-exito: #a3e6a1;
 
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -79,11 +78,20 @@
     margin-top: 5px;
 }
 
-.autenticacion__aviso {
-    color: var(--auth-exito);
-    font-size: 13px;
-    line-height: 1.35;
-    margin-top: 12px;
+.autenticacion__alerta {
+    background-color: #3e1a1a;
+    border: 1px solid #c62828;
+    border-radius: 10px;
+    color: var(--auth-error);
+    font-size: 14px;
+    line-height: 1.4;
+    margin-bottom: 14px;
+    padding: 10px 12px;
+}
+
+.autenticacion .boton:disabled {
+    opacity: 0.6;
+    cursor: wait;
 }
 
 /* Botones: se pisan los estilos generales de .boton solo dentro de esta pantalla */

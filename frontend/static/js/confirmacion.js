@@ -1,6 +1,8 @@
-/* Cancelacion simulada: solo cambia lo que se ve, no se guarda en ningun lado. */
+/* Dialogo de confirmacion para cancelar la compra.
+   La cancelacion la hace el servidor al recibir el formulario. */
 
 const dialogoCancelacion = document.getElementById('dialogo-cancelacion');
+const formularioCancelacion = document.getElementById('form-cancelacion');
 
 document.getElementById('abrir-cancelacion').addEventListener('click', () => {
     dialogoCancelacion.showModal();
@@ -10,12 +12,9 @@ document.getElementById('cerrar-cancelacion').addEventListener('click', () => {
     dialogoCancelacion.close();
 });
 
-document.getElementById('confirmar-cancelacion').addEventListener('click', () => {
-    dialogoCancelacion.close();
-
-    document.getElementById('confirmacion').classList.add('confirmacion--cancelada');
-    document.getElementById('confirmacion-titulo').textContent = 'Compra cancelada';
-    document.getElementById('confirmacion-qr').alt = 'Código QR de demostración anulado';
-    document.getElementById('confirmacion-acciones').hidden = true;
-    document.getElementById('confirmacion-cancelada').hidden = false;
+// Evita enviar dos veces la cancelacion por doble clic
+formularioCancelacion.addEventListener('submit', () => {
+    formularioCancelacion.querySelectorAll('button').forEach((boton) => {
+        boton.disabled = true;
+    });
 });

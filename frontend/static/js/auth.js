@@ -1,5 +1,5 @@
-/* Validacion de los formularios de login y registro.
-   Solo es una demostracion de frontend: no envia datos ni inicia sesion. */
+/* Validacion de los formularios de login y registro antes de enviarlos.
+   El envio es un POST normal del formulario: JavaScript no hace peticiones. */
 
 const MENSAJES_CAMPO_VACIO = {
     nombre: 'Ingresá tu nombre.',
@@ -39,15 +39,14 @@ function validarCampo(campo) {
 }
 
 document.querySelectorAll('.autenticacion form').forEach((formulario) => {
-    const campos = Array.from(formulario.querySelectorAll('input'));
-    const aviso = formulario.querySelector('.autenticacion__aviso');
+    const campos = Array.from(formulario.querySelectorAll('input:not([type="hidden"])'));
+    const boton = formulario.querySelector('button[type="submit"]');
 
     // Con JavaScript activo, los errores se muestran debajo de cada campo
     formulario.noValidate = true;
 
     campos.forEach((campo) => {
         campo.addEventListener('input', () => {
-            aviso.hidden = true;
             if (campo.hasAttribute('aria-invalid')) {
                 validarCampo(campo);
             }
@@ -55,17 +54,13 @@ document.querySelectorAll('.autenticacion form').forEach((formulario) => {
     });
 
     formulario.addEventListener('submit', (evento) => {
-        // Pendiente de integracion: hoy el envio siempre se detiene aca
-        evento.preventDefault();
-
         const invalidos = campos.filter((campo) => !validarCampo(campo));
         if (invalidos.length > 0) {
-            aviso.hidden = true;
+            evento.preventDefault();
             invalidos[0].focus();
             return;
         }
-
-        formulario.querySelector('input[type="password"]').value = '';
-        aviso.hidden = false;
+        // Evita un segundo envio por doble clic mientras responde el servidor
+        boton.disabled = true;
     });
 });

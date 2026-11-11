@@ -150,8 +150,25 @@
     margin: 14px 0 15px;
 }
 
+.resumen__nota {
+    color: var(--compra-texto-suave);
+    font-size: 12px;
+    margin: -8px 0 15px;
+}
+
 .resumen .boton {
     width: 100%;
+}
+
+.compra .boton:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.compra__aviso {
+    color: #f88787;
+    font-size: 14px;
+    margin-top: 10px;
 }
 
 /* --------------------------------------------------------------------------
@@ -175,12 +192,14 @@
     max-width: 100%;
     height: auto;
     margin: 15px auto 0;
+    /* El SVG del QR es transparente: los lectores necesitan fondo claro */
+    background-color: #f1efea;
     transition: opacity 0.2s ease;
 }
 
-.confirmacion__demo {
+.confirmacion__estado {
     color: var(--compra-ambar);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     margin: 8px 0 6px;
 }
@@ -212,16 +231,8 @@
     margin-top: 10px;
 }
 
-#confirmacion-cancelada .boton {
-    margin-top: 14px;
-}
-
-.confirmacion--cancelada .confirmacion__qr {
+.confirmacion--inactiva .confirmacion__qr {
     opacity: 0.25;
-}
-
-.confirmacion--cancelada .confirmacion__demo {
-    visibility: hidden;
 }
 
 /* Dialogo de cancelacion. El reset global (margin: 0) le quita el centrado */

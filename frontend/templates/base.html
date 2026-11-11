@@ -23,8 +23,20 @@
                 <a href="{{ url_for('web.site.peliculas.index') }}"
                 class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.site.peliculas') %}navbar__link--active{% endif %}">Cartelera</a>
                 
+                {% if usuario_sesion %}
+                    {% if usuario_es_admin %}
+                    <a href="{{ url_for('web.admin.index') }}"
+                    class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.admin') %}navbar__link--active{% endif %}">Backoffice</a>
+                    {% endif %}
+
+                    <form class="navbar__form" method="POST" action="{{ url_for('web.site.login.logout') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="navbar__link navbar__boton">Salir</button>
+                    </form>
+                {% else %}
                 <a href="{{ url_for('web.site.login.index') }}"
-                class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.site.login') %}navbar__link--active{% endif %}">Login</a>
+                class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.site.login') %}navbar__link--active{% endif %}">Ingresar</a>
+                {% endif %}
             </nav>
             {% endblock %}
         </div>

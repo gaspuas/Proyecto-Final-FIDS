@@ -96,6 +96,19 @@ body {
     background-color: rgba(212, 175, 55, 0.15);
 }
 
+/* Boton "Salir": es un formulario POST, pero se ve igual que los enlaces */
+.navbar__form {
+    display: flex;
+}
+
+.navbar__boton {
+    background: none;
+    border: none;
+    font-family: inherit;
+    line-height: inherit;
+    cursor: pointer;
+}
+
 /* --------------------------------------------------------------------------
    3. Mensajes Flash y Contenedor Principal (base.html)
    -------------------------------------------------------------------------- */
