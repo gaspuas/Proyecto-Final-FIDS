@@ -132,6 +132,23 @@ CREATE TABLE IF NOT EXISTS resenas (
 ) ENGINE=InnoDB;
 
 -- -----------------------------------------------------
+-- 10. Tabla: novedades (Carrousel)
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS novedades (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(150) NOT NULL,
+    descripcion TEXT NULL,
+    imagen_url VARCHAR(500) NOT NULL,
+    tipo ENUM('estreno','oferta','publicidad') NOT NULL,
+    enlace VARCHAR(500) NULL,
+    orden INT NOT NULL DEFAULT 0,
+    fecha_inicio DATETIME NULL,
+    fecha_fin DATETIME NULL,
+    activo BOOLEAN NOT NULL DEFAULT TRUE,
+    INDEX idx_novedades_publicacion (activo, orden, fecha_inicio, fecha_fin)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------
 -- Carga inicial de datos de prueba
 -- -----------------------------------------------------
 INSERT IGNORE INTO locales_salas (nombre_local, numero_sala, capacidad_total, filas, columnas) VALUES
@@ -184,3 +201,20 @@ INSERT INTO funciones (
 (8, 3, '2026-11-17 17:00:00', 5800.00, 'Subtitulada', 'IMAX 2D'),
 (9, 2, '2026-11-18 20:00:00', 4500.00, 'Subtitulada', '2D'),
 (10, 1, '2026-11-18 18:00:00', 5200.00, 'Doblada', '4XD');
+
+
+INSERT INTO novedades (titulo, descripcion, imagen_url, tipo, enlace, orden, fecha_inicio, fecha_fin, activo)
+SELECT 'Semana de clásicos', 'Una selección de películas para redescubrir en pantalla grande.',
+       '/static/img/novedades/clasicos.svg', 'oferta', '/peliculas/', 1, NULL, NULL, 1
+WHERE NOT EXISTS (
+    SELECT 1 FROM novedades WHERE titulo = 'Semana de clásicos'
+      AND imagen_url = '/static/img/novedades/clasicos.svg'
+);
+
+INSERT INTO novedades (titulo, descripcion, imagen_url, tipo, enlace, orden, fecha_inicio, fecha_fin, activo)
+SELECT 'Próximos estrenos', 'Conocé las funciones y títulos que llegan a la cartelera.',
+       '/static/img/novedades/estrenos.svg', 'estreno', '/peliculas/', 2, NULL, NULL, 1
+WHERE NOT EXISTS (
+    SELECT 1 FROM novedades WHERE titulo = 'Próximos estrenos'
+      AND imagen_url = '/static/img/novedades/estrenos.svg'
+);
