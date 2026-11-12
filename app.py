@@ -1,4 +1,5 @@
 import os
+import secrets
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -20,8 +21,8 @@ app = Flask(
 )
 app.json.sort_keys = False
 app.config['SECRET_KEY'] = os.getenv(
-    'SECRET_KEY', 'cine_paradiso_secret_key_2026'
-)
+    'SECRET_KEY'
+) or secrets.token_hex(32)
 
 register_api_routes(app)
 app.register_blueprint(web_bp)
@@ -46,9 +47,9 @@ def internal_server_error(error):
 def backend_unavailable(error):
     return render_template(
         '500.html',
-        error_title='503 · Backend no disponible',
+        error_title=f'{error.status_code} · Error del backend',
         error_message=str(error),
-    ), error.status_code if 400 <= error.status_code < 500 else 503
+    ), error.status_code
 
 
 if __name__ == '__main__':

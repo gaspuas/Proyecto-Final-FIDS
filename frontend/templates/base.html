@@ -25,6 +25,9 @@
                 
                 {% if session.get('usuario') %}
                 <span class="navbar__link">Hola, {{ session['usuario']['nombre'] }}</span>
+                {% if session['usuario'].get('rol') == 'administrador' %}
+                <a class="navbar__link" href="{{ url_for('web.admin.index') }}">Administración</a>
+                {% endif %}
                 <a class="navbar__link" href="{{ url_for('web.site.compra.historial') }}">Mis compras</a>
                 <form action="{{ url_for('web.site.login.logout') }}" method="POST">
                     <button class="navbar__link" type="submit">Cerrar sesión</button>

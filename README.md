@@ -336,3 +336,8 @@ requiere iniciar sesión y registra la compra por la API. El alta de películas
 y la programación de funciones también consumen los endpoints administrativos
 disponibles. Los datos dependen de que la base esté inicializada y contenga los
 registros necesarios en `database/schema.sql`.
+
+El panel `/admin/` y sus endpoints `/api/admin/*` requieren una sesión con rol
+`administrador`; los clientes reciben acceso denegado. Al iniciar sesión, los
+administradores llegan al panel. Configurá un `SECRET_KEY` privado en `.env`
+para conservar las sesiones tras reiniciar la aplicación.
