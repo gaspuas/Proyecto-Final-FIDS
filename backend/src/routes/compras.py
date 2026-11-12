@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, current_app, request, jsonify
 
 from backend.src.utils.api_responses import generar_respuesta_error
 from backend.src.validators.compras_validators import (
@@ -35,6 +35,7 @@ def crear_compra():
         return jsonify(compra), 201
 
     except Exception as e:
+        current_app.logger.exception("Error al crear compra")
         return generar_respuesta_error(
             "ERROR_INTERNO", "Error al crear la compra", str(e), 500
         )

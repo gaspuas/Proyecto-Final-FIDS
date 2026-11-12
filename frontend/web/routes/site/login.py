@@ -45,6 +45,9 @@ def index():
                 destino = _safe_next_url(request.args.get('next'))
                 if destino:
                     return redirect(destino)
+                if session['usuario']['rol'] == 'administrador':
+                    flash('Iniciaste sesión correctamente.', 'success')
+                    return redirect(url_for('web.admin.index'))
                 if session.get('checkout'):
                     return redirect(url_for('web.site.compra.servicios'))
                 flash('Iniciaste sesión correctamente.', 'success')
