@@ -1,15 +1,17 @@
 import unittest
 from unittest.mock import patch
 
-from app import app
+from backend.app import app as backend_app
+from frontend.app import app as frontend_app
 
 
 class AdminAccessTests(unittest.TestCase):
     def setUp(self):
-        self.client = app.test_client()
+        self.client = frontend_app.test_client()
+        self.api_client = backend_app.test_client()
 
-    def iniciar_sesion_como(self, rol):
-        with self.client.session_transaction() as sesion:
+    def iniciar_sesion_como(self, rol, client=None):
+        with (client or self.client).session_transaction() as sesion:
             sesion['usuario'] = {
                 'id': 1,
                 'nombre': 'Usuario de prueba',
@@ -42,17 +44,18 @@ class AdminAccessTests(unittest.TestCase):
         self.assertIn(b'Administraci', respuesta.data)
 
     def test_api_admin_requiere_rol_administrador(self):
-        self.assertEqual(self.client.get('/api/admin/peliculas').status_code, 401)
+        api = self.api_client
+        self.assertEqual(api.get('/api/admin/peliculas').status_code, 401)
 
-        self.iniciar_sesion_como('cliente')
-        self.assertEqual(self.client.get('/api/admin/peliculas').status_code, 403)
+        self.iniciar_sesion_como('cliente', api)
+        self.assertEqual(api.get('/api/admin/peliculas').status_code, 403)
 
-        self.iniciar_sesion_como('administrador')
+        self.iniciar_sesion_como('administrador', api)
         with patch(
             'backend.src.routes.admin.procesar_listar_todas_las_peliculas',
             return_value={'exito': True, 'datos': []},
         ):
-            respuesta = self.client.get('/api/admin/peliculas')
+            respuesta = api.get('/api/admin/peliculas')
 
         self.assertEqual(respuesta.status_code, 200)
 

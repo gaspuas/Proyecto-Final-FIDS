@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 
 import requests
 
-from app import app
+from frontend.app import app
 
 
 class BackendAPIErrorTests(unittest.TestCase):
