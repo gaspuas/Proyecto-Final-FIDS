@@ -15,14 +15,20 @@ def _compra(id_compra, estado):
         'monto_total': 200,
         'codigo_qr': f'codigo-{id_compra}',
         'estado_qr': estado,
-        'entradas': [{
-            'pelicula_titulo': 'Prueba',
-            'fecha_hora': '2026-12-01 20:00:00',
-            'numero_butaca': 'C7',
-            'nombre_local': 'Paradiso Central',
-            'numero_sala': 1,
-        }],
-        'servicios': [],
+        'entradas': [
+            {
+                'pelicula_titulo': 'Prueba',
+                'fecha_hora': '2026-12-01 20:00:00',
+                'numero_butaca': butaca,
+                'precio': '100.00',
+                'nombre_local': 'Paradiso Central',
+                'numero_sala': 1,
+            }
+            for butaca in ('C7', 'C8')
+        ],
+        'servicios': [
+            {'id': 1, 'nombre': 'Combo', 'cant': 2, 'subtotal': '9000.00'},
+        ],
     }
 
 
@@ -71,6 +77,94 @@ class HistorialVistaTests(unittest.TestCase):
         html = self._historial([_compra(2, 'cancelado')])
 
         self.assertNotIn('data:image/png', html)
+
+    def test_la_tarjeta_del_historial_tiene_el_mismo_detalle_que_la_confirmacion(self):
+        compra = _compra(1, 'activo')
+        compra['qr_data_uri'] = QR_FALSO
+        compra['monto_total'] = '9200.00'
+
+        html = self._historial([compra])
+
+        self.assertIn('class="compra__tarjeta confirmacion"', html)
+        self.assertIn('Prueba · 2026-12-01 20:00:00 · Butacas C7, C8', html)
+        self.assertIn('Entradas (2)', html)
+        self.assertIn('$200.00', html)
+        self.assertIn('Combo × 2', html)
+        self.assertIn('$9000.00', html)
+        self.assertIn('$9200.00', html)
+        self.assertIn('Cancelar compra', html)
+
+    def test_una_compra_cancelada_se_ve_como_cancelada_y_sin_boton_de_cancelar(self):
+        html = self._historial([_compra(2, 'cancelado')])
+
+        self.assertIn('confirmacion--cancelada', html)
+        self.assertIn('Compra cancelada', html)
+        self.assertNotIn('Cancelar compra', html)
+
+
+class NavbarMisComprasTests(unittest.TestCase):
+    PATRON_ACTIVO = r'class="navbar__link navbar__link--active"[^>]*>Mis compras'
+
+    def _client_con_sesion(self):
+        client = frontend_app.test_client()
+        with client.session_transaction() as sesion:
+            sesion['usuario'] = {'id': 1, 'nombre': 'Cliente', 'rol': 'cliente'}
+        return client
+
+    def test_mis_compras_se_marca_como_activo_en_el_historial(self):
+        client = self._client_con_sesion()
+        with patch(
+            'frontend.web.routes.site.compra.obtener_compras_usuario',
+            return_value=[],
+        ):
+            html = client.get('/compra/historial').get_data(as_text=True)
+
+        self.assertRegex(html, self.PATRON_ACTIVO)
+
+    def test_mis_compras_no_se_marca_como_activo_en_otras_paginas(self):
+        client = self._client_con_sesion()
+        with patch(
+            'frontend.web.routes.site.home.obtener_novedades', return_value=[]
+        ):
+            html = client.get('/').get_data(as_text=True)
+
+        self.assertNotRegex(html, self.PATRON_ACTIVO)
+
+
+class ConfirmacionVistaTests(unittest.TestCase):
+    def test_la_confirmacion_usa_la_misma_tarjeta_que_el_historial(self):
+        client = frontend_app.test_client()
+        with client.session_transaction() as sesion:
+            sesion['usuario'] = {'id': 1, 'nombre': 'Cliente', 'rol': 'cliente'}
+            sesion['checkout'] = {'id_funcion': 1, 'butacas': ['A1', 'A2']}
+
+        with patch(
+            'frontend.web.routes.site.compra.obtener_funcion',
+            return_value={
+                'id': 1,
+                'precio_base': 100,
+                'pelicula_titulo': 'Prueba',
+                'fecha_hora': '2026-12-01 20:00:00',
+            },
+        ), patch(
+            'frontend.web.routes.site.compra.obtener_servicios', return_value=[]
+        ), patch(
+            'frontend.web.routes.site.compra.crear_compra',
+            return_value={
+                'id': 7,
+                'codigo_qr': 'codigo-7',
+                'qr_data_uri': QR_FALSO,
+                'monto_total': 200,
+            },
+        ):
+            html = client.post('/compra/servicios').get_data(as_text=True)
+
+        self.assertIn('class="compra__tarjeta confirmacion"', html)
+        self.assertIn('Compra confirmada', html)
+        self.assertIn('Prueba · 2026-12-01 20:00:00 · Butacas A1, A2', html)
+        self.assertIn(f'src="{QR_FALSO}"', html)
+        self.assertIn('Cancelar compra', html)
+        self.assertIn('Volver al inicio', html)
 
 
 if __name__ == '__main__':

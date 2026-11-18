@@ -9,39 +9,9 @@
 {% block content %}
 
 <section class="compra">
-    <div class="compra__tarjeta confirmacion" id="confirmacion">
-        <h1 class="compra__titulo" id="confirmacion-titulo">Compra confirmada</h1>
-        <p class="confirmacion__detalle">{{ compra.pelicula }} · {{ compra.fecha_hora }} · Butacas {{ compra.butacas|join(', ') }}</p>
-
-        {% if compra.qr_data_uri %}
-        <img class="confirmacion__qr" id="confirmacion-qr" src="{{ compra.qr_data_uri }}" alt="Código QR de la compra" width="183" height="183">
-        {% endif %}
-
-        <p class="confirmacion__detalle">Código: {{ compra.codigo_qr }}</p>
-
-        <dl class="confirmacion__importes">
-            <div>
-                <dt>Entradas ({{ compra.butacas|length }})</dt>
-                <dd>${{ "%.2f"|format(compra.total_entradas) }}</dd>
-            </div>
-            {% for servicio in compra.servicios_elegidos %}
-            <div>
-                <dt>{{ servicio.nombre }} × {{ servicio.cantidad }}</dt>
-                <dd>${{ "%.2f"|format(servicio.subtotal) }}</dd>
-            </div>
-            {% endfor %}
-            <div class="confirmacion__total">
-                <dt>Total</dt>
-                <dd>${{ "%.2f"|format(compra.total) }}</dd>
-            </div>
-        </dl>
-
-        <form action="{{ url_for('web.site.compra.cancelar', compra_id=compra.id) }}" method="POST">
-            <button type="submit" class="boton boton--secundario">Cancelar compra</button>
-            <p class="confirmacion__nota">Cancelable hasta 2 h antes de la función</p>
-        </form>
-        <a class="boton boton--secundario" href="{{ url_for('web.site.home.index') }}">Volver al inicio</a>
-    </div>
+    {% with titulo='Compra confirmada', etiqueta='h1', volver_inicio=true %}
+        {% include 'site/_tarjeta_compra.html' %}
+    {% endwith %}
 </section>
 
 {% endblock %}

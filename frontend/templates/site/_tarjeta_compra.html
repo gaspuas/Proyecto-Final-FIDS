@@ -1,0 +1,47 @@
+{# Tarjeta de compra compartida por la confirmación y "Mis compras".
+   Variables: compra, titulo, etiqueta (h1 o h2) y volver_inicio (opcional). #}
+{% set estado = compra.estado_qr|default('activo') %}
+<div class="compra__tarjeta confirmacion{% if estado == 'cancelado' %} confirmacion--cancelada{% endif %}">
+    <{{ etiqueta|default('h2') }} class="compra__titulo">{{ titulo }}</{{ etiqueta|default('h2') }}>
+    <p class="confirmacion__detalle">{{ compra.pelicula }} · {{ compra.fecha_hora }} · Butacas {{ compra.butacas|join(', ') }}</p>
+
+    {% if estado == 'cancelado' %}
+    <p class="confirmacion__nota">Compra cancelada</p>
+    {% elif estado == 'usado' %}
+    <p class="confirmacion__nota">Entrada utilizada</p>
+    {% endif %}
+
+    {% if compra.qr_data_uri %}
+    <img class="confirmacion__qr" src="{{ compra.qr_data_uri }}" alt="Código QR de la compra" width="183" height="183">
+    {% endif %}
+
+    <p class="confirmacion__detalle">Código: {{ compra.codigo_qr }}</p>
+
+    <dl class="confirmacion__importes">
+        <div>
+            <dt>Entradas ({{ compra.butacas|length }})</dt>
+            <dd>${{ "%.2f"|format(compra.total_entradas) }}</dd>
+        </div>
+        {% for servicio in compra.servicios_elegidos %}
+        <div>
+            <dt>{{ servicio.nombre }} × {{ servicio.cantidad }}</dt>
+            <dd>${{ "%.2f"|format(servicio.subtotal) }}</dd>
+        </div>
+        {% endfor %}
+        <div class="confirmacion__total">
+            <dt>Total</dt>
+            <dd>${{ "%.2f"|format(compra.total) }}</dd>
+        </div>
+    </dl>
+
+    {% if estado == 'activo' %}
+    <form action="{{ url_for('web.site.compra.cancelar', compra_id=compra.id) }}" method="POST">
+        <button type="submit" class="boton boton--secundario">Cancelar compra</button>
+        <p class="confirmacion__nota">Cancelable hasta 2 h antes de la función</p>
+    </form>
+    {% endif %}
+
+    {% if volver_inicio %}
+    <a class="boton boton--secundario" href="{{ url_for('web.site.home.index') }}">Volver al inicio</a>
+    {% endif %}
+</div>

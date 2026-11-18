@@ -2,33 +2,21 @@
 
 {% block title %}Mis compras · Cine Paradiso{% endblock %}
 
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/compra.css') }}">
+{% endblock %}
+
 {% block content %}
 <section class="pagina">
     <div class="pagina__cabecera">
         <h1 class="pagina__titulo">Mis compras</h1>
     </div>
     {% if compras %}
-    <div class="grilla-peliculas">
+    <div class="compra compra__lista">
         {% for compra in compras %}
-        <article class="tarjeta-pelicula">
-            <div class="tarjeta-pelicula__cuerpo">
-                <h2 class="tarjeta-pelicula__titulo">Compra #{{ compra.id }}</h2>
-                <p>{{ compra.fecha_compra }} · ${{ compra.monto_total }}</p>
-                <p>Estado: {{ compra.estado_qr }}</p>
-                {% for entrada in compra.entradas %}
-                <p>{{ entrada.pelicula_titulo }} · {{ entrada.fecha_hora }} · Butaca {{ entrada.numero_butaca }} · {{ entrada.nombre_local }} Sala {{ entrada.numero_sala }}</p>
-                {% endfor %}
-                {% if compra.estado_qr == 'activo' %}
-                {% if compra.qr_data_uri %}
-                <img src="{{ compra.qr_data_uri }}" alt="Código QR de la compra #{{ compra.id }}" width="160" height="160">
-                <p>Código: {{ compra.codigo_qr }}</p>
-                {% endif %}
-                <form action="{{ url_for('web.site.compra.cancelar', compra_id=compra.id) }}" method="POST">
-                    <button class="boton boton--secundario" type="submit">Cancelar compra</button>
-                </form>
-                {% endif %}
-            </div>
-        </article>
+            {% with titulo='Compra #' ~ compra.id, etiqueta='h2' %}
+                {% include 'site/_tarjeta_compra.html' %}
+            {% endwith %}
         {% endfor %}
     </div>
     {% else %}
