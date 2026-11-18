@@ -2,17 +2,12 @@ from flask import jsonify
 from urllib.parse import urlencode
 
 def generar_respuesta_error(code, message, description, status_code):
-    """Helper para estructurar respuestas de error estandarizadas."""
-    return jsonify({
-        "errors": [
-            {
-                "code": code,
-                "message": message,
-                "level": "error",
-                "description": description
-            }
-        ]
-    }), status_code
+    if status_code >= 500:
+        public_message = "Ocurrió un error inesperado. Intenta nuevamente más tarde."
+    else:
+        public_message = description or message or "No se pudo completar la solicitud."
+
+    return jsonify({"message": public_message}), status_code
 
 def construir_links_hateoas(base_url, query_params, total, limit, offset):
     """Genera el objeto _links con navegación HATEOAS (_first, _prev, _next, _last)."""

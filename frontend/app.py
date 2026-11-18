@@ -37,14 +37,18 @@ def page_not_found(error):
 
 @app.errorhandler(500)
 def internal_server_error(error):
-    return render_template('500.html', error_message=error.description), 500
+    return render_template(
+        '500.html',
+        error_title='Ocurrió un error',
+        error_message='No pudimos completar la solicitud. Intenta más tarde.',
+    ), 500
 
 
 @app.errorhandler(BackendAPIError)
 def backend_unavailable(error):
     return render_template(
         '500.html',
-        error_title=f'{error.status_code} · Error del backend',
+        error_title='No se pudo completar la solicitud',
         error_message=str(error),
     ), error.status_code
 
