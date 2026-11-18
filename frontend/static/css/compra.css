@@ -206,6 +206,12 @@
     font-weight: 700;
 }
 
+/* Lista de tarjetas en "Mis compras" */
+.compra__lista {
+    display: grid;
+    gap: 20px;
+}
+
 .confirmacion__nota {
     color: var(--compra-texto-suave);
     font-size: 14px;

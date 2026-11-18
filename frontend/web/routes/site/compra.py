@@ -29,6 +29,28 @@ def _require_login():
     return False
 
 
+def _como_tarjeta(compra):
+    """Adapta una compra del historial a los campos de la tarjeta de confirmación."""
+    entradas = compra.get('entradas') or []
+    primera = entradas[0] if entradas else {}
+    return {
+        **compra,
+        'pelicula': primera.get('pelicula_titulo', ''),
+        'fecha_hora': primera.get('fecha_hora', ''),
+        'butacas': [entrada['numero_butaca'] for entrada in entradas],
+        'total_entradas': sum(float(entrada.get('precio') or 0) for entrada in entradas),
+        'servicios_elegidos': [
+            {
+                'nombre': servicio['nombre'],
+                'cantidad': servicio['cant'],
+                'subtotal': float(servicio['subtotal']),
+            }
+            for servicio in compra.get('servicios') or []
+        ],
+        'total': float(compra.get('monto_total') or 0),
+    }
+
+
 @compra_bp.route('/servicios', methods=['GET', 'POST'])
 def servicios():
     checkout = _checkout()
@@ -119,4 +141,7 @@ def historial():
         flash('Iniciá sesión para consultar tus compras.', 'error')
         return redirect(url_for('web.site.login.index', next=request.path))
     compras_usuario = obtener_compras_usuario(int(usuario['id']))
-    return render_template('site/historial_compras.html', compras=compras_usuario)
+    return render_template(
+        'site/historial_compras.html',
+        compras=[_como_tarjeta(compra) for compra in compras_usuario],
+    )
