@@ -1,5 +1,5 @@
 """Frontend routes for the database-backed checkout flow."""
-from flask import Blueprint, abort, flash, redirect, render_template, request, session, url_for
+from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 
 from frontend.web.services.api_client import BackendAPIError
 from frontend.web.services.compras import (
@@ -12,6 +12,19 @@ from frontend.web.services.servicios import obtener_servicios
 
 compra_bp = Blueprint('compra', __name__)
 CANTIDAD_MAXIMA = 10
+
+# El backend responde 400 para varios rechazos: el plazo solo se distingue por este texto.
+TEXTO_PLAZO_BACKEND = 'solo puede cancelarse hasta'
+MENSAJE_PLAZO_VENCIDO = (
+    'No se puede cancelar la compra porque faltan menos de 2 horas '
+    'para el inicio de la función.'
+)
+MENSAJE_COMPRA_INEXISTENTE = 'No encontramos esa compra en tu cuenta.'
+MENSAJE_SIN_CONEXION = (
+    'No pudimos conectarnos con el servidor. '
+    'Revisá el estado de tu compra e intentá de nuevo.'
+)
+MENSAJE_ERROR_SERVIDOR = 'Ocurrió un error al cancelar la compra. Intentá de nuevo más tarde.'
 
 
 def _checkout():
@@ -49,6 +62,18 @@ def _como_tarjeta(compra):
         ],
         'total': float(compra.get('monto_total') or 0),
     }
+
+
+def _mensaje_error_cancelacion(error):
+    if error.status_code == 404:
+        return MENSAJE_COMPRA_INEXISTENTE
+    if error.status_code in (502, 504):
+        return MENSAJE_SIN_CONEXION
+    if error.status_code >= 500:
+        return MENSAJE_ERROR_SERVIDOR
+    if TEXTO_PLAZO_BACKEND in str(error):
+        return MENSAJE_PLAZO_VENCIDO
+    return str(error)
 
 
 @compra_bp.route('/servicios', methods=['GET', 'POST'])
@@ -125,12 +150,15 @@ def cancelar(compra_id):
     usuario = session.get('usuario')
     if not usuario:
         return redirect(url_for('web.site.login.index'))
-    compras_usuario = obtener_compras_usuario(int(usuario['id']))
-    if not any(compra['id'] == compra_id for compra in compras_usuario):
-        abort(404)
-
-    cancelar_compra(compra_id)
-    flash('La compra fue cancelada.', 'success')
+    try:
+        compras_usuario = obtener_compras_usuario(int(usuario['id']))
+        if any(compra['id'] == compra_id for compra in compras_usuario):
+            cancelar_compra(compra_id)
+            flash('La compra fue cancelada.', 'success')
+        else:
+            flash(MENSAJE_COMPRA_INEXISTENTE, 'error')
+    except BackendAPIError as error:
+        flash(_mensaje_error_cancelacion(error), 'error')
     return redirect(url_for('.historial'))
 
 
@@ -140,7 +168,15 @@ def historial():
     if not usuario:
         flash('Iniciá sesión para consultar tus compras.', 'error')
         return redirect(url_for('web.site.login.index', next=request.path))
-    compras_usuario = obtener_compras_usuario(int(usuario['id']))
+    try:
+        compras_usuario = obtener_compras_usuario(int(usuario['id']))
+    except BackendAPIError as error:
+        if error.status_code < 500:
+            raise
+        # Mantiene visible el cartel de una cancelación fallida si el backend no responde.
+        return render_template(
+            'site/historial_compras.html', compras=[], error_carga=True
+        ), error.status_code
     return render_template(
         'site/historial_compras.html',
         compras=[_como_tarjeta(compra) for compra in compras_usuario],

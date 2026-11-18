@@ -11,7 +11,9 @@
     <div class="pagina__cabecera">
         <h1 class="pagina__titulo">Mis compras</h1>
     </div>
-    {% if compras %}
+    {% if error_carga %}
+    <p>No pudimos cargar tus compras. Intentá de nuevo en unos minutos.</p>
+    {% elif compras %}
     <div class="compra compra__lista">
         {% for compra in compras %}
             {% with titulo='Compra #' ~ compra.id, etiqueta='h2' %}
