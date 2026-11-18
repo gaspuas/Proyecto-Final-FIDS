@@ -39,7 +39,8 @@ El sistema a desarrollar constará de dos plataformas integradas:
 ### 1.4 Estructura del proyecto
 
 cine-paradiso/
-├── app.py                        # Aplicación Flask única: frontend + API
+├── backend/app.py                # Aplicación Flask del backend (API REST)
+├── frontend/app.py               # Aplicación Flask del frontend (web)
 ├── requirements.txt              # Dependencias (Flask, mysql-connector-python, etc.)
 ├── .env                          # Variables de entorno (DB_HOST, DB_USER, SECRET_KEY)
 ├── database/                     # Paquete principal de la aplicación
@@ -312,7 +313,8 @@ cp .env.base .env            # los defaults ya funcionan en local
 
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python app.py     # Frontend y API en http://localhost:5000
+.venv/bin/python -m backend.app     # API en http://localhost:5001
+.venv/bin/python -m frontend.app    # Web en http://localhost:5000 (otra terminal)
 ```
 
 En Windows, usar los comandos equivalentes:
@@ -320,14 +322,16 @@ En Windows, usar los comandos equivalentes:
 ```powershell
 py -m venv .venv
 .venv\Scripts\python.exe -m pip install -r requirements.txt
-.venv\Scripts\python.exe app.py
+.venv\Scripts\python.exe -m backend.app
+.venv\Scripts\python.exe -m frontend.app
 ```
 
-El proyecto tiene un único proceso y una única aplicación Flask (`app.py`):
-registra las rutas web y la API REST. El frontend renderiza sus plantillas y
-consume los datos mediante peticiones HTTP a la API REST (`/api/*`); el backend
-procesa esas peticiones y es el único que accede a MySQL. `BACKEND_URL` es
-opcional; por defecto apunta a `http://127.0.0.1:5000`, la misma aplicación.
+El proyecto tiene dos aplicaciones Flask independientes: `backend/app.py`
+(API REST, puerto 5001, único que accede a MySQL) y `frontend/app.py` (páginas
+web, puerto 5000). El frontend consume la API mediante peticiones HTTP a
+`/api/*`. `BACKEND_URL` es opcional; por defecto apunta a
+`http://127.0.0.1:5001`. Ambos procesos DEBEN compartir el mismo `SECRET_KEY`
+en `.env`, porque la API admin lee la cookie de sesión firmada por el frontend.
 La cartelera, el detalle de películas, funciones, butacas, servicios,
 autenticación, compras, cancelaciones e historial consultan el backend.
 

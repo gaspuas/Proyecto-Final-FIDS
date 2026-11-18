@@ -1,3 +1,4 @@
+"""Punto de entrada del frontend: solo páginas web. Ejecutar con `python -m frontend.app`."""
 import os
 import secrets
 from pathlib import Path
@@ -5,14 +6,13 @@ from pathlib import Path
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template
 
-from backend.src.routes import register_api_routes
 from frontend.web.routes import web_bp
 from frontend.web.services.api_client import BackendAPIError
 
-BASE_DIR = Path(__file__).resolve().parent
-FRONTEND_DIR = BASE_DIR / 'frontend'
+FRONTEND_DIR = Path(__file__).resolve().parent
+ROOT_DIR = FRONTEND_DIR.parent
 
-load_dotenv(BASE_DIR / '.env')
+load_dotenv(ROOT_DIR / '.env')
 
 app = Flask(
     __name__,
@@ -20,11 +20,8 @@ app = Flask(
     static_folder=str(FRONTEND_DIR / 'static'),
 )
 app.json.sort_keys = False
-app.config['SECRET_KEY'] = os.getenv(
-    'SECRET_KEY'
-) or secrets.token_hex(32)
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY') or secrets.token_hex(32)
 
-register_api_routes(app)
 app.register_blueprint(web_bp)
 
 

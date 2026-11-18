@@ -16,11 +16,7 @@ class BackendAPIError(Exception):
 
 
 def api_request(method, path, *, params=None, payload=None):
-    default_port = os.getenv('PORT', '5000')
-    base_url = os.getenv(
-        'BACKEND_URL',
-        f'http://127.0.0.1:{default_port}',
-    ).rstrip('/')
+    base_url = os.getenv('BACKEND_URL', 'http://127.0.0.1:5001').rstrip('/')
     headers = None
     if path == '/api/admin' or path.startswith('/api/admin/'):
         if has_request_context():

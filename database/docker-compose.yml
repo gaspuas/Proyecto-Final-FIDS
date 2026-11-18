@@ -9,6 +9,8 @@ services:
       MYSQL_DATABASE: cine_paradiso_db
       MYSQL_USER: cineAdmin
       MYSQL_PASSWORD: cinePass1234
+      # Zona horaria local: sin esto MySQL usa UTC y NOW() queda 3 horas adelantado
+      TZ: America/Argentina/Buenos_Aires
     ports:
       - "3307:3306"
     volumes:
