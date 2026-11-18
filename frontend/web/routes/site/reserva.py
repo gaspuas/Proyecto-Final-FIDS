@@ -1,8 +1,21 @@
+import re
+
 from flask import Blueprint, abort, flash, redirect, render_template, request, session, url_for
 
 from frontend.web.services.funciones import obtener_butacas, obtener_funcion
 
 reserva_bp = Blueprint('reserva', __name__)
+
+# Código de butaca: letra de fila + número de columna (A1, C7).
+CODIGO_BUTACA = re.compile(r'[A-Z][1-9][0-9]?')
+
+
+def _agrupar_por_fila(butacas):
+    """Agrupa las butacas por letra de fila, conservando el orden del mapa."""
+    filas = {}
+    for butaca in butacas:
+        filas.setdefault(butaca['fila'], []).append(butaca)
+    return filas
 
 
 def _render_reserva(funcion_id, seleccionadas=None):
@@ -11,8 +24,8 @@ def _render_reserva(funcion_id, seleccionadas=None):
     return render_template(
         'site/reserva_butacas.html',
         funcion=funcion,
-        butacas=mapa['butacas'],
-        columnas=mapa['columnas'],
+        filas=_agrupar_por_fila(mapa['butacas']),
+        columnas=range(1, mapa['columnas'] + 1),
         seleccionadas=seleccionadas or [],
     )
 
@@ -35,13 +48,13 @@ def procesar():
     asientos = request.form.getlist('asientos')
     if not asientos:
         return redirect(url_for('.butacas', funcion_id=funcion_id))
-    if any(not asiento.isdigit() or int(asiento) <= 0 for asiento in asientos):
+    if any(not CODIGO_BUTACA.fullmatch(asiento) for asiento in asientos):
         abort(400)
     if len(set(asientos)) != len(asientos):
         abort(400)
 
     mapa = obtener_butacas(funcion_id)
-    libres = {str(butaca['numero']) for butaca in mapa['butacas'] if butaca['libre']}
+    libres = {butaca['codigo'] for butaca in mapa['butacas'] if butaca['libre']}
     if not set(asientos).issubset(libres):
         flash('Una o más butacas ya no están disponibles. Elegí otras.', 'error')
         return _render_reserva(funcion_id, seleccionadas=asientos)

@@ -12,19 +12,33 @@
 
             <form action="{{ url_for('web.site.reserva.procesar') }}" method="POST" id="form-butacas">
                 <input type="hidden" name="funcion_id" value="{{ funcion.id }}">
-                <div class="mapa-cine" style="--columnas: {{ columnas }}">
-                    {% for butaca in butacas %}
-                    {% set seleccionada = (butaca.numero|string) in seleccionadas %}
-                    <label class="butaca {% if not butaca.libre %}butaca--ocupada{% endif %}">
-                        <input
-                            type="checkbox"
-                            name="asientos"
-                            value="{{ butaca.numero }}"
-                            {% if not butaca.libre %}disabled{% endif %}
-                            {% if seleccionada %}checked{% endif %}
-                        >
-                        <span class="butaca__cuadro" aria-label="Butaca {{ butaca.numero }}">{{ butaca.numero }}</span>
-                    </label>
+                <div class="mapa-cine">
+                    <div class="mapa-cine__fila">
+                        <span class="mapa-cine__letra"></span>
+                        <div class="mapa-cine__bloque">
+                            {% for columna in columnas %}
+                            <span class="mapa-cine__columna">{{ columna }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% for letra, butacas_fila in filas.items() %}
+                    <div class="mapa-cine__fila">
+                        <span class="mapa-cine__letra">{{ letra }}</span>
+                        <div class="mapa-cine__bloque">
+                            {% for butaca in butacas_fila %}
+                            <label class="butaca {% if not butaca.libre %}butaca--ocupada{% endif %}">
+                                <input
+                                    type="checkbox"
+                                    name="asientos"
+                                    value="{{ butaca.codigo }}"
+                                    {% if not butaca.libre %}disabled{% endif %}
+                                    {% if butaca.codigo in seleccionadas %}checked{% endif %}
+                                >
+                                <span class="butaca__cuadro" title="{{ butaca.codigo }}" aria-label="Fila {{ butaca.fila }}, butaca {{ butaca.columna }}"></span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
 

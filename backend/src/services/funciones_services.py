@@ -6,6 +6,7 @@ from backend.src.repositories.funciones_repository import (
     obtener_funciones_db,
     obtener_funcion_por_id_db,
 )
+from backend.src.utils.butacas import generar_codigos
 
 
 def _serializar_fecha(valor):
@@ -78,22 +79,25 @@ def consultar_butacas_funcion_service(id_funcion: int):
         return None, f"Función con ID {id_funcion} no encontrada.", 404
 
     capacidad_total = int(funcion['capacidad_total'])
+    filas = int(funcion['filas'])
+    columnas = int(funcion['columnas'])
     ocupadas = obtener_butacas_ocupadas_db(id_funcion)
 
     butacas = []
     ocupadas_lista = []
     libres_lista = []
 
-    for numero in range(1, capacidad_total + 1):
-        valor = str(numero)
-        estado = 'ocupada' if valor in ocupadas else 'libre'
+    for codigo in generar_codigos(filas, columnas):
+        estado = 'ocupada' if codigo in ocupadas else 'libre'
         if estado == 'ocupada':
-            ocupadas_lista.append(numero)
+            ocupadas_lista.append(codigo)
         else:
-            libres_lista.append(numero)
+            libres_lista.append(codigo)
 
         butacas.append({
-            'numero': numero,
+            'codigo': codigo,
+            'fila': codigo[0],
+            'columna': int(codigo[1:]),
             'estado': estado,
             'libre': estado == 'libre',
         })
@@ -101,8 +105,8 @@ def consultar_butacas_funcion_service(id_funcion: int):
     return {
         'funcion_id': id_funcion,
         'capacidad_total': capacidad_total,
-        'filas': int(funcion['filas']),
-        'columnas': int(funcion['columnas']),
+        'filas': filas,
+        'columnas': columnas,
         'ocupadas': ocupadas_lista,
         'libres': libres_lista,
         'butacas': butacas,

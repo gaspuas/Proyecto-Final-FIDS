@@ -25,7 +25,9 @@ def obtener_funcion_por_id_db(id_funcion: int):
                 f.sala_id,
                 f.fecha_hora,
                 f.precio_base,
-                s.capacidad_total
+                s.capacidad_total,
+                s.filas,
+                s.columnas
             FROM funciones AS f
             INNER JOIN locales_salas AS s ON s.id = f.sala_id
             WHERE f.id = %s

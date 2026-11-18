@@ -1,3 +1,5 @@
+import re
+
 
 def validar_id_recurso(recurso_id: int) -> tuple[bool, str | None]:
     if not isinstance(recurso_id, int) or recurso_id <= 0:
@@ -34,13 +36,14 @@ def validar_body_crear_compra(data: dict) -> tuple[dict, str | None]:
 
     butacas_limpias = []
     for butaca in butacas:
-        if isinstance(butaca, bool) or not isinstance(butaca, (int, str)):
-            return {}, "Cada butaca debe ser un número entero positivo."
-        butaca_str = str(butaca).strip()
-        if not butaca_str.isdigit() or int(butaca_str) <= 0:
-            return {}, "Cada butaca debe identificarse con un número entero positivo."
-        if len(butaca_str) > 3:
-            return {}, "El numero de butaca no puede superar los 3 caracteres."
+        if not isinstance(butaca, str):
+            return {}, "Cada butaca debe ser un código de texto, por ejemplo 'A1'."
+        butaca_str = butaca.strip().upper()
+        if not re.fullmatch(r'[A-Z][1-9][0-9]?', butaca_str):
+            return {}, (
+                "Cada butaca debe identificarse con una letra de fila y un "
+                "número de columna, por ejemplo 'A1' o 'C7'."
+            )
         butacas_limpias.append(butaca_str)
 
     if len(set(butacas_limpias)) != len(butacas_limpias):
