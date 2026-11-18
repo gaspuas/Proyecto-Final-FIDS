@@ -5,6 +5,7 @@ from secrets import token_urlsafe
 import mysql.connector
 
 from backend.src.repositories.compras_repository import *
+from backend.src.utils.butacas import es_codigo_valido
 
 
 HORAS_LIMITE_CANCELACION = 2
@@ -46,10 +47,11 @@ def crear_compra_service(id_usuario: int, id_funcion: int, butacas: list, servic
     if fecha_funcion <= ahora:
         return None, "No se pueden comprar entradas para una función que ya comenzó.", 400
 
-    capacidad = int(funcion['capacidad_total'])
+    filas = int(funcion['filas'])
+    columnas = int(funcion['columnas'])
     butacas_invalidas = [
         butaca for butaca in butacas
-        if not butaca.isdigit() or int(butaca) > capacidad
+        if not es_codigo_valido(butaca, filas, columnas)
     ]
     if butacas_invalidas:
         return None, (

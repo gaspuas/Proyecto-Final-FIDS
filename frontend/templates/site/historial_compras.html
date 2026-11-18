@@ -19,6 +19,10 @@
                 <p>{{ entrada.pelicula_titulo }} · {{ entrada.fecha_hora }} · Butaca {{ entrada.numero_butaca }} · {{ entrada.nombre_local }} Sala {{ entrada.numero_sala }}</p>
                 {% endfor %}
                 {% if compra.estado_qr == 'activo' %}
+                {% if compra.qr_data_uri %}
+                <img src="{{ compra.qr_data_uri }}" alt="Código QR de la compra #{{ compra.id }}" width="160" height="160">
+                <p>Código: {{ compra.codigo_qr }}</p>
+                {% endif %}
                 <form action="{{ url_for('web.site.compra.cancelar', compra_id=compra.id) }}" method="POST">
                     <button class="boton boton--secundario" type="submit">Cancelar compra</button>
                 </form>

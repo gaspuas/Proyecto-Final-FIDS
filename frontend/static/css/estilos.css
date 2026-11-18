@@ -613,19 +613,28 @@ body {
 
 /* Estructura del Mapa de Cine con Pasillos */
 .mapa-cine {
-    display: grid;
-    grid-template-columns: repeat(var(--columnas, 10), minmax(30px, 1fr));
-    justify-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 0.6rem;
     margin-bottom: 2rem;
     width: 100%; /* Asegura usar el 100% del contenedor */
+    overflow-x: auto; /* Evita desbordar en pantallas angostas */
 }
 
 .mapa-cine__fila {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Empuja el bloque izq y der a los extremos */
-    width: 100%;
+    justify-content: center;
+    gap: 0.8rem;
+}
+
+/* Número de columna sobre cada butaca */
+.mapa-cine__columna {
+    width: 34px;
+    color: #8a8a9e;
+    font-size: 0.8rem;
+    text-align: center;
 }
 
 .mapa-cine__letra {
