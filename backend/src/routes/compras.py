@@ -56,6 +56,11 @@ def listar_compras_usuario(id_usuario: int):
                 "RECURSO_NO_ENCONTRADO", "Usuario no encontrado", err_negocio, status
             )
 
+        # Solo las compras activas necesitan el QR para ingresar a la función.
+        for compra in compras:
+            if compra.get('estado_qr') == 'activo':
+                compra['qr_data_uri'] = generar_qr_base64(compra['codigo_qr'])
+
         return jsonify({"compras": compras}), 200
 
     except Exception as e:
