@@ -85,9 +85,12 @@ CREATE TABLE IF NOT EXISTS entradas_detalle (
   funcion_id INT NOT NULL,
   numero_butaca VARCHAR(10) NOT NULL,
   precio DECIMAL(10,2) NOT NULL,
+  -- 1 mientras la entrada ocupa la butaca; NULL cuando la compra se cancela.
+  -- MySQL permite varios NULL en un índice único, así la butaca se puede volver a vender.
+  activa TINYINT(1) NULL DEFAULT 1,
   CONSTRAINT fk_entradas_compra FOREIGN KEY (compra_id) REFERENCES compras(id) ON DELETE CASCADE,
   CONSTRAINT fk_entradas_funcion FOREIGN KEY (funcion_id) REFERENCES funciones(id) ON DELETE CASCADE,
-  CONSTRAINT uq_funcion_butaca UNIQUE (funcion_id, numero_butaca)
+  CONSTRAINT uq_funcion_butaca_activa UNIQUE (funcion_id, numero_butaca, activa)
 ) ENGINE=InnoDB;
 
 -- -----------------------------------------------------

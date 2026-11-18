@@ -253,6 +253,12 @@ def cancelar_compra_db(id_compra: int):
             "UPDATE compras SET estado_qr = 'cancelado' WHERE id = %s",
             (id_compra,)
         )
+        # Las entradas se conservan para el historial, pero dejan de ocupar la
+        # butaca: activa = NULL queda fuera de la restricción UNIQUE.
+        cursor.execute(
+            "UPDATE entradas_detalle SET activa = NULL WHERE compra_id = %s",
+            (id_compra,)
+        )
         connection.commit()
         return {
             'id': id_compra,
