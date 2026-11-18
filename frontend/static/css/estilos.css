@@ -613,31 +613,33 @@ body {
 
 /* Estructura del Mapa de Cine con Pasillos */
 .mapa-cine {
+    --hueco: 0.6rem; /* Espacio entre butacas */
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.6rem;
+    gap: var(--hueco);
     margin-bottom: 2rem;
     width: 100%; /* Asegura usar el 100% del contenedor */
-    overflow-x: auto; /* Evita desbordar en pantallas angostas */
 }
 
+/* Cada fila ocupa todo el ancho disponible, hasta el tamaño natural del mapa */
 .mapa-cine__fila {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 0.8rem;
+    width: 100%;
+    max-width: calc(var(--columnas, 10) * 34px + (var(--columnas, 10) - 1) * var(--hueco) + 20px + 0.8rem);
 }
 
 /* Número de columna sobre cada butaca */
 .mapa-cine__columna {
-    width: 34px;
     color: #8a8a9e;
     font-size: 0.8rem;
     text-align: center;
 }
 
 .mapa-cine__letra {
+    flex: none;
     width: 20px;
     color: #8a8a9e;
     font-weight: 600;
@@ -645,9 +647,13 @@ body {
     text-align: center;
 }
 
+/* Las butacas se reparten el ancho de la fila: se achican solas en pantallas angostas */
 .mapa-cine__bloque {
-    display: flex;
-    gap: 0.6rem; /* Espaciado entre las butacas de un mismo bloque */
+    flex: 1;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(var(--columnas, 10), minmax(0, 1fr));
+    gap: var(--hueco);
 }
 
 .mapa-cine__pasillo {
@@ -660,10 +666,16 @@ body {
     display: none;
 }
 
+.butaca {
+    display: block;
+}
+
 .butaca__cuadro {
-    display: inline-flex;
-    width: 34px;
-    height: 34px;
+    display: flex;
+    width: 100%;
+    max-width: 34px;
+    aspect-ratio: 1;
+    margin: 0 auto;
     align-items: center;
     justify-content: center;
     border-radius: 6px;
@@ -789,3 +801,80 @@ body {
   .carrusel__indicadores { right:1.25rem; bottom:.85rem; }
 }
 @media(prefers-reduced-motion:reduce) { .carrusel__slide { transition:none; } }
+
+/* --------------------------------------------------------------------------
+   13. Adaptabilidad Responsive: detalle de película y reserva de butacas
+   -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+    /* Reserva: el resumen pasa debajo del mapa */
+    .reserva-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Detalle de película: póster arriba e información debajo */
+    .detalle-pelicula__layout {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 1.5rem 0;
+    }
+
+    .detalle-pelicula__poster-img,
+    .detalle-pelicula__poster-placeholder {
+        height: auto;
+        aspect-ratio: 2 / 3;
+        max-width: 260px;
+        margin: 0 auto;
+    }
+
+    .detalle-pelicula__titulo {
+        font-size: 1.7rem;
+    }
+
+    .tarjeta-funciones {
+        padding: 1.2rem;
+    }
+
+    /* El texto del horario puede ocupar varias líneas en vez de desbordar */
+    .opcion-horario__texto {
+        display: block;
+    }
+
+    .tarjeta-funciones__horarios .opcion-horario {
+        flex: 1 1 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .reserva-sala {
+        padding: 1rem;
+    }
+
+    .reserva-sala__titulo {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .reserva-sala__pantalla {
+        margin-bottom: 1.5rem;
+    }
+
+    .mapa-cine {
+        --hueco: 0.3rem;
+    }
+
+    .mapa-cine__fila {
+        gap: 0.4rem;
+        max-width: none;
+    }
+
+    .mapa-cine__letra {
+        width: 16px;
+    }
+
+    .reserva-leyenda {
+        flex-wrap: wrap;
+        gap: 0.8rem 1.2rem;
+    }
+}
