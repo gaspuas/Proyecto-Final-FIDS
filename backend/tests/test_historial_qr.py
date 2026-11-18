@@ -102,6 +102,35 @@ class HistorialVistaTests(unittest.TestCase):
         self.assertNotIn('Cancelar compra', html)
 
 
+class NavbarMisComprasTests(unittest.TestCase):
+    PATRON_ACTIVO = r'class="navbar__link navbar__link--active"[^>]*>Mis compras'
+
+    def _client_con_sesion(self):
+        client = frontend_app.test_client()
+        with client.session_transaction() as sesion:
+            sesion['usuario'] = {'id': 1, 'nombre': 'Cliente', 'rol': 'cliente'}
+        return client
+
+    def test_mis_compras_se_marca_como_activo_en_el_historial(self):
+        client = self._client_con_sesion()
+        with patch(
+            'frontend.web.routes.site.compra.obtener_compras_usuario',
+            return_value=[],
+        ):
+            html = client.get('/compra/historial').get_data(as_text=True)
+
+        self.assertRegex(html, self.PATRON_ACTIVO)
+
+    def test_mis_compras_no_se_marca_como_activo_en_otras_paginas(self):
+        client = self._client_con_sesion()
+        with patch(
+            'frontend.web.routes.site.home.obtener_novedades', return_value=[]
+        ):
+            html = client.get('/').get_data(as_text=True)
+
+        self.assertNotRegex(html, self.PATRON_ACTIVO)
+
+
 class ConfirmacionVistaTests(unittest.TestCase):
     def test_la_confirmacion_usa_la_misma_tarjeta_que_el_historial(self):
         client = frontend_app.test_client()

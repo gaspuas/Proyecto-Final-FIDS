@@ -90,6 +90,15 @@ body {
     transition: all 0.2s ease;
 }
 
+/* "Cerrar sesión" es un <button>: se le quita el aspecto por defecto del navegador */
+button.navbar__link {
+    background: transparent;
+    border: 0;
+    font-family: inherit;
+    line-height: inherit;
+    cursor: pointer;
+}
+
 .navbar__link:hover,
 .navbar__link--active {
     color: var(--color-dorado);
@@ -847,6 +856,27 @@ body {
 }
 
 @media (max-width: 600px) {
+    /* Navbar: el menú pasa a varias líneas en vez de desbordar hacia la derecha */
+    .header-principal {
+        position: static; /* Un header de varias líneas ocuparía demasiada pantalla fijo */
+    }
+
+    .nav {
+        padding: 0.8rem 1rem;
+        gap: 0.6rem;
+    }
+
+    .nav__menu {
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+        gap: 0.4rem 0.5rem;
+    }
+
+    .navbar__link {
+        padding: 0.5rem 0.8rem; /* Más alto para tocarlo con el dedo */
+    }
+
     .reserva-sala {
         padding: 1rem;
     }
