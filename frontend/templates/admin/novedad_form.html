@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar' if novedad else 'Nueva' }} novedad · Cine Paradiso{% endblock %}
+{% block content %}
+<section class="pagina pagina--site admin-novedades-pagina">
+  <div class="pagina__cabecera admin-novedades__cabecera">
+    <div>
+      <p class="admin-novedades__sobrelinea">PANEL DE ADMINISTRACIÓN / NOVEDADES</p>
+      <h1 class="pagina__titulo">{{ 'Editar novedad' if novedad else 'Nueva novedad o promoción' }}</h1>
+      <p class="pagina__subtitulo">Prepará lo que los visitantes van a ver en el carrusel de Cine Paradiso.</p>
+    </div>
+    <a class="boton boton--secundario admin-novedades__volver" href="{{ url_for('web.admin.novedades.index') }}">← Volver a novedades</a>
+  </div>
+  {% if error %}<p class="alerta alerta--error" role="alert">{{ error }}</p>{% endif %}
+  <form method="POST" enctype="multipart/form-data" class="formulario-admin admin-novedades__formulario">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="admin-novedades__seccion">
+      <div class="admin-novedades__seccion-titulo">
+        <span class="admin-novedades__numero">01</span>
+        <div><h2>Información de la promoción</h2><p>Escribí un título claro y una descripción atractiva.</p></div>
+      </div>
+      <div class="admin-novedades__campos">
+        <div class="admin-novedades__campo">
+          <label for="titulo">Título <span class="admin-novedades__obligatorio">*</span></label>
+          <input id="titulo" name="titulo" type="text" maxlength="150" required placeholder="Ej.: Combo pochoclos + bebida" value="{{ request.form.get('titulo', novedad.titulo if novedad else '') }}">
+        </div>
+        <div class="admin-novedades__campo">
+          <label for="descripcion">Descripción</label>
+          <textarea id="descripcion" name="descripcion" rows="4" placeholder="Contá qué incluye la promoción y por qué vale la pena...">{{ request.form.get('descripcion', novedad.descripcion if novedad else '') or '' }}</textarea>
+        </div>
+        <div class="admin-novedades__campo">
+          <label for="tipo">Tipo de novedad</label>
+          {% set tipo_actual = request.form.get('tipo', novedad.tipo if novedad else 'oferta') %}
+          <select id="tipo" name="tipo">
+            <option value="estreno" {% if tipo_actual == 'estreno' %}selected{% endif %}>Película / estreno</option>
+            <option value="oferta" {% if tipo_actual == 'oferta' %}selected{% endif %}>Promoción de consumibles</option>
+            <option value="publicidad" {% if tipo_actual == 'publicidad' %}selected{% endif %}>Publicidad / anuncio</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="admin-novedades__seccion">
+      <div class="admin-novedades__seccion-titulo">
+        <span class="admin-novedades__numero">02</span>
+        <div><h2>Imagen del carrusel</h2><p>Subí una foto nueva o elegí una que ya esté en el proyecto.</p></div>
+      </div>
+      <div class="admin-novedades__campos">
+        {% if novedad and novedad.imagen_url %}
+        <div class="admin-novedades__imagen-actual">
+          <span>Imagen actual</span>
+          <img class="admin-novedades__vista-previa" src="{{ novedad.imagen_url }}" alt="Imagen actual de la novedad">
+        </div>
+        {% endif %}
+        <div class="admin-novedades__campo">
+          <label for="imagen_archivo">Subir una imagen nueva</label>
+          <input id="imagen_archivo" name="imagen_archivo" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+          <p class="admin-novedades__ayuda">JPG, PNG o WebP · Hasta 5 MB · Ideal 16:9. Se guarda en <code>frontend/static/img/novedades/</code>.</p>
+        </div>
+        <div class="admin-novedades__separador"><span>O elegí una imagen del proyecto</span></div>
+        <div class="admin-novedades__campo">
+          <label for="imagen_existente">Imagen existente</label>
+          <select id="imagen_existente" name="imagen_existente">
+            <option value="">{{ 'Conservar imagen actual' if novedad else 'Seleccioná una imagen' }}</option>
+            {% set imagen_seleccionada = request.form.get('imagen_existente', novedad.imagen_url if novedad else '') %}
+            {% for grupo in grupos_imagenes %}
+            <optgroup label="{{ grupo.titulo }}">
+              {% for imagen in grupo.imagenes %}
+              <option value="{{ imagen.url }}" {% if imagen_seleccionada == imagen.url %}selected{% endif %}>{{ imagen.nombre }}</option>
+              {% endfor %}
+            </optgroup>
+            {% endfor %}
+          </select>
+          <p class="admin-novedades__ayuda">Las imágenes de películas conservan sus enlaces originales. Si subís una nueva, tendrá prioridad sobre esta selección.</p>
+        </div>
+
+        <div class="admin-encuadre" id="admin-encuadre" data-imagen-actual="{{ novedad.imagen_url if novedad and novedad.imagen_url else '' }}">
+          <div class="admin-encuadre__cabecera">
+            <div><h3>Vista previa del carrusel</h3><p>Arrastrá la foto para moverla y usá el zoom para elegir el encuadre. Así se verá en Inicio.</p></div>
+            <span class="admin-encuadre__medida">Formato panorámico · 30:13</span>
+          </div>
+          <div class="admin-encuadre__marco">
+            <canvas id="admin-encuadre-canvas" width="1200" height="520" aria-label="Vista previa del recorte de la imagen"></canvas>
+            <div class="admin-encuadre__textos" aria-hidden="true"><small>OFERTA / ESTRENO</small><strong id="admin-encuadre-titulo">{{ request.form.get('titulo', novedad.titulo if novedad else 'Tu promoción') or 'Tu promoción' }}</strong><span>Ver cartelera →</span></div>
+            <div class="admin-encuadre__vacio" id="admin-encuadre-vacio">Seleccioná una imagen para previsualizarla</div>
+          </div>
+          <div class="admin-encuadre__herramientas">
+            <label for="admin-encuadre-zoom">Zoom <output id="admin-encuadre-zoom-valor">100%</output></label>
+            <input id="admin-encuadre-zoom" type="range" min="100" max="300" step="1" value="100" disabled>
+            <button class="boton boton--secundario" type="button" id="admin-encuadre-centrar" disabled>Centrar</button>
+            <button class="boton boton--dorado" type="button" id="admin-encuadre-aplicar" disabled>Aplicar encuadre</button>
+          </div>
+          <p class="admin-encuadre__estado" id="admin-encuadre-estado" role="status" aria-live="polite">Podés subir una imagen o elegir una del proyecto.</p>
+          <p class="admin-novedades__ayuda">El botón «Aplicar encuadre» crea una nueva imagen panorámica y la guarda junto con la novedad. La imagen original del proyecto no se modifica. Si no lo aplicás, se usa la imagen elegida sin recortarla.</p>
+        </div>
+      </div>
+    </div>
+    <div class="admin-novedades__seccion">
+      <div class="admin-novedades__seccion-titulo">
+        <span class="admin-novedades__numero">03</span>
+        <div><h2>Publicación</h2><p>Decidí cuándo y en qué posición aparece.</p></div>
+      </div>
+      <div class="admin-novedades__campos">
+        <div class="admin-novedades__campo">
+          <label for="enlace">Enlace al hacer clic <span class="admin-novedades__opcional">Opcional</span></label>
+          <input id="enlace" name="enlace" maxlength="500" value="{{ request.form.get('enlace', novedad.enlace if novedad else '') or '' }}" placeholder="/cartelera o https://...">
+        </div>
+        <div class="admin-novedades__grid">
+          <div class="admin-novedades__campo">
+            <label for="orden">Orden en el carrusel</label>
+            <input id="orden" name="orden" type="number" min="0" value="{{ request.form.get('orden', novedad.orden if novedad else 0) }}" required>
+          </div>
+          <div class="admin-novedades__campo">
+            <label for="fecha_inicio">Publicar desde <span class="admin-novedades__opcional">Opcional</span></label>
+            <input id="fecha_inicio" name="fecha_inicio" type="datetime-local" value="{{ request.form.get('fecha_inicio', fecha_input(novedad.fecha_inicio) if novedad else '') }}">
+          </div>
+          <div class="admin-novedades__campo">
+            <label for="fecha_fin">Publicar hasta <span class="admin-novedades__opcional">Opcional</span></label>
+            <input id="fecha_fin" name="fecha_fin" type="datetime-local" value="{{ request.form.get('fecha_fin', fecha_input(novedad.fecha_fin) if novedad else '') }}">
+          </div>
+        </div>
+        {% set activo = request.form.get('activo') == 'on' if request.method == 'POST' else (novedad.activo if novedad else true) %}
+        <label class="admin-novedades__activar">
+          <input type="checkbox" name="activo" {% if activo %}checked{% endif %}>
+          <span><strong>Mostrar en la página de inicio</strong><small>La promoción se mostrará cuando esté dentro de las fechas configuradas.</small></span>
+        </label>
+      </div>
+    </div>
+    <div class="admin-novedades__pie">
+      <a class="boton boton--secundario" href="{{ url_for('web.admin.novedades.index') }}">Cancelar</a>
+      <button class="boton boton--dorado" type="submit">{{ 'Guardar cambios' if novedad else 'Crear novedad' }}</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+
+{% block extra_js %}<script src="{{ url_for('static', filename='js/admin_encuadre_novedades.js') }}" defer></script>{% endblock %}

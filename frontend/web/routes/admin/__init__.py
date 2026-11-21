@@ -2,6 +2,7 @@
 from flask import Blueprint, abort, redirect, request, session, url_for
 
 from frontend.web.routes.admin.peliculas import peliculas_bp
+from frontend.web.routes.admin.novedades import novedades_bp
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -21,3 +22,5 @@ def index():
 
 
 admin_bp.register_blueprint(peliculas_bp, url_prefix='/peliculas')
+
+admin_bp.register_blueprint(novedades_bp, url_prefix='/novedades')
