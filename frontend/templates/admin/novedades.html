@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Novedades · Administración · Cine Paradiso{% endblock %}
+{% block content %}
+<section class="pagina pagina--site">
+  <div class="pagina__cabecera"><div>
+    <h1 class="pagina__titulo">Novedades y promociones</h1>
+    <p class="pagina__subtitulo">Administrá lo que aparece en el carrusel de la página principal.</p>
+    <a class="boton boton--dorado" href="{{ url_for('web.admin.novedades.nueva') }}">+ Nueva promoción</a>
+    <a class="boton boton--secundario" href="{{ url_for('web.admin.peliculas.index') }}">Volver al panel</a>
+  </div></div>
+  {% if novedades %}
+  <div class="admin-novedades">
+    {% for n in novedades %}
+    <article class="admin-novedades__item">
+      <img src="{{ n.imagen_url }}" alt="Imagen de {{ n.titulo }}" loading="lazy">
+      <div class="admin-novedades__info">
+        <h2>{{ n.titulo }}</h2>
+        <p>{{ n.descripcion or '' }}</p>
+        <p><strong>{{ n.tipo|capitalize }}</strong> · Orden {{ n.orden }} · {% if n.activo %}Activa{% else %}Inactiva{% endif %}</p>
+        <p class="admin-novedades__detalle">{% if n.fecha_inicio %}Desde: {{ n.fecha_inicio }} {% endif %}{% if n.fecha_fin %}Hasta: {{ n.fecha_fin }}{% endif %}</p>
+        <div class="admin-novedades__acciones">
+          <a class="boton boton--dorado" href="{{ url_for('web.admin.novedades.editar', novedad_id=n.id) }}">Editar</a>
+          <form method="POST" action="{{ url_for('web.admin.novedades.eliminar', novedad_id=n.id) }}" onsubmit="return confirm('¿Eliminar esta novedad?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="boton boton--secundario">Eliminar</button>
+          </form>
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p>Todavía no hay novedades cargadas. Creá una para mostrarla en el inicio.</p>
+  {% endif %}
+</section>
+{% endblock %}

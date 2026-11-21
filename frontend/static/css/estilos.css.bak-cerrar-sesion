@@ -1,0 +1,922 @@
+/* ==========================================================================
+   Cine Paradiso - Hoja de Estilos (base.html, inicio.html y cartelera.html)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Variables y Reset Básico
+   -------------------------------------------------------------------------- */
+:root {
+    --bg-principal: #121214;
+    --bg-secundario: #18181c;
+    --bg-tarjeta: #1c1c22;
+    --color-dorado: #d4af37;
+    --color-dorado-hover: #e5b938;
+    --color-texto: #f0f0f3;
+    --color-texto-secundario: #a0a0aa;
+    --color-borde: rgba(212, 175, 55, 0.25);
+    --color-exito: #2e7d32;
+    --ancho-maximo: 1200px;
+    --font-titulos: 'Playfair Display', Georgia, serif;
+    --font-cuerpo: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-principal);
+    color: var(--color-texto);
+    font-family: var(--font-cuerpo);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --------------------------------------------------------------------------
+   2. Header y Navegación Principal (base.html)
+   -------------------------------------------------------------------------- */
+.header-principal {
+    background-color: var(--bg-secundario);
+    border-bottom: 1px solid var(--color-borde);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.nav {
+    max-width: var(--ancho-maximo);
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar__brand {
+    text-decoration: none;
+}
+
+.navbar__brand-name {
+    color: var(--color-dorado);
+    font-family: var(--font-titulos);
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: color 0.2s ease;
+}
+
+.navbar__brand:hover .navbar__brand-name {
+    color: var(--color-dorado-hover);
+}
+
+.nav__menu {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.navbar__link {
+    color: var(--color-texto-secundario);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.navbar__link:hover,
+.navbar__link--active {
+    color: var(--color-dorado);
+    background-color: rgba(212, 175, 55, 0.15);
+}
+
+/* --------------------------------------------------------------------------
+   3. Mensajes Flash y Contenedor Principal (base.html)
+   -------------------------------------------------------------------------- */
+.contenedor-flash {
+    max-width: var(--ancho-maximo);
+    width: 100%;
+    margin: 1rem auto 0 auto;
+    padding: 0 1.5rem;
+}
+
+.alerta {
+    padding: 0.85rem 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.alerta--success {
+    background-color: #1e3a1f;
+    color: #a3e6a1;
+    border: 1px solid #2e7d32;
+}
+
+.alerta--error {
+    background-color: #3e1a1a;
+    color: #f88787;
+    border: 1px solid #c62828;
+}
+
+.contenedor-principal {
+    max-width: var(--ancho-maximo);
+    width: 100%;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --------------------------------------------------------------------------
+   4. Encabezados de Sección (cartelera.html)
+   -------------------------------------------------------------------------- */
+.pagina {
+    width: 100%;
+}
+
+.pagina__cabecera {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--color-borde);
+    padding-bottom: 1rem;
+}
+
+.pagina__titulo {
+    color: var(--color-dorado);
+    font-size: 2.1rem;
+    font-family: var(--font-titulos);
+    font-weight: 700;
+}
+
+.pagina__subtitulo {
+    color: var(--color-texto-secundario);
+    font-size: 0.95rem;
+    margin-top: 0.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   5. Grilla y Tarjetas de Películas (cartelera.html)
+   -------------------------------------------------------------------------- */
+.grilla-peliculas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.75rem;
+}
+
+.tarjeta-pelicula {
+    background-color: var(--bg-tarjeta);
+    border: 1px solid var(--color-borde);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjeta-pelicula:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-dorado);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.25);
+}
+
+.tarjeta-pelicula__poster {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    background-color: #0c0c0e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.tarjeta-pelicula__poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.tarjeta-pelicula__poster-placeholder {
+    font-size: 3.5rem;
+    color: #3a3a42;
+}
+
+.tarjeta-pelicula__badges {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.3rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge--reestreno {
+    background-color: var(--color-dorado);
+    color: #0d0d0f;
+}
+
+.badge--estreno {
+    background-color: var(--color-exito);
+    color: #ffffff;
+}
+
+.badge--clasificacion {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #e0e0e0;
+    border: 1px solid var(--color-borde);
+}
+
+.tarjeta-pelicula__cuerpo {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.tarjeta-pelicula__titulo {
+    font-size: 1.25rem;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+    font-family: var(--font-titulos);
+}
+
+.tarjeta-pelicula__meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--color-texto-secundario);
+}
+
+.tag-genero {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    color: var(--color-texto-secundario);
+}
+
+.duracion {
+    color: var(--color-texto-secundario);
+}
+
+.tarjeta-pelicula__acciones {
+    margin-top: auto;
+    display: flex;
+    gap: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tarjeta-pelicula__acciones .boton {
+    width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   6. Botones Generales y Hero (inicio.html & cartelera.html)
+   -------------------------------------------------------------------------- */
+.boton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--color-dorado);
+    color: #0d0d0f;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.boton:hover,
+.boton--dorado:hover {
+    background-color: var(--color-dorado-hover);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+    transform: translateY(-2px);
+}
+
+.inicio-hero {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-height: 55vh;
+    padding: 2rem 1rem;
+}
+
+.inicio-hero__contenido {
+    max-width: 650px;
+    width: 100%;
+    background-color: var(--bg-tarjeta);
+    border: 1px solid var(--color-borde);
+    border-radius: 16px;
+    padding: 3.5rem 2rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.inicio-hero__titulo {
+    font-family: var(--font-titulos);
+    font-size: 2.3rem;
+    color: var(--color-dorado);
+    margin-bottom: 1rem;
+}
+
+.inicio-hero__subtitulo {
+    color: var(--color-texto-secundario);
+    font-size: 1.1rem;
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+}
+
+.inicio-hero__acciones {
+    display: flex;
+    justify-content: center;
+}
+
+/* --------------------------------------------------------------------------
+   7. Estado Vacío (cartelera.html)
+   -------------------------------------------------------------------------- */
+.vacio {
+    text-align: center;
+    padding: 3.5rem 1rem;
+    color: var(--color-texto-secundario);
+    background-color: var(--bg-tarjeta);
+    border-radius: 12px;
+    border: 1px solid var(--color-borde);
+}
+
+.vacio__icono {
+    font-size: 3.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.vacio__texto {
+    font-size: 1.1rem;
+    color: var(--color-texto);
+}
+
+/* --------------------------------------------------------------------------
+   8. Pie de Página (base.html)
+   -------------------------------------------------------------------------- */
+.footer {
+    background-color: var(--bg-secundario);
+    border-top: 1px solid var(--color-borde);
+    padding: 1.5rem 0;
+    margin-top: auto;
+    text-align: center;
+    color: var(--color-texto-secundario);
+    font-size: 0.85rem;
+}
+
+/* --------------------------------------------------------------------------
+   9. Adaptabilidad Responsive
+   -------------------------------------------------------------------------- */
+@media (max-width: 992px) {
+    .grilla-peliculas {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .nav {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .grilla-peliculas {
+        grid-template-columns: 1fr;
+    }
+
+    .inicio-hero__titulo {
+        font-size: 1.8rem;
+    }
+
+    .inicio-hero__contenido {
+        padding: 2rem 1.5rem;
+    }
+}
+/* --------------------------------------------------------------------------
+   10. Botones Generales, Horarios y Ficha de Película (pelicula_detalle.html)
+   -------------------------------------------------------------------------- */
+
+/* Layout general a dos columnas */
+.detalle-pelicula__layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 2.5rem;
+    padding: 2.5rem 0;
+    align-items: start;
+}
+
+/* Columna izquierda: Póster y Placeholder */
+.detalle-pelicula__poster-img,
+.detalle-pelicula__poster-placeholder {
+    width: 100%;
+    height: 480px;
+    border-radius: 12px;
+    object-fit: cover;
+    background-color: #242430;
+    border: 1px solid #2a2a38;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8a8a9a;
+    font-size: 1.1rem;
+}
+
+/* Columna derecha: Detalles del título y meta */
+.detalle-pelicula__titulo {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+
+.detalle-pelicula__meta {
+    font-size: 0.95rem;
+    color: #a0a0b0;
+    margin-bottom: 1.2rem;
+}
+
+.detalle-pelicula__sinopsis {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #d0d0e0;
+    margin-bottom: 2rem;
+}
+
+/* Contenedor "Dónde y cuándo verla" */
+.tarjeta-funciones {
+    background-color: #1a1a24;
+    border: 1px solid #2a2a38;
+    border-radius: 12px;
+    padding: 1.8rem;
+    margin-top: 1.5rem;
+}
+
+.tarjeta-funciones__titulo {
+    font-size: 1.4rem;
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.tarjeta-funciones__sede {
+    margin-bottom: 1.2rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid #2a2a38;
+}
+
+.tarjeta-funciones__sede-nombre {
+    font-size: 1.1rem;
+    color: #ffffff;
+    margin-bottom: 0.8rem;
+}
+
+.tarjeta-funciones__horarios {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+/* Botones de selección de horarios */
+.boton-horario {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    background-color: #242430;
+    border: 1px solid #3a3a4c;
+    border-radius: 8px;
+    color: #ffffff;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+}
+
+.boton-horario:hover {
+    border-color: #f39c12;
+    color: #f39c12;
+    background-color: rgba(243, 156, 18, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Footer de la tarjeta con precio y CTA principal */
+.tarjeta-funciones__footer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+}
+
+.tarjeta-funciones__precio {
+    font-size: 1.05rem;
+    color: #cccccc;
+}
+
+.tarjeta-funciones__precio strong {
+    color: #ffffff;
+    font-size: 1.2rem;
+}
+
+.tarjeta-funciones__nota {
+    font-size: 0.85rem;
+    color: #7a7a8c;
+}
+
+/* Radio buttons estilizados como botones */
+.opcion-horario input[type="radio"] {
+    display: none;
+}
+
+.opcion-horario__texto {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    background-color: #242430;
+    border: 1px solid #3a3a4c;
+    border-radius: 8px;
+    color: #ffffff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.opcion-horario input[type="radio"]:checked + .opcion-horario__texto {
+    background-color: #f39c12;
+    color: #121212;
+    border-color: #f39c12;
+    font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   11. Vista de Reserva y Mapa de Butacas (reserva_butacas.html)
+   -------------------------------------------------------------------------- */
+
+.seccion-reserva {
+    padding: 2.5rem 0;
+}
+
+.reserva-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 2rem;
+    align-items: start;
+}
+
+/* Contenedor Principal de la Sala */
+.reserva-sala {
+    background-color: #1a1a24;
+    border: 1px solid #2a2a38;
+    border-radius: 12px;
+    padding: 2rem;
+}
+
+.reserva-sala__titulo {
+    font-size: 1.5rem;
+    color: #ffffff;
+    margin-bottom: 2rem;
+}
+
+/* Pantalla del cine */
+.reserva-sala__pantalla {
+    width: 100%;
+    background-color: #2e2e3d;
+    color: #8a8a9e;
+    text-align: center;
+    padding: 0.6rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    margin-bottom: 2.5rem;
+}
+
+/* Estructura del Mapa de Cine con Pasillos */
+.mapa-cine {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 2rem;
+    width: 100%; /* Asegura usar el 100% del contenedor */
+    overflow-x: auto; /* Evita desbordar en pantallas angostas */
+}
+
+.mapa-cine__fila {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+}
+
+/* Número de columna sobre cada butaca */
+.mapa-cine__columna {
+    width: 34px;
+    color: #8a8a9e;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.mapa-cine__letra {
+    width: 20px;
+    color: #8a8a9e;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.mapa-cine__bloque {
+    display: flex;
+    gap: 0.6rem; /* Espaciado entre las butacas de un mismo bloque */
+}
+
+.mapa-cine__pasillo {
+    flex-grow: 1; /* Permite que los pasillos absorban el espacio sobrante de forma pareja */
+    min-width: 20px;
+}
+
+/* Botones de Butacas (Checkbox nativo estilizado) */
+.butaca input[type="checkbox"] {
+    display: none;
+}
+
+.butaca__cuadro {
+    display: inline-flex;
+    width: 34px;
+    height: 34px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    border: 1.5px solid #4a4a5e;
+    background-color: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Butaca Libre Hover */
+.butaca:hover input:not(:disabled) + .butaca__cuadro {
+    border-color: #f39c12;
+}
+
+/* Butaca Ocupada (Gris) */
+.butaca--ocupada .butaca__cuadro,
+.butaca__cuadro--ocupada {
+    background-color: #383848;
+    border-color: #383848;
+    cursor: not-allowed;
+}
+
+/* Butaca Seleccionada (Ámbar / Dorado) */
+.butaca input[type="checkbox"]:checked + .butaca__cuadro,
+.butaca__cuadro--seleccionada {
+    background-color: #f39c12;
+    border-color: #f39c12;
+}
+
+.butaca__cuadro--libre {
+    background-color: transparent;
+    border-color: #4a4a5e;
+}
+
+/* Leyenda inferior */
+.reserva-leyenda {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.85rem;
+    color: #a0a0b0;
+    margin-top: 1rem;
+}
+
+.reserva-leyenda__item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.reserva-leyenda__item .butaca__cuadro {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+}
+
+/* Panel Lateral de Resumen */
+.tarjeta-resumen {
+    background-color: #1a1a24;
+    border: 1px solid #2a2a38;
+    border-radius: 12px;
+    padding: 1.8rem;
+}
+
+.tarjeta-resumen__titulo {
+    font-size: 1.3rem;
+    color: #ffffff;
+    margin-bottom: 1rem;
+}
+
+.tarjeta-resumen__sede {
+    color: #a0a0b0;
+    font-size: 0.95rem;
+    margin-bottom: 0.8rem;
+}
+
+.tarjeta-resumen__precio {
+    font-size: 0.95rem;
+    color: #a0a0b0;
+    margin-bottom: 1.5rem;
+}
+
+.tarjeta-resumen__precio strong {
+    color: #ffffff;
+}
+
+.tarjeta-resumen__btn {
+    width: 100%;
+}
+/* Carrusel de novedades de Cine Paradiso 
+   12. Carrusel de novedades en Home (contenido dinámico de la API)
+   -------------------------------------------------------------------------- */
+.novedades { width: 100%; margin-bottom: 1.5rem; }
+.novedades__encabezado { display:flex; justify-content:space-between; align-items:end; gap:1rem; margin-bottom:1rem; }
+.novedades__eyebrow { font-size:.73rem; font-weight:700; letter-spacing:.2em; color:var(--color-dorado); margin-bottom:.25rem; }
+.novedades__titulo { font:700 clamp(1.6rem,3vw,2.4rem)/1.2 var(--font-titulos); }
+.novedades__controles { display:flex; gap:.5rem; }
+.novedades__flecha { width:42px; height:42px; border-radius:50%; border:1px solid var(--color-borde); background:var(--bg-tarjeta); color:var(--color-texto); cursor:pointer; font-size:1.15rem; }
+.novedades__flecha:hover { color:var(--color-dorado); border-color:var(--color-dorado); }
+.carrusel { position:relative; overflow:hidden; border:1px solid var(--color-borde); border-radius:18px; background:var(--bg-tarjeta); }
+.carrusel__pista { position:relative; height:clamp(440px,68vh,660px); }
+.carrusel__slide { position:absolute; inset:0; opacity:0; visibility:hidden; pointer-events:none; transition:opacity .55s ease, visibility .55s; overflow:hidden; }
+.carrusel__slide--activo { opacity:1; visibility:visible; pointer-events:auto; z-index:1; }
+.carrusel__imagen { width:100%; height:100%; object-fit:cover; display:block; }
+.carrusel__degradado { position:absolute; inset:0; background:linear-gradient(90deg,rgba(8,8,11,.94) 0%,rgba(8,8,11,.72) 44%,rgba(8,8,11,.12) 100%); }
+.carrusel__contenido { position:absolute; left:clamp(1.5rem,5vw,4rem); bottom:clamp(2.5rem,5vw,4rem); width:min(560px,80%); z-index:2; }
+.carrusel__etiqueta { display:inline-block; color:var(--color-dorado); font-weight:800; font-size:.75rem; letter-spacing:.17em; margin-bottom:.5rem; }
+.carrusel__contenido h2 { font:700 clamp(1.7rem,4vw,3.1rem)/1.13 var(--font-titulos); margin-bottom:.7rem; }
+.carrusel__contenido p { max-width:46ch; color:#e2e2e6; margin-bottom:1.3rem; }
+.carrusel__indicadores { position:absolute; z-index:3; right:1.5rem; bottom:1.25rem; display:flex; gap:.55rem; }
+.carrusel__punto { width:22px; height:5px; border:0; background:rgba(255,255,255,.45); border-radius:30px; cursor:pointer; transition:background .2s,width .2s; }
+.carrusel__punto--activo { background:var(--color-dorado); width:40px; }
+.novedades__vacio { min-height:170px; padding:2rem; border-radius:18px; border:1px dashed var(--color-borde); background:linear-gradient(135deg,#222027,#121214); display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center; gap:.35rem; }
+.novedades__vacio-icono { color:var(--color-dorado); font-size:1.75rem; }
+.novedades__vacio p { font-weight:650; }
+.novedades__vacio span:last-child { font-size:.9rem; color:var(--color-texto-secundario); }
+.inicio-hero { flex:none; min-height:auto; padding:2.25rem 1rem 3.5rem; }
+@media(max-width:600px) {
+  .novedades__titulo { font-size:1.6rem; }
+  .carrusel__pista { height:clamp(420px,65svh,550px); }
+  .carrusel__contenido { left:1.25rem; bottom:2.6rem; width:calc(100% - 2.5rem); }
+  .carrusel__contenido h2 { font-size:1.8rem; }
+  .carrusel__degradado { background:linear-gradient(0deg,rgba(8,8,11,.94),rgba(8,8,11,.45) 75%); }
+  .carrusel__indicadores { right:1.25rem; bottom:.85rem; }
+}
+@media(prefers-reduced-motion:reduce) { .carrusel__slide { transition:none; } }
+
+/* Administracion de novedades (sin afectar el resto de la interfaz) */
+.admin-novedades {display:grid;gap:18px;margin-top:24px;}
+.admin-novedades__item {display:flex;gap:22px;align-items:center;padding:18px;border:1px solid rgba(198,164,99,.35);border-radius:14px;background:rgba(255,255,255,.04);}
+.admin-novedades__item img {width:220px;max-width:38%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;}
+.admin-novedades__info {flex:1;min-width:0;}
+.admin-novedades__info h2 {margin:0 0 8px;}
+.admin-novedades__acciones {display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-top:14px;}
+.admin-novedades__acciones form {margin:0;}
+.admin-novedades__vista-previa {width:320px;max-width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:9px;}
+.admin-novedades__ayuda,.admin-novedades__detalle {opacity:.75;font-size:.9rem;}
+.admin-novedades__formulario input[type=file],.admin-novedades__formulario select {width:100%;max-width:650px;padding:10px;border-radius:6px;}
+@media(max-width:640px){.admin-novedades__item {flex-direction:column;align-items:stretch;}.admin-novedades__item img {max-width:100%;width:100%;}}
+
+/* Mejora visual del formulario de novedades — aislada del resto del sitio */
+.admin-novedades-pagina {max-width:1050px;margin:0 auto;padding-bottom:4rem;}
+.admin-novedades__cabecera {display:flex;justify-content:space-between;align-items:center;gap:1.5rem;margin-bottom:1.8rem;}
+.admin-novedades__sobrelinea {color:var(--color-dorado,#d4af37);font-size:.74rem;letter-spacing:.16em;font-weight:800;margin:0 0 .7rem;}
+.admin-novedades__volver {white-space:nowrap;}
+.admin-novedades__formulario {display:flex;flex-direction:column;gap:1.3rem;max-width:none;width:100%;}
+.admin-novedades__seccion {background:linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,.018));border:1px solid rgba(212,175,55,.18);border-radius:18px;padding:clamp(1.2rem,3vw,2rem);box-shadow:0 12px 35px rgba(0,0,0,.13);}
+.admin-novedades__seccion-titulo {display:flex;align-items:flex-start;gap:.9rem;padding-bottom:1.25rem;margin-bottom:1.5rem;border-bottom:1px solid rgba(255,255,255,.1);}
+.admin-novedades__numero {width:38px;height:38px;flex:none;border-radius:11px;background:rgba(212,175,55,.12);color:var(--color-dorado,#d4af37);display:grid;place-items:center;font-weight:800;font-size:.85rem;}
+.admin-novedades__seccion-titulo h2 {color:#fff;font-size:1.2rem;line-height:1.35;margin:0 0 .25rem;}
+.admin-novedades__seccion-titulo p {color:var(--color-texto-secundario,#bbb);margin:0;font-size:.9rem;}
+.admin-novedades__campos {display:flex;flex-direction:column;gap:1.3rem;}
+.admin-novedades__campo {display:flex;flex-direction:column;gap:.5rem;min-width:0;}
+.admin-novedades__campo label {font-weight:700;color:#f4f4f4;font-size:.93rem;}
+.admin-novedades__obligatorio {color:var(--color-dorado,#d4af37);}
+.admin-novedades__opcional {font-size:.73rem;font-weight:500;color:var(--color-texto-secundario,#aaa);margin-left:.35rem;}
+.admin-novedades__formulario .admin-novedades__campo input:not([type=checkbox]),
+.admin-novedades__formulario .admin-novedades__campo textarea,
+.admin-novedades__formulario .admin-novedades__campo select {box-sizing:border-box;display:block;width:100%;max-width:none;min-height:48px;background:#17171e;color:#f8f7f5;border:1px solid #42404a;border-radius:11px;padding:.8rem 1rem;font:inherit;transition:border-color .2s,box-shadow .2s,background .2s;}
+.admin-novedades__formulario .admin-novedades__campo textarea {min-height:116px;resize:vertical;line-height:1.55;}
+.admin-novedades__formulario .admin-novedades__campo input::placeholder,
+.admin-novedades__formulario .admin-novedades__campo textarea::placeholder {color:#888692;opacity:1;}
+.admin-novedades__formulario .admin-novedades__campo input:focus,
+.admin-novedades__formulario .admin-novedades__campo textarea:focus,
+.admin-novedades__formulario .admin-novedades__campo select:focus {outline:none;border-color:var(--color-dorado,#d4af37);box-shadow:0 0 0 3px rgba(212,175,55,.16);background:#1b1b24;}
+.admin-novedades__formulario .admin-novedades__campo input[type=file] {padding:.75rem;border:1px dashed rgba(212,175,55,.55);background:rgba(212,175,55,.035);cursor:pointer;}
+.admin-novedades__formulario input[type=file]::file-selector-button {background:rgba(212,175,55,.15);color:#f4d78c;border:1px solid rgba(212,175,55,.4);border-radius:7px;padding:.55rem .8rem;margin-right:1rem;cursor:pointer;font-weight:700;}
+.admin-novedades__ayuda {margin:0;color:var(--color-texto-secundario,#b8b8bf);font-size:.81rem;line-height:1.55;opacity:1;}
+.admin-novedades__ayuda code {word-break:break-word;color:#e8ca7b;}
+.admin-novedades__imagen-actual {display:flex;flex-direction:column;gap:.65rem;}
+.admin-novedades__imagen-actual>span {font-size:.85rem;font-weight:700;color:var(--color-texto-secundario,#ccc);}
+.admin-novedades__vista-previa {width:min(100%,430px);max-width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;border:1px solid rgba(212,175,55,.35);}
+.admin-novedades__separador {display:flex;align-items:center;gap:1rem;color:var(--color-texto-secundario,#aaa);font-size:.79rem;}
+.admin-novedades__separador:before,.admin-novedades__separador:after {content:"";height:1px;flex:1;background:rgba(255,255,255,.12);}
+.admin-novedades__grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;}
+.admin-novedades__activar {display:flex;align-items:center;gap:1rem;background:rgba(212,175,55,.055);border:1px solid rgba(212,175,55,.25);border-radius:12px;padding:1.05rem 1.1rem;cursor:pointer;}
+.admin-novedades__activar input {width:19px;height:19px;accent-color:var(--color-dorado,#d4af37);flex:none;}
+.admin-novedades__activar span {display:flex;flex-direction:column;gap:.2rem;}
+.admin-novedades__activar strong {font-size:.92rem;color:#fff;}
+.admin-novedades__activar small {font-size:.81rem;color:var(--color-texto-secundario,#ccc);line-height:1.5;}
+.admin-novedades__pie {display:flex;justify-content:flex-end;gap:.8rem;padding:.5rem 0;flex-wrap:wrap;}
+@media(max-width:740px){.admin-novedades__grid {grid-template-columns:1fr;}.admin-novedades__cabecera {flex-direction:column;align-items:flex-start;}.admin-novedades__pie .boton {flex:1;}.admin-novedades__seccion {border-radius:14px;}}
+
+/* Botón de cartelera sobre el banner, inspirado en el estilo de Netflix. */
+.carrusel__boton-cartelera {
+  display:inline-flex; align-items:center; justify-content:center; gap:.65rem;
+  background:#fff; color:#161616; border:1px solid #fff; border-radius:9px;
+  padding:.85rem 1.5rem; font-weight:800; font-size:1rem;
+  text-decoration:none; box-shadow:0 6px 22px rgba(0,0,0,.24);
+  transition:background .2s ease,transform .2s ease;
+}
+.carrusel__boton-cartelera:hover { background:#e6e6e6; color:#161616; transform:translateY(-2px); }
+.carrusel__boton-cartelera:focus-visible { outline:3px solid var(--color-dorado); outline-offset:4px; }
+@media(max-width:600px) { .carrusel__boton-cartelera { padding:.8rem 1.2rem; font-size:.95rem; } }
+
+/* Home: ancho de portada tipo Netflix, sin afectar las otras pantallas.
+   El contenedor general tiene un max-width de 1200px que limita el carrusel. */
+.contenedor-principal:has(> .novedades) {
+  max-width: none;
+  width: 100%;
+  padding: 1.25rem clamp(16px, 2vw, 36px) 2rem;
+}
+.contenedor-principal:has(> .novedades) > .novedades {
+  width: 100%;
+  max-width: none;
+}
+.contenedor-principal:has(> .novedades) .carrusel__pista {
+  height: clamp(440px, 67vh, 680px);
+}
+@media (max-width: 600px) {
+  .contenedor-principal:has(> .novedades) .carrusel__pista {
+    height: clamp(420px, 65svh, 550px);
+  }
+}
+
+/* Portada: una sola imagen nítida ocupando todo el banner.
+   Más altura reduce la sensación de recorte en fotografías no panorámicas. */
+.contenedor-principal:has(> .novedades) .carrusel__pista {
+  height: clamp(440px, 46vw, 620px);
+}
+.carrusel__imagen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 36%;
+}
+@media (max-width: 600px) {
+  .contenedor-principal:has(> .novedades) .carrusel__pista {
+    height: clamp(390px, 68svh, 520px);
+  }
+  .carrusel__imagen { object-position: center 35%; }
+}
+
+/* Editor de encuadre de imágenes de novedades: solo panel de administración. */
+.admin-encuadre { display:grid; gap:1rem; padding:1.15rem; background:#101014; border:1px solid rgba(212,175,55,.32); border-radius:16px; }
+.admin-encuadre__cabecera { display:flex; justify-content:space-between; align-items:start; gap:1rem; }
+.admin-encuadre__cabecera h3 { margin:0 0 .35rem; color:#fff; font-size:1.05rem; }
+.admin-encuadre__cabecera p { margin:0; color:#c7c5cc; font-size:.88rem; }
+.admin-encuadre__medida { font-size:.75rem; color:#ddbc67; white-space:nowrap; }
+.admin-encuadre__marco { position:relative; width:100%; aspect-ratio:30/13; border-radius:12px; overflow:hidden; background:#24232a; border:1px solid #514735; }
+.admin-encuadre__marco canvas { width:100%; height:100%; display:block; touch-action:none; cursor:grab; }
+.admin-encuadre__marco canvas:active { cursor:grabbing; }
+.admin-encuadre__marco:after { content:""; position:absolute; inset:0; background:linear-gradient(90deg,rgba(0,0,0,.75),rgba(0,0,0,.15) 68%,transparent); pointer-events:none; }
+.admin-encuadre__textos { position:absolute; left:5%; bottom:11%; z-index:1; pointer-events:none; display:flex; flex-direction:column; gap:.5rem; color:#fff; max-width:60%; }
+.admin-encuadre__textos small { font-size:.7rem; letter-spacing:.16em; color:#e8c268; font-weight:800; }
+.admin-encuadre__textos strong { font-size:clamp(1.1rem,3vw,2rem); line-height:1.1; font-family:Georgia,serif; }
+.admin-encuadre__textos span { align-self:flex-start; background:#fff; color:#161616; border-radius:6px; padding:.5rem .75rem; font-size:.75rem; font-weight:800; }
+.admin-encuadre__vacio { position:absolute; inset:0; display:grid; place-items:center; padding:1rem; text-align:center; color:#d1c6ae; background:#19191f; z-index:2; }
+.admin-encuadre__vacio[hidden] { display:none; }
+.admin-encuadre__herramientas { display:flex; align-items:center; flex-wrap:wrap; gap:.8rem; }
+.admin-encuadre__herramientas label { font-weight:700; color:#fff; font-size:.87rem; }
+.admin-encuadre__herramientas output { color:#dfbc68; font-variant-numeric:tabular-nums; }
+.admin-encuadre__herramientas input[type=range] { flex:1; min-width:130px; accent-color:#dfbc68; }
+.admin-encuadre__herramientas .boton { white-space:nowrap; cursor:pointer; }
+.admin-encuadre__herramientas button:disabled { opacity:.45; cursor:not-allowed; }
+.admin-encuadre__estado { margin:0; font-size:.83rem; color:#dfbc68; }
+@media(max-width:700px) { .admin-encuadre__cabecera {flex-direction:column;} .admin-encuadre__textos span {padding:.3rem .5rem;} }

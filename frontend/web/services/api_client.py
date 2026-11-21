@@ -18,7 +18,9 @@ class BackendAPIError(Exception):
 def api_request(method, path, *, params=None, payload=None):
     base_url = os.getenv('BACKEND_URL', 'http://127.0.0.1:5001').rstrip('/')
     headers = None
-    if path == '/api/admin' or path.startswith('/api/admin/'):
+    if (path == '/api/admin' or path.startswith('/api/admin/')
+            or path.startswith('/api/novedades/admin/')
+            or (path.startswith('/api/novedades') and method.upper() != 'GET')):
         if has_request_context():
             cookie = request.headers.get('Cookie')
             if cookie:
@@ -60,8 +62,10 @@ def api_request(method, path, *, params=None, payload=None):
     if not response.ok:
         message = 'El backend no pudo completar la operación.'
         if isinstance(result, dict):
-            errors = result.get('errors')
-            if isinstance(errors, list) and errors and isinstance(errors[0], dict):
+            errors = result.get('errors') or result.get('errores')
+            if isinstance(errors, list) and errors and isinstance(errors[0], str):
+                message = '; '.join(errors)
+            elif isinstance(errors, list) and errors and isinstance(errors[0], dict):
                 message = errors[0].get('description') or errors[0].get('message') or message
             else:
                 message = (

@@ -7,7 +7,7 @@
     <div class="novedades__encabezado">
         <div>
             <p class="novedades__eyebrow">CINE PARADISO / ACTUALIDAD</p>
-            <h1 class="novedades__titulo">En primera fila</h1>
+            <h1 class="novedades__titulo">En Primera Fila</h1>
         </div>
         {% if novedades|length > 1 %}
         <div class="novedades__controles">
@@ -28,7 +28,7 @@
                     <span class="carrusel__etiqueta">{{ novedad.tipo|upper }}</span>
                     <h2>{{ novedad.titulo }}</h2>
                     {% if novedad.descripcion %}<p>{{ novedad.descripcion }}</p>{% endif %}
-                    {% if novedad.enlace %}<a class="boton" href="{{ novedad.enlace }}" {% if novedad.enlace.startswith('http') %}rel="noopener noreferrer"{% endif %}>Descubrir más <span aria-hidden="true">↗</span></a>{% endif %}
+                    <a class="boton carrusel__boton-cartelera" href="{{ url_for('web.site.peliculas.index') }}">Ver cartelera <span aria-hidden="true">&#8594;</span></a>
                 </div>
             </article>
             {% endfor %}
