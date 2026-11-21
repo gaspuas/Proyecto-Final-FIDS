@@ -16,7 +16,11 @@ CREATE TABLE IF NOT EXISTS usuarios (
   email VARCHAR(150) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
   rol ENUM('cliente', 'administrador') NOT NULL DEFAULT 'cliente',
-  fecha_registro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  fecha_registro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  fecha_nacimiento DATE NULL,
+  acepta_terminos BOOLEAN NOT NULL DEFAULT FALSE,
+  fecha_aceptacion_terminos DATETIME NULL,
+  recibir_promociones BOOLEAN NOT NULL DEFAULT FALSE
 ) ENGINE=InnoDB;
 
 -- -----------------------------------------------------
@@ -85,12 +89,9 @@ CREATE TABLE IF NOT EXISTS entradas_detalle (
   funcion_id INT NOT NULL,
   numero_butaca VARCHAR(10) NOT NULL,
   precio DECIMAL(10,2) NOT NULL,
-  -- 1 mientras la entrada ocupa la butaca; NULL cuando la compra se cancela.
-  -- MySQL permite varios NULL en un índice único, así la butaca se puede volver a vender.
-  activa TINYINT(1) NULL DEFAULT 1,
   CONSTRAINT fk_entradas_compra FOREIGN KEY (compra_id) REFERENCES compras(id) ON DELETE CASCADE,
   CONSTRAINT fk_entradas_funcion FOREIGN KEY (funcion_id) REFERENCES funciones(id) ON DELETE CASCADE,
-  CONSTRAINT uq_funcion_butaca_activa UNIQUE (funcion_id, numero_butaca, activa)
+  CONSTRAINT uq_funcion_butaca UNIQUE (funcion_id, numero_butaca)
 ) ENGINE=InnoDB;
 
 -- -----------------------------------------------------
