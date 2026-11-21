@@ -16,7 +16,8 @@
     --auth-exito: #a3e6a1;
 
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
     gap: 33px;
     max-width: 886px;
     width: 100%;
@@ -134,3 +135,16 @@
         font-size: 16px;
     }
 }
+
+/* Registro: fecha, preferencias y confirmación de contraseña */
+.autenticacion__campo input[type="date"] { color-scheme: dark; }
+.autenticacion__ayuda { color: var(--color-texto-secundario); font-size: 12px; line-height: 1.45; margin: 7px 0 0; }
+.autenticacion__preferencias { margin-top: 18px; padding: 14px; border: 1px solid #484049; border-radius: 12px; background: #1b1a20; }
+.autenticacion__check { display: flex; align-items: flex-start; gap: 11px; margin: 6px 0 12px; }
+.autenticacion__check:last-child { margin-bottom: 2px; }
+.autenticacion__check input[type="checkbox"] { appearance: auto; accent-color: var(--auth-ambar); width: 18px; height: 18px; flex: 0 0 18px; margin: 3px 0 0; cursor: pointer; }
+.autenticacion__check label { color: #f2eef0; line-height: 1.45; font-size: 14px; cursor: pointer; }
+.autenticacion__check input[aria-invalid="true"] { outline: 2px solid var(--auth-error); outline-offset: 2px; }
+.autenticacion__obligatorio { color: var(--auth-ambar); }
+.autenticacion__opcional { color: var(--color-texto-secundario); font-size: 12px; }
+.autenticacion__registro .boton { margin-top: 18px; }

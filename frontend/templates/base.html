@@ -16,26 +16,33 @@
             </a>
 
             {% block navbar_menu %}
-            <nav class="nav__menu">
-                <a href="{{ url_for('web.site.home.index') }}"
-                class="navbar__link {% if request.endpoint == 'web.site.home.index' %}navbar__link--active{% endif %}">Inicio</a>
-                
-                <a href="{{ url_for('web.site.peliculas.index') }}"
-                class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.site.peliculas') %}navbar__link--active{% endif %}">Cartelera</a>
-                
-                {% if session.get('usuario') %}
-                <span class="navbar__link">Hola, {{ session['usuario']['nombre'] }}</span>
-                {% if session['usuario'].get('rol') == 'administrador' %}
-                <a class="navbar__link" href="{{ url_for('web.admin.index') }}">Administración</a>
-                {% endif %}
-                <a class="navbar__link {% if request.endpoint == 'web.site.compra.historial' %}navbar__link--active{% endif %}" href="{{ url_for('web.site.compra.historial') }}">Mis compras</a>
-                <form action="{{ url_for('web.site.login.logout') }}" method="POST">
-                    <button class="navbar__link" type="submit">Cerrar sesión</button>
-                </form>
-                {% else %}
-                <a href="{{ url_for('web.site.login.index') }}"
-                class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.site.login') %}navbar__link--active{% endif %}">Ingresar</a>
-                {% endif %}
+            <nav class="nav__menu" aria-label="Navegación principal">
+                <div class="nav__links-principales">
+                    <a href="{{ url_for('web.site.home.index') }}"
+                       class="navbar__link {% if request.endpoint == 'web.site.home.index' %}navbar__link--active{% endif %}">Inicio</a>
+                    <a href="{{ url_for('web.site.peliculas.index') }}"
+                       class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.site.peliculas') %}navbar__link--active{% endif %}">Cartelera</a>
+                    {% if session.get('usuario') and session['usuario'].get('rol') == 'administrador' %}
+                    <a class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.admin') %}navbar__link--active{% endif %}"
+                       href="{{ url_for('web.admin.index') }}">Administración</a>
+                    {% endif %}
+                </div>
+                <div class="nav__cuenta">
+                    {% if session.get('usuario') %}
+                    <span class="nav__saludo" title="Sesión iniciada">
+                        <span class="nav__avatar" aria-hidden="true">{{ session['usuario']['nombre'][:1]|upper }}</span>
+                        <span class="nav__saludo-texto"><small>Bienvenido</small><strong>Hola, {{ session['usuario']['nombre'] }}</strong></span>
+                    </span>
+                    <a class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.site.compra') %}navbar__link--active{% endif %}"
+                       href="{{ url_for('web.site.compra.historial') }}">Mis compras</a>
+                    <form action="{{ url_for('web.site.login.logout') }}" method="POST">
+                        <button class="navbar__link nav__salir" type="submit">Cerrar sesión</button>
+                    </form>
+                    {% else %}
+                    <a href="{{ url_for('web.site.login.index') }}"
+                       class="navbar__link nav__ingresar {% if request.endpoint and request.endpoint.startswith('web.site.login') %}navbar__link--active{% endif %}">Ingresar</a>
+                    {% endif %}
+                </div>
             </nav>
             {% endblock %}
         </div>
