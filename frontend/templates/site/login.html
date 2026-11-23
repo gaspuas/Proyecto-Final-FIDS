@@ -35,7 +35,7 @@
     <div class="autenticacion__tarjeta">
         <h2 class="autenticacion__titulo">Crear cuenta</h2>
 
-        <form method="POST" action="{{ url_for('web.site.login.index') }}">
+        <form method="POST" action="{{ url_for('web.site.login.index') }}" class="autenticacion__registro">
             <input type="hidden" name="accion" value="registro">
             <div class="autenticacion__campo">
                 <label for="registro-nombre">Nombre</label>
@@ -45,7 +45,7 @@
 
             <div class="autenticacion__campo">
                 <label for="registro-email">Email</label>
-                <input type="email" id="registro-email" name="email" autocomplete="email" aria-describedby="registro-email-error" required>
+                <input type="email" id="registro-email" name="email" autocomplete="email" inputmode="email" pattern="[^\s@]+@[^\s@]+\.[^\s@]+" title="Ingresá un email como nombre@dominio.com" aria-describedby="registro-email-error" required>
                 <p class="autenticacion__error" id="registro-email-error" hidden></p>
             </div>
 
@@ -55,7 +55,33 @@
                 <p class="autenticacion__error" id="registro-password-error" hidden></p>
             </div>
 
-            <button type="submit" class="boton boton--secundario">Registrarme</button>
+            <div class="autenticacion__campo">
+                <label for="registro-password-confirmacion">Repetir contraseña</label>
+                <input type="password" id="registro-password-confirmacion" name="password_confirmacion" autocomplete="new-password" minlength="6" aria-describedby="registro-password-confirmacion-error" required>
+                <p class="autenticacion__error" id="registro-password-confirmacion-error" hidden></p>
+            </div>
+
+            <div class="autenticacion__campo">
+                <label for="registro-fecha-nacimiento">Fecha de nacimiento</label>
+                <input type="date" id="registro-fecha-nacimiento" name="fecha_nacimiento" autocomplete="bday" aria-describedby="registro-fecha-nacimiento-error" required>
+                <p class="autenticacion__ayuda">La guardamos para una posible promoción de cumpleaños. No se envían correos automáticamente.</p>
+                <p class="autenticacion__error" id="registro-fecha-nacimiento-error" hidden></p>
+            </div>
+
+            <div class="autenticacion__preferencias">
+                <div class="autenticacion__check">
+                    <input type="checkbox" id="registro-acepta-terminos" name="acepta_terminos" value="1" aria-describedby="registro-acepta-terminos-error" required>
+                    <label for="registro-acepta-terminos">Acepto los términos y condiciones <span class="autenticacion__obligatorio">*</span></label>
+                </div>
+                <p class="autenticacion__error" id="registro-acepta-terminos-error" hidden></p>
+
+                <div class="autenticacion__check">
+                    <input type="checkbox" id="registro-recibir-promociones" name="recibir_promociones" value="1">
+                    <label for="registro-recibir-promociones">Quiero recibir novedades y promociones <span class="autenticacion__opcional">(opcional)</span></label>
+                </div>
+            </div>
+
+            <button type="submit" class="boton boton--secundario">Crear mi cuenta</button>
 
         </form>
     </div>

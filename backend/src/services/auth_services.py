@@ -12,7 +12,10 @@ def registrar_cliente_servicio(data):
 
     password_hash = generate_password_hash(password)
 
-    return crear_usuario_cliente(nombre, email, password_hash)
+    return crear_usuario_cliente(
+        nombre, email.strip(), password_hash,
+        data['fecha_nacimiento'], data['recibir_promociones'],
+    )
 
 def procesar_login(data):
     es_valido, mensaje_error = validar_login(data)

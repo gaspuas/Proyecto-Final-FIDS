@@ -29,6 +29,10 @@ def index():
                     request.form.get('nombre', '').strip(),
                     email,
                     password,
+                    request.form.get('password_confirmacion', ''),
+                    request.form.get('fecha_nacimiento', ''),
+                    request.form.get('acepta_terminos') == '1',
+                    request.form.get('recibir_promociones') == '1',
                 )
                 flash('Tu cuenta fue creada. Ya podés iniciar sesión.', 'success')
             elif accion == 'login':

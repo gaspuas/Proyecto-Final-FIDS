@@ -1,7 +1,7 @@
 import mysql.connector
 from backend.src.utils.db_connection import get_db_connection
 
-def crear_usuario_cliente(nombre, email, password_hash):
+def crear_usuario_cliente(nombre, email, password_hash, fecha_nacimiento, recibir_promociones):
     conn = get_db_connection()
     if not conn:
         return False
@@ -15,10 +15,13 @@ def crear_usuario_cliente(nombre, email, password_hash):
             return False  
 
         query = """
-            INSERT INTO usuarios (nombre, email, password_hash, rol, fecha_registro)
-            VALUES (%s, %s, %s, %s, NOW())
+            INSERT INTO usuarios (
+                nombre, email, password_hash, rol, fecha_registro,
+                fecha_nacimiento, acepta_terminos, fecha_aceptacion_terminos,
+                recibir_promociones
+            ) VALUES (%s, %s, %s, %s, NOW(), %s, 1, NOW(), %s)
         """
-        cursor.execute(query, (nombre, email, password_hash, 'cliente'))
+        cursor.execute(query, (nombre, email, password_hash, 'cliente', fecha_nacimiento, recibir_promociones))
         conn.commit()
         return True
         

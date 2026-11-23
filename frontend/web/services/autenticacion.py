@@ -9,9 +9,15 @@ def iniciar_sesion(email, password):
     )
 
 
-def registrar_usuario(nombre, email, password):
+def registrar_usuario(nombre, email, password, password_confirmacion, fecha_nacimiento, acepta_terminos, recibir_promociones):
     return api_request(
         'POST',
         '/api/auth/register',
-        payload={'nombre': nombre, 'email': email, 'password': password},
+        payload={
+            'nombre': nombre, 'email': email, 'password': password,
+            'password_confirmacion': password_confirmacion,
+            'fecha_nacimiento': fecha_nacimiento,
+            'acepta_terminos': acepta_terminos,
+            'recibir_promociones': recibir_promociones,
+        },
     )
