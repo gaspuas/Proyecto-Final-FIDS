@@ -1,46 +1,172 @@
 {% extends "base.html" %}
-
 {% block title %}Programar función · Cine Paradiso{% endblock %}
 
 {% block content %}
-<section class="pagina">
-    <div class="pagina__cabecera">
-        <h1 class="pagina__titulo">Programar función</h1>
+<style>
+/* Estilos exclusivos de Programar función: no alteran el resto del sitio. */
+.funcion-editor { width: min(100% - 2rem, 850px); margin: 2.5rem auto 5rem; }
+.funcion-editor__volver { display: inline-flex; gap: .45rem; align-items: center; color: #c8a955; text-decoration: none; font-size: .9rem; margin-bottom: 1.45rem; }
+.funcion-editor__volver:hover { color: #f2d783; }
+.funcion-editor__eyebrow { font-size: .74rem; color: #dbb453; letter-spacing: .16em; text-transform: uppercase; font-weight: 700; margin: 0 0 .45rem; }
+.funcion-editor__titulo { font-size: clamp(1.7rem, 3vw, 2.5rem); margin: 0; color: #f0cf76; font-family: Georgia, 'Times New Roman', serif; }
+.funcion-editor__subtitulo { font-size: .96rem; line-height: 1.55; color: #a6a4ac; margin: .55rem 0 1.9rem; }
+.funcion-editor__form { display: grid; gap: 1.25rem; }
+.funcion-editor__panel { background: #202025; border: 1px solid #3c3730; border-radius: 16px; padding: clamp(1.2rem, 3vw, 2rem); box-shadow: 0 16px 38px rgba(0,0,0,.17); }
+.funcion-editor__cabecera { display: flex; align-items: center; gap: .85rem; margin: 0 0 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #37343a; }
+.funcion-editor__icono { display: grid; place-items: center; width: 2.35rem; height: 2.35rem; flex: none; border-radius: 12px; background: #352c1d; color: #e8b84e; font-size: .88rem; font-weight: 800; letter-spacing: .04em; }
+.funcion-editor__seccion { color: #f3e8cc; font-size: 1.1rem; margin: 0 0 .22rem; }
+.funcion-editor__descripcion { color: #a8a5b0; font-size: .82rem; margin: 0; }
+.funcion-editor__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.3rem 1.2rem; }
+.funcion-editor__campo { display: flex; flex-direction: column; gap: .55rem; min-width: 0; }
+.funcion-editor__campo--ancho { grid-column: 1 / -1; }
+.funcion-editor__campo label { font-weight: 600; color: #eee9e2; font-size: .88rem; }
+.funcion-editor__campo input, .funcion-editor__campo select { box-sizing: border-box; display: block; width: 100%; min-height: 48px; padding: .76rem .9rem; border: 1px solid #504b56; border-radius: 9px; background: #151519; color: #f7f5f2; font: inherit; font-size: .94rem; color-scheme: dark; transition: border-color .18s, box-shadow .18s; }
+.funcion-editor__campo input:focus, .funcion-editor__campo select:focus { outline: none; border-color: #e4b84b; box-shadow: 0 0 0 3px rgba(224,177,66,.16); }
+.funcion-editor__campo select { cursor: pointer; }
+.funcion-editor__ayuda { font-size: .78rem; color: #aba7b0; line-height: 1.5; margin: 0; }
+.funcion-editor__acciones { display: flex; justify-content: flex-end; align-items: center; gap: .85rem; flex-wrap: wrap; padding: .3rem .15rem 0; }
+.funcion-editor__acciones .boton { display: inline-flex; align-items: center; justify-content: center; min-height: 45px; padding: .7rem 1.4rem; border-radius: 9px; text-decoration: none; font-weight: 700; font: inherit; cursor: pointer; }
+.funcion-editor__acciones .funcion-editor__cancelar { background: transparent; color: #ded6c9; border: 1px solid #6a604d; }
+.funcion-editor__acciones .funcion-editor__cancelar:hover { background: #2d2a26; }
+.funcion-editor__acciones .funcion-editor__guardar { background: #e5b94f; border: 1px solid #e5b94f; color: #191717; }
+.funcion-editor__acciones .funcion-editor__guardar:hover { background: #f3cd72; }
+@media(max-width: 640px) { .funcion-editor { width: min(100% - 1.5rem, 850px); margin-top: 1.5rem; } .funcion-editor__grid { grid-template-columns: 1fr; } .funcion-editor__campo--ancho { grid-column: auto; } .funcion-editor__acciones { flex-direction: column-reverse; } .funcion-editor__acciones .boton { width: 100%; box-sizing: border-box; } }
+
+.funcion-editor__imagen-control{display:grid;gap:1rem}
+.funcion-editor__foto{border:1px solid #5a4c2e;background:#131318;border-radius:12px;overflow:hidden;position:relative;max-width:100%}
+.funcion-editor__foto canvas{display:block;width:100%;height:auto;aspect-ratio:30/13;touch-action:none;cursor:grab}
+.funcion-editor__foto canvas:active{cursor:grabbing}
+.funcion-editor__foto-vacio{position:absolute;inset:0;display:grid;place-items:center;color:#e8dcbf;pointer-events:none;background:#1b1a1f}
+.funcion-editor__herramientas{display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
+.funcion-editor__herramientas input[type=range]{flex:1;accent-color:#e5b94f;min-width:140px}
+.funcion-editor__herramientas button{border-radius:9px;padding:.7rem .95rem;cursor:pointer}
+.funcion-editor__estado{color:#ccb773;font-size:.84rem;margin:0}
+.funcion-editor__imagen-control input[type=file]{padding:.65rem;color:#f7f5f2}
+
+.imagen-unificada{display:grid;gap:1.2rem}
+.imagen-unificada__campo{display:grid;gap:.45rem}
+.imagen-unificada__campo label{color:#f5e7cd;font-weight:650}
+.imagen-unificada__campo p{color:#b2acb5;font-size:.8rem;margin:0;line-height:1.5}
+.imagen-unificada__campo input,.imagen-unificada__campo select{width:100%;box-sizing:border-box;min-height:47px;padding:.72rem .9rem;background:#151519;color:#eee;border:1px solid #514a52;border-radius:9px;font:inherit;color-scheme:dark}
+.imagen-unificada__visor{position:relative;overflow:hidden;background:#16161b;border:1px solid #63502e;border-radius:13px}
+.imagen-unificada__visor canvas{display:block;width:100%;aspect-ratio:auto;height:auto;touch-action:none;cursor:grab}
+.imagen-unificada__vacio{position:absolute;inset:0;display:grid;place-items:center;background:#1b1b21;color:#ccb676;pointer-events:none;padding:1rem;text-align:center}
+.imagen-unificada__vacio[hidden]{display:none}
+.imagen-unificada__herramientas{display:flex;flex-wrap:wrap;align-items:center;gap:.85rem}
+.imagen-unificada__herramientas input{flex:1;accent-color:#ddb65a;min-width:125px}
+.imagen-unificada__herramientas button{cursor:pointer;padding:.6rem .85rem;border-radius:8px}
+.imagen-unificada__estado{color:#d6be80;margin:0;font-size:.84rem}
+/* El mismo marco de la tarjeta de película en Administración > Cartelera. */
+.funcion-editor__area-cartelera{width:100%;max-width:100%;overflow-x:auto;padding:2px 0 12px}
+.funcion-editor__tarjeta-preview{width:365px;max-width:none;flex-shrink:0;transition:none}
+.funcion-editor__tarjeta-preview:hover{transform:none;border-color:var(--color-borde);box-shadow:0 4px 15px rgba(0,0,0,.4)}
+.funcion-editor__tarjeta-preview .imagen-unificada__visor.tarjeta-pelicula__poster{border:0;border-radius:0;height:300px;min-height:0;flex:none}
+.funcion-editor__tarjeta-preview .imagen-unificada__visor canvas{display:block;width:100%;height:100%;aspect-ratio:auto;touch-action:none;cursor:grab}
+.funcion-editor__tarjeta-preview .tarjeta-pelicula__cuerpo{padding:1rem}
+
+</style>
+<section class="funcion-editor">
+  <a class="funcion-editor__volver" href="{{ url_for('web.admin.peliculas.index') }}">← Volver a administración de películas</a>
+  <p class="funcion-editor__eyebrow">Administración / Cartelera</p>
+  <h1 class="funcion-editor__titulo">Programar función</h1>
+  <p class="funcion-editor__subtitulo">Elegí la película, la sala y los detalles de la proyección para incorporarla a la cartelera.</p>
+
+  {% if error %}<p class="alerta alerta--error" role="alert">{{ error }}</p>{% endif %}
+  {% if not peliculas or not salas %}
+    <div class="funcion-editor__panel"><p>Para programar una función primero debe haber películas y salas registradas.</p></div>
+  {% else %}
+    <form method="POST" enctype="multipart/form-data" class="formulario-admin funcion-editor__form">
+      <div class="funcion-editor__panel">
+        <div class="funcion-editor__cabecera">
+          <span class="funcion-editor__icono" aria-hidden="true">01</span>
+          <div>
+            <h2 class="funcion-editor__seccion">Película y sala</h2>
+            <p class="funcion-editor__descripcion">Seleccioná qué se proyectará y dónde.</p>
+          </div>
+        </div>
+        <div class="funcion-editor__grid">
+          <div class="funcion-editor__campo">
+            <label for="pelicula_id">Película *</label>
+            <select id="pelicula_id" name="pelicula_id" required>
+              {% for pelicula in peliculas %}
+              <option value="{{ pelicula.id }}" data-poster="{{ pelicula.poster_url or '' }}" {% if request.form.get('pelicula_id') == pelicula.id|string %}selected{% endif %}>{{ pelicula.titulo }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="funcion-editor__campo">
+            <label for="sala_id">Sala *</label>
+            <select id="sala_id" name="sala_id" required>
+              {% for sala in salas %}
+              <option value="{{ sala.id }}">{{ sala.nombre_local }} · Sala {{ sala.numero_sala }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="funcion-editor__panel">
+        <div class="funcion-editor__cabecera">
+          <span class="funcion-editor__icono" aria-hidden="true">02</span>
+          <div>
+            <h2 class="funcion-editor__seccion">Fecha y precio</h2>
+            <p class="funcion-editor__descripcion">Definí cuándo se realiza la función y el valor base de la entrada.</p>
+          </div>
+        </div>
+        <div class="funcion-editor__grid">
+          <div class="funcion-editor__campo">
+            <label for="fecha_hora">Fecha y hora *</label>
+            <input id="fecha_hora" name="fecha_hora" type="datetime-local" required>
+          </div>
+          <div class="funcion-editor__campo">
+            <label for="precio_base">Precio base *</label>
+            <input id="precio_base" name="precio_base" type="number" min="0.01" step="0.01" placeholder="Ej.: 4500.00" required>
+          </div>
+        </div>
+      </div>
+      <div class="funcion-editor__panel">
+        <div class="funcion-editor__cabecera">
+          <span class="funcion-editor__icono" aria-hidden="true">03</span>
+          <div>
+            <h2 class="funcion-editor__seccion">Detalles de proyección</h2>
+            <p class="funcion-editor__descripcion">Indicá el idioma y formato que verá el público.</p>
+          </div>
+        </div>
+        <div class="funcion-editor__grid">
+          <div class="funcion-editor__campo">
+            <label for="idioma">Idioma *</label>
+            <input id="idioma" name="idioma" value="Español" required>
+          </div>
+          <div class="funcion-editor__campo">
+            <label for="formato">Formato *</label>
+            <input id="formato" name="formato" value="2D" required>
+          </div>
+        </div>
+      </div>
+      <div class="funcion-editor__panel">
+        <div class="funcion-editor__cabecera"><span class="funcion-editor__icono">04</span><div><h2 class="funcion-editor__seccion">Imagen de la función</h2><p class="funcion-editor__descripcion">Usá el póster de la película, subí otra foto o seleccioná una imagen existente. También podés ajustar el encuadre.</p></div></div>
+
+  <div class="imagen-unificada" id="funcion-encuadre" data-modo="funcion">
+    <input type="hidden" name="encuadre_aplicado" value="0">
+    <div class="imagen-unificada__campo"><label for="funcion-imagen-archivo">1. Subir una imagen nueva</label><input id="funcion-imagen-archivo" name="imagen_archivo" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"><p>JPG, PNG o WebP, hasta 5 MB. Se guarda en <code>frontend/static/img/funciones/</code>.</p></div>
+    <div class="imagen-unificada__campo"><label for="funcion-imagen-existente">2. Elegir una imagen del proyecto</label><select id="funcion-imagen-existente" name="imagen_existente"><option value="">Seleccioná una imagen ya cargada</option>{% for grupo in grupos_imagenes %}<optgroup label="{{ grupo.titulo }}">{% for imagen in grupo.imagenes %}<option value="{{ imagen.url }}" {% if request.form.get('imagen_existente') == imagen.url %}selected{% endif %}>{{ imagen.nombre }}</option>{% endfor %}</optgroup>{% endfor %}</select><p>No se duplican ni modifican las imágenes originales.</p></div>
+    <div class="imagen-unificada__campo"><label for="funcion-imagen-url">3. O pegar una URL externa</label><input id="funcion-imagen-url" name="imagen_url_manual" type="url" placeholder="https://ejemplo.com/imagen.jpg" value="{{ request.form.get('imagen_url_manual', '') }}"><p>Para recortar fotos externas, el servidor de origen debe permitirlo. Si no, descargalas y subilas como archivo.</p></div>
+    <p class="funcion-editor__ayuda">Vista previa con el mismo marco que la tarjeta de Cartelera. Esta imagen corresponde a esta función: no reemplaza el póster general de la película.</p>
+    <div class="funcion-editor__area-cartelera">
+      <article class="tarjeta-pelicula funcion-editor__tarjeta-preview">
+        <div class="tarjeta-pelicula__poster imagen-unificada__visor"><canvas id="funcion-encuadre-canvas" width="726" height="600" aria-label="Vista previa del póster con el tamaño de Cartelera"></canvas><div class="imagen-unificada__vacio" id="funcion-encuadre-vacio">Elegí una imagen para previsualizarla.</div></div>
+        <div class="tarjeta-pelicula__cuerpo"><h2 class="tarjeta-pelicula__titulo" id="funcion-encuadre-titulo">{{ peliculas[0].titulo if peliculas else 'Tu película' }}</h2></div>
+      </article>
     </div>
-    {% if error %}<p class="alerta alerta--error" role="alert">{{ error }}</p>{% endif %}
-    {% if not peliculas or not salas %}
-    <p>Para programar una función primero debe haber películas y salas registradas.</p>
-    {% else %}
-    <form method="POST" class="formulario-admin">
-        <label for="pelicula_id">Película</label>
-        <select id="pelicula_id" name="pelicula_id" required>
-            {% for pelicula in peliculas %}
-            <option value="{{ pelicula.id }}">{{ pelicula.titulo }}</option>
-            {% endfor %}
-        </select>
-
-        <label for="sala_id">Sala</label>
-        <select id="sala_id" name="sala_id" required>
-            {% for sala in salas %}
-            <option value="{{ sala.id }}">{{ sala.nombre_local }} · Sala {{ sala.numero_sala }}</option>
-            {% endfor %}
-        </select>
-
-        <label for="fecha_hora">Fecha y hora</label>
-        <input id="fecha_hora" name="fecha_hora" type="datetime-local" required>
-
-        <label for="precio_base">Precio base</label>
-        <input id="precio_base" name="precio_base" type="number" min="0.01" step="0.01" required>
-
-        <label for="idioma">Idioma</label>
-        <input id="idioma" name="idioma" value="Español" required>
-
-        <label for="formato">Formato</label>
-        <input id="formato" name="formato" value="2D" required>
-
-        <button class="boton boton--dorado" type="submit">Guardar función</button>
-        <a class="boton boton--secundario" href="{{ url_for('web.admin.peliculas.index') }}">Volver</a>
+    <div class="imagen-unificada__herramientas"><label for="funcion-zoom">Zoom <output id="funcion-zoom-valor">100%</output></label><input id="funcion-zoom" type="range" min="100" max="300" value="100" disabled><button id="funcion-centrar" class="boton boton--secundario" type="button" disabled>Centrar</button><button id="funcion-aplicar" class="boton boton--dorado" type="button" disabled>Aplicar encuadre</button></div>
+    <p class="imagen-unificada__estado" id="funcion-encuadre-estado" role="status">Podés guardar la imagen sin recortarla, o aplicar el encuadre.</p>
+  </div>
+      </div>
+      <div class="funcion-editor__acciones">
+        <a class="boton funcion-editor__cancelar" href="{{ url_for('web.admin.peliculas.index') }}">Cancelar</a>
+        <button class="boton funcion-editor__guardar" type="submit">Guardar función</button>
+      </div>
     </form>
-    {% endif %}
+  {% endif %}
 </section>
 {% endblock %}
+
+{% block extra_js %}<script src="{{ url_for('static', filename='js/utils/editor_imagen.js', v='7') }}" defer></script>{% endblock %}

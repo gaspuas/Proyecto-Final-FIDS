@@ -1,0 +1,19 @@
+CINE PARADISO - AMPLIACIÓN DEL REGISTRO DE USUARIOS
+
+1) Hacé un respaldo de los archivos del proyecto y de tu base MySQL.
+2) Extraé este ZIP en la raíz del repositorio (solo contiene archivos del registro y SQL).
+3) Abrí Docker Desktop y verificá el contenedor cine_paradiso_db.
+4) IMPORTANTE: actualizá las tablas antes de probar registros nuevos:
+   docker cp .\database\migraciones\002_registro_cumpleanos_y_preferencias.sql cine_paradiso_db:/tmp/002_registro.sql
+   docker exec -it cine_paradiso_db mysql -u cineAdmin -pcinePass1234 cine_paradiso_db
+   En el prompt mysql> ejecutá: SOURCE /tmp/002_registro.sql;
+   Después: DESCRIBE usuarios;
+   Y finalmente: exit;
+5) Reiniciá backend y frontend, probá crear un usuario de prueba.
+
+La migración conserva los usuarios existentes y puede ejecutarse nuevamente sin añadir columnas duplicadas.
+La fecha de cumpleaños y la aceptación quedan registradas en MySQL.
+La opción de recibir promociones guarda solo consentimiento, NO envía correos.
+El checkbox de términos no enlaza todavía a un texto legal; antes de publicarlo
+fuera de la demo es necesario proporcionar términos reales.
+NO se modifica el header, el carrusel, el administrador ni otras páginas.

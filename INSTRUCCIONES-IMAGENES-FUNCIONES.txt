@@ -1,0 +1,29 @@
+CINE PARADISO — Editor de encuadre para Programar función y estética de Agregar película
+
+ATENCIÓN: estos archivos están basados en la última copia completa del proyecto compartida
+anteriormente, NO en tu repositorio Windows actual. Tus compañeros pueden haber modificado
+alguno de ellos. Revisá las diferencias y guardá los cambios actuales en Git ANTES de extraer.
+
+Se reemplazan archivos del frontend y backend, por lo que recomendamos aplicar desde una rama
+de trabajo y revisar git diff, no desde main. No se incluye schema.sql antiguo porque podría
+sobrescribir columnas creadas posteriormente.
+
+Para base de datos EXISTENTE, ejecutá SOLO UNA VEZ:
+  docker cp .\database\migraciones\003_imagen_independiente_funciones.sql cine_paradiso_db:/tmp/003_funciones.sql
+  docker exec -it cine_paradiso_db mysql -u cineAdmin -pcinePass1234 cine_paradiso_db
+  SOURCE /tmp/003_funciones.sql;
+  exit;
+
+Reiniciá backend y frontend y actualizá el navegador con Ctrl+F5.
+
+En Programar función, seleccioná una película y su póster se muestra como referencia.
+Podés subir una foto nueva y ajustar el encuadre (arrastrar, zoom, aplicar).
+La imagen aplicada se guarda como archivo independiente en frontend/static/img/funciones/
+y su URL queda vinculada a ESA función en MySQL, sin alterar el póster original.
+En el detalle de película la función muestra una miniatura de la imagen personalizada, si existe.
+
+Agregar película queda con secciones numeradas y estilos independientes. La ruta y
+los nombres de los campos se conservan.
+
+IMPORTANTE: las imágenes subidas se guardan localmente: compartilas mediante GitHub;
+los registros MySQL deben compartirse por separado.

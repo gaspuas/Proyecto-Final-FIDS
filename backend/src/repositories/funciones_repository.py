@@ -24,6 +24,7 @@ def obtener_funciones_db(
                 s.columnas,
                 f.fecha_hora,
                 f.precio_base,
+                f.imagen_url,
                 f.formato,
                 f.idioma
             FROM funciones AS f
@@ -74,7 +75,8 @@ def obtener_funcion_por_id_db(id_funcion: int):
                 s.filas,
                 s.columnas,
                 f.fecha_hora,
-                f.precio_base
+                f.precio_base,
+                f.imagen_url
             FROM funciones AS f
             INNER JOIN peliculas AS p ON p.id = f.pelicula_id
             INNER JOIN locales_salas AS s ON s.id = f.sala_id

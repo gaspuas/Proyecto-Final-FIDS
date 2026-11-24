@@ -129,3 +129,26 @@ def listar_resenas_pelicula(pelicula_id):
             cursor.close()
         if conn and conn.is_connected():
             conn.close()
+
+
+def actualizar_poster_pelicula_db(pelicula_id, poster_url):
+    """Edita solamente el poster_url de una película existente."""
+    conn = get_db_connection()
+    if not conn:
+        raise RuntimeError("Fallo en la conexión a la base de datos.")
+    cursor = None
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE peliculas SET poster_url = %s WHERE id = %s",
+            (poster_url, pelicula_id),
+        )
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        if cursor:
+            cursor.close()
+        if conn and conn.is_connected():
+            conn.close()
