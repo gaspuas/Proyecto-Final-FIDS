@@ -6,6 +6,7 @@
 <section class="pagina">
     <h1>{{ error_title or 'Ocurrió un error' }}</h1>
     <p>{{ error_message or 'Ocurrio un error inesperado. Intenta mas tarde.' }}</p>
+    <p>Código HTTP: {{ error_status_code|default(500) }}</p>
     <p><a class="boton" href="{{ url_for('web.site.home.index') }}">Volver al inicio</a></p>
 </section>
 {% endblock %}

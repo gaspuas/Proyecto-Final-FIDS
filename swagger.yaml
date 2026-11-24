@@ -1,0 +1,1417 @@
+openapi: 3.0.3
+info:
+  title: Cine Paradiso Backend API
+  version: 1.0.0
+  description: |
+    Especificación de los endpoints registrados por `backend/app.py`.
+
+    Los endpoints administrativos requieren la cookie de sesión Flask `session`
+    con un usuario cuyo rol sea `administrador`. La sesión es compartida con el
+    frontend: ambos procesos deben usar el mismo `SECRET_KEY`. El endpoint de
+    login devuelve un token en el cuerpo JSON, pero las rutas administrativas
+    implementadas aquí validan la cookie de sesión, no un token Bearer.
+servers:
+  - url: http://localhost:5001
+    description: Backend local (puerto predeterminado; configurable con BACKEND_PORT)
+tags:
+  - name: Estado
+  - name: Autenticación
+  - name: Películas
+  - name: Funciones
+  - name: Servicios
+  - name: Compras
+  - name: Novedades
+  - name: Administración
+paths:
+  /health:
+    get:
+      tags: [Estado]
+      summary: Comprobar el estado del backend
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Backend disponible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /api/auth/register:
+    post:
+      tags: [Autenticación]
+      summary: Registrar una cuenta de cliente
+      operationId: registrarCliente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Cuenta registrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/auth/login:
+    post:
+      tags: [Autenticación]
+      summary: Validar credenciales
+      description: Devuelve los datos del usuario y un token en el cuerpo JSON.
+      operationId: iniciarSesion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Credenciales válidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/peliculas:
+    get:
+      tags: [Películas]
+      summary: Obtener películas en cartelera
+      operationId: listarPeliculasCartelera
+      parameters:
+        - name: sede_id
+          in: query
+          required: false
+          description: Filtra las funciones por el ID de la sede/sala.
+          schema:
+            type: integer
+        - name: fecha
+          in: query
+          required: false
+          description: Filtra las funciones por fecha.
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Cartelera consultada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovieListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/peliculas/{pelicula_id}:
+    get:
+      tags: [Películas]
+      summary: Obtener el detalle de una película
+      operationId: obtenerPelicula
+      parameters:
+        - $ref: '#/components/parameters/PeliculaId'
+      responses:
+        '200':
+          description: Película encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovieDetailResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/peliculas/{pelicula_id}/resenas:
+    get:
+      tags: [Películas]
+      summary: Listar reseñas de una película
+      operationId: listarResenasPelicula
+      parameters:
+        - $ref: '#/components/parameters/PeliculaId'
+      responses:
+        '200':
+          description: Reseñas consultadas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/funciones:
+    get:
+      tags: [Funciones]
+      summary: Listar funciones futuras
+      operationId: listarFunciones
+      parameters:
+        - name: pelicula_id
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: sala_id
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: formato
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: idioma
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Funciones consultadas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/funciones/{id_funcion}:
+    get:
+      tags: [Funciones]
+      summary: Obtener una función
+      operationId: obtenerFuncion
+      parameters:
+        - $ref: '#/components/parameters/FuncionId'
+      responses:
+        '200':
+          description: Función encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionDetailResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/funciones/{id_funcion}/butacas:
+    get:
+      tags: [Funciones]
+      summary: Consultar disponibilidad de butacas
+      operationId: consultarButacas
+      parameters:
+        - $ref: '#/components/parameters/FuncionId'
+      responses:
+        '200':
+          description: Mapa de butacas de la función
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatMap'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/servicios:
+    get:
+      tags: [Servicios]
+      summary: Listar servicios adicionales
+      operationId: listarServicios
+      responses:
+        '200':
+          description: Catálogo de servicios
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServicesResponse'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/compras:
+    post:
+      tags: [Compras]
+      summary: Crear una compra
+      operationId: crearCompra
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePurchaseRequest'
+      responses:
+        '201':
+          description: Compra creada con entradas, servicios y QR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Purchase'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/compras/usuario/{id_usuario}:
+    get:
+      tags: [Compras]
+      summary: Consultar las compras de un usuario
+      operationId: listarComprasUsuario
+      parameters:
+        - name: id_usuario
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Historial de compras
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseHistoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/compras/{id_compra}/cancelar:
+    patch:
+      tags: [Compras]
+      summary: Cancelar una compra
+      description: La compra solo puede cancelarse hasta dos horas antes de la función.
+      operationId: cancelarCompra
+      parameters:
+        - name: id_compra
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Compra cancelada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Purchase'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/novedades:
+    get:
+      tags: [Novedades]
+      summary: Listar novedades publicadas
+      operationId: listarNovedadesPublicas
+      responses:
+        '200':
+          description: Novedades activas dentro de su período de publicación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewsList'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    post:
+      tags: [Novedades]
+      summary: Crear una novedad
+      operationId: crearNovedad
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNewsRequest'
+      responses:
+        '201':
+          description: Novedad creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewsItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/novedades/admin/todas:
+    get:
+      tags: [Novedades]
+      summary: Listar todas las novedades
+      operationId: listarTodasLasNovedades
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Todas las novedades, incluidas las no publicadas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewsList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+  /api/novedades/{novedad_id}:
+    put:
+      tags: [Novedades]
+      summary: Actualizar parcialmente una novedad
+      operationId: editarNovedad
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: novedad_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateNewsRequest'
+      responses:
+        '200':
+          description: Novedad actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewsItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Novedades]
+      summary: Eliminar una novedad
+      operationId: eliminarNovedad
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: novedad_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '204':
+          description: Novedad eliminada
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/admin/salas:
+    get:
+      tags: [Administración]
+      summary: Listar salas
+      operationId: listarSalasAdmin
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Salas disponibles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/admin/peliculas:
+    get:
+      tags: [Administración]
+      summary: Listar todas las películas
+      operationId: listarTodasLasPeliculas
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Catálogo completo de películas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminMovieListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [Administración]
+      summary: Crear una película
+      operationId: crearPeliculaAdmin
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMovieRequest'
+      responses:
+        '201':
+          description: Película creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedMovieResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/admin/peliculas/{pelicula_id}/poster:
+    patch:
+      tags: [Administración]
+      summary: Actualizar el póster de una película
+      operationId: actualizarPosterPelicula
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/PeliculaId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePosterRequest'
+      responses:
+        '200':
+          description: Póster actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdatedPosterResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/admin/funciones:
+    post:
+      tags: [Administración]
+      summary: Programar una función
+      operationId: crearFuncionAdmin
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFunctionRequest'
+      responses:
+        '201':
+          description: Función programada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedFunctionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/admin/validar-qr:
+    post:
+      tags: [Administración]
+      summary: Validar un QR de entrada
+      operationId: validarQr
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidateQrRequest'
+      responses:
+        '200':
+          description: QR válido; el ticket queda marcado como usado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidateQrResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/admin/dashboard:
+    get:
+      tags: [Administración]
+      summary: Consultar métricas del dashboard
+      description: |
+        Requiere `desde` y `hasta` en formato `YYYY-MM-DD`.
+        Nota: el servicio espera `total_entradas_vendidas` del repositorio,
+        pero el repositorio actualmente solo devuelve `total_compras` y
+        `facturacion_total`; con esos datos el endpoint puede responder 500.
+      operationId: obtenerDashboard
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: desde
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: hasta
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Métricas del período solicitado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: session
+      description: Cookie de sesión Flask firmada con el SECRET_KEY compartido.
+  parameters:
+    PeliculaId:
+      name: pelicula_id
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+    FuncionId:
+      name: id_funcion
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+  responses:
+    BadRequest:
+      description: Solicitud inválida o error de validación
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Se requiere iniciar sesión
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Se requiere rol de administrador
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Conflicto de estado o de negocio
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ServerError:
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ServiceUnavailable:
+      description: Servicio temporalmente no disponible
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        error:
+          type: string
+        errores:
+          type: array
+          items:
+            type: string
+        errors:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      additionalProperties: true
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Backend activo
+      required: [status, message]
+    MessageResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+      required: [status, message]
+    RegisterRequest:
+      type: object
+      properties:
+        nombre:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+        password_confirmacion:
+          type: string
+        fecha_nacimiento:
+          type: string
+          format: date
+        acepta_terminos:
+          type: boolean
+          enum: [true]
+        recibir_promociones:
+          type: boolean
+          default: false
+      required:
+        - nombre
+        - email
+        - password
+        - password_confirmacion
+        - fecha_nacimiento
+        - acepta_terminos
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required: [email, password]
+    LoginResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+            nombre:
+              type: string
+            email:
+              type: string
+              format: email
+            rol:
+              type: string
+              enum: [cliente, administrador]
+            token:
+              type: string
+            expira_en:
+              type: string
+              format: date-time
+          required: [id, nombre, email, rol, token, expira_en]
+      required: [status, message, data]
+    Movie:
+      type: object
+      properties:
+        id:
+          type: integer
+        api_id:
+          type: integer
+          nullable: true
+        titulo:
+          type: string
+        sinopsis:
+          type: string
+        poster_url:
+          type: string
+          nullable: true
+        duracion_minutos:
+          type: integer
+        clasificacion:
+          type: string
+          nullable: true
+        genero:
+          type: string
+          nullable: true
+        director:
+          type: string
+          nullable: true
+        es_reestreno:
+          type: integer
+          enum: [0, 1]
+      required: [id, titulo, sinopsis, duracion_minutos]
+      additionalProperties: true
+    MovieListResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Movie'
+      required: [status, data]
+    AdminMovieListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Movie'
+      required: [data]
+    MovieDetailResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/Movie'
+      required: [status, message, data]
+    Review:
+      type: object
+      properties:
+        nombre_usuario:
+          type: string
+        puntuacion:
+          type: number
+        comentario:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+      additionalProperties: true
+    ReviewsResponse:
+      type: object
+      properties:
+        resenas:
+          type: array
+          items:
+            $ref: '#/components/schemas/Review'
+      required: [resenas]
+    Function:
+      type: object
+      properties:
+        id:
+          type: integer
+        pelicula_id:
+          type: integer
+        pelicula_titulo:
+          type: string
+        sala_id:
+          type: integer
+        nombre_local:
+          type: string
+        numero_sala:
+          type: integer
+        capacidad_total:
+          type: integer
+        filas:
+          type: integer
+        columnas:
+          type: integer
+        fecha_hora:
+          type: string
+          format: date-time
+        precio_base:
+          type: number
+          format: float
+        imagen_url:
+          type: string
+          nullable: true
+        formato:
+          type: string
+        idioma:
+          type: string
+      additionalProperties: true
+    FunctionsResponse:
+      type: object
+      properties:
+        funciones:
+          type: array
+          items:
+            $ref: '#/components/schemas/Function'
+      required: [funciones]
+    FunctionDetailResponse:
+      type: object
+      properties:
+        funcion:
+          $ref: '#/components/schemas/Function'
+      required: [funcion]
+    Seat:
+      type: object
+      properties:
+        codigo:
+          type: string
+          example: A1
+        fila:
+          type: string
+        columna:
+          type: integer
+        estado:
+          type: string
+          enum: [ocupada, libre]
+        libre:
+          type: boolean
+      required: [codigo, fila, columna, estado, libre]
+    SeatMap:
+      type: object
+      properties:
+        funcion_id:
+          type: integer
+        capacidad_total:
+          type: integer
+        filas:
+          type: integer
+        columnas:
+          type: integer
+        ocupadas:
+          type: array
+          items:
+            type: string
+        libres:
+          type: array
+          items:
+            type: string
+        butacas:
+          type: array
+          items:
+            $ref: '#/components/schemas/Seat'
+      required: [funcion_id, capacidad_total, filas, columnas, ocupadas, libres, butacas]
+    Service:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+        categoria:
+          type: string
+        precio:
+          type: string
+          description: Precio DECIMAL serializado por Flask como texto.
+        descripcion:
+          type: string
+          nullable: true
+      required: [id, nombre, categoria, precio]
+    ServicesResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Service'
+      required: [status, message, data]
+    CreatePurchaseRequest:
+      type: object
+      properties:
+        id_usuario:
+          type: integer
+          minimum: 1
+        id_funcion:
+          type: integer
+          minimum: 1
+        butacas:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            type: string
+            pattern: '^[A-Za-z][1-9][0-9]?$'
+            example: A1
+        servicios:
+          type: array
+          default: []
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                minimum: 1
+              cant:
+                type: integer
+                minimum: 1
+            required: [id, cant]
+            additionalProperties: false
+      required: [id_usuario, id_funcion, butacas]
+      additionalProperties: false
+    Purchase:
+      type: object
+      properties:
+        id:
+          type: integer
+        usuario_id:
+          type: integer
+        fecha_compra:
+          type: string
+          format: date-time
+        monto_total:
+          oneOf:
+            - type: number
+            - type: string
+          description: Puede serializarse como texto porque proviene de MySQL DECIMAL.
+        codigo_qr:
+          type: string
+        estado_qr:
+          type: string
+          enum: [activo, usado, cancelado]
+        qr_data_uri:
+          type: string
+          description: Data URI de la imagen QR; se incluye al crear la compra.
+        entradas:
+          type: array
+          items:
+            type: object
+            properties:
+              funcion_id:
+                type: integer
+              numero_butaca:
+                type: string
+              precio:
+                oneOf:
+                  - type: number
+                  - type: string
+            required: [funcion_id, numero_butaca, precio]
+            additionalProperties: true
+        servicios:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              cant:
+                type: integer
+              precio_unitario:
+                oneOf:
+                  - type: number
+                  - type: string
+              nombre:
+                type: string
+              subtotal:
+                oneOf:
+                  - type: number
+                  - type: string
+            required: [id, cant]
+            additionalProperties: true
+      required: [id, usuario_id, fecha_compra, monto_total, codigo_qr, estado_qr]
+      additionalProperties: true
+    PurchaseHistoryResponse:
+      type: object
+      properties:
+        compras:
+          type: array
+          items:
+            $ref: '#/components/schemas/Purchase'
+      required: [compras]
+    NewsItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        titulo:
+          type: string
+        descripcion:
+          type: string
+          nullable: true
+        imagen_url:
+          type: string
+        tipo:
+          type: string
+          enum: [estreno, oferta, publicidad]
+        enlace:
+          type: string
+          nullable: true
+        orden:
+          type: integer
+        fecha_inicio:
+          type: string
+          format: date-time
+          nullable: true
+        fecha_fin:
+          type: string
+          format: date-time
+          nullable: true
+        activo:
+          type: integer
+          enum: [0, 1]
+      additionalProperties: true
+    NewsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/NewsItem'
+    CreateNewsRequest:
+      type: object
+      properties:
+        titulo:
+          type: string
+          maxLength: 150
+        descripcion:
+          type: string
+          nullable: true
+        imagen_url:
+          type: string
+          maxLength: 500
+          description: URL HTTP(S) o ruta local `/...`.
+        tipo:
+          type: string
+          enum: [estreno, oferta, publicidad]
+        enlace:
+          type: string
+          nullable: true
+          maxLength: 500
+        orden:
+          type: integer
+          minimum: 0
+        fecha_inicio:
+          type: string
+          format: date-time
+          nullable: true
+        fecha_fin:
+          type: string
+          format: date-time
+          nullable: true
+        activo:
+          type: boolean
+      required: [titulo, imagen_url, tipo]
+      additionalProperties: false
+    UpdateNewsRequest:
+      type: object
+      description: Se requiere al menos un campo; los campos omitidos no se modifican.
+      minProperties: 1
+      properties:
+        titulo:
+          type: string
+          maxLength: 150
+        descripcion:
+          type: string
+          nullable: true
+        imagen_url:
+          type: string
+          maxLength: 500
+          description: URL HTTP(S) o ruta local `/...`.
+        tipo:
+          type: string
+          enum: [estreno, oferta, publicidad]
+        enlace:
+          type: string
+          nullable: true
+          maxLength: 500
+        orden:
+          type: integer
+          minimum: 0
+        fecha_inicio:
+          type: string
+          format: date-time
+          nullable: true
+        fecha_fin:
+          type: string
+          format: date-time
+          nullable: true
+        activo:
+          type: boolean
+      additionalProperties: false
+    RoomsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              nombre_local:
+                type: string
+              numero_sala:
+                type: integer
+              capacidad_total:
+                type: integer
+              filas:
+                type: integer
+              columnas:
+                type: integer
+            required: [id, nombre_local, numero_sala, capacidad_total, filas, columnas]
+      required: [data]
+    CreateMovieRequest:
+      type: object
+      properties:
+        titulo:
+          type: string
+        sinopsis:
+          type: string
+        duracion_minutos:
+          type: number
+          exclusiveMinimum: true
+          minimum: 0
+          description: También se acepta el alias `duracion`.
+        duracion:
+          type: number
+          exclusiveMinimum: true
+          minimum: 0
+          description: Alias de `duracion_minutos`.
+        poster_url:
+          type: string
+          nullable: true
+        api_id:
+          type: integer
+          nullable: true
+        clasificacion:
+          type: string
+          nullable: true
+        genero:
+          type: string
+          nullable: true
+        director:
+          type: string
+          nullable: true
+        es_reestreno:
+          type: boolean
+          default: false
+      required: [titulo, sinopsis]
+      anyOf:
+        - required: [duracion_minutos]
+        - required: [duracion]
+    CreatedMovieResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        titulo:
+          type: string
+        mensaje:
+          type: string
+      required: [id, titulo, mensaje]
+    UpdatePosterRequest:
+      type: object
+      properties:
+        poster_url:
+          type: string
+          maxLength: 500
+          description: URL HTTP(S) o ruta local `/static/img/...`.
+      required: [poster_url]
+    UpdatedPosterResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+            poster_url:
+              type: string
+          required: [id, poster_url]
+      required: [data]
+    CreateFunctionRequest:
+      type: object
+      properties:
+        pelicula_id:
+          type: integer
+          minimum: 1
+          description: También se acepta el alias `id_pelicula`.
+        id_pelicula:
+          type: integer
+          minimum: 1
+        sala_id:
+          type: integer
+          minimum: 1
+          description: También se acepta el alias `id_sala`.
+        id_sala:
+          type: integer
+          minimum: 1
+        fecha_hora:
+          type: string
+          format: date-time
+        precio_base:
+          type: number
+          minimum: 0
+          description: También se acepta el alias `precio`.
+        precio:
+          type: number
+          minimum: 0
+        idioma:
+          type: string
+          default: Español
+        formato:
+          type: string
+          default: 2D
+        imagen_url:
+          type: string
+          nullable: true
+      required: [fecha_hora]
+      allOf:
+        - anyOf:
+            - required: [pelicula_id]
+            - required: [id_pelicula]
+        - anyOf:
+            - required: [sala_id]
+            - required: [id_sala]
+        - anyOf:
+            - required: [precio_base]
+            - required: [precio]
+    CreatedFunctionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        pelicula_id:
+          type: integer
+        sala_id:
+          type: integer
+        mensaje:
+          type: string
+      required: [id, pelicula_id, sala_id, mensaje]
+    ValidateQrRequest:
+      type: object
+      properties:
+        codigo_qr:
+          type: string
+      required: [codigo_qr]
+    ValidateQrResponse:
+      type: object
+      properties:
+        valido:
+          type: boolean
+          enum: [true]
+        mensaje:
+          type: string
+      required: [valido, mensaje]
+    DashboardResponse:
+      type: object
+      properties:
+        periodo:
+          type: object
+          properties:
+            desde:
+              type: string
+              format: date
+            hasta:
+              type: string
+              format: date
+          required: [desde, hasta]
+        metricas:
+          type: object
+          properties:
+            total_compras:
+              type: integer
+            facturacion_total:
+              type: number
+              format: float
+            total_entradas_vendidas:
+              type: integer
+          required: [total_compras, facturacion_total, total_entradas_vendidas]
+      required: [periodo, metricas]
