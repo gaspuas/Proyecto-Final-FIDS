@@ -1,0 +1,1 @@
+Editor de encuadre para Novedades. Solo modifica formulario, CSS y agrega JS. Descomprimir en la raíz de Proyecto-Final-FIDS. Permite arrastrar, zoom y aplicar recorte panorámico 1200x520. La imagen se sube a frontend/static/img/novedades al guardar la novedad. No modifica imagen original. Para enlaces externos sin CORS, descargar imagen y subir como archivo.

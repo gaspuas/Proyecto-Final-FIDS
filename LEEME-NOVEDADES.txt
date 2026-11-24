@@ -1,0 +1,25 @@
+CINE PARADISO - ADMINISTRACION DE NOVEDADES
+
+Contenido: cambios del administrador + dos imágenes nuevas + SQL opcional.
+
+Instalación en Windows (PowerShell, desde la carpeta Proyecto-Final-FIDS):
+  Expand-Archive -Path "$HOME\Downloads\Cine-Paradiso-NOVEDADES-COMPLETO.zip" -DestinationPath . -Force
+
+Iniciá backend y frontend en terminales distintas (como siempre).
+Acceso: http://127.0.0.1:5000/admin/novedades/
+
+En el formulario podés elegir una imagen de frontend/static/img/peliculas,
+una de frontend/static/img/novedades, o subir JPG/PNG/WebP desde la PC.
+Los archivos nuevos se guardan en frontend/static/img/novedades.
+
+Para cargar las dos promociones ejemplo en MySQL (OPCIONAL):
+  docker cp .\database\promociones_nuevas.sql cine_paradiso_db:/tmp/promociones_nuevas.sql
+  docker exec -it cine_paradiso_db mysql -u cineAdmin -p cine_paradiso_db
+  (Ingresá la contraseña configurada en Docker; luego en el prompt mysql:)
+  SOURCE /tmp/promociones_nuevas.sql;
+  exit
+
+IMPORTANTE: guardar imágenes en el proyecto NO las sube automáticamente a GitHub.
+Para compartir archivos nuevos habrá que hacer git add/commit/push.
+Los registros MySQL no se sincronizan con GitHub: crear/editar desde el panel
+solo actualiza la base de datos que use esa instalación.
