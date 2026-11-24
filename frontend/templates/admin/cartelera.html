@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}Cartelera · Cine Paradiso{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/posters_cartelera.css', v='1') }}">{% endblock %}
 
 {% block content %}
 <section class="pagina pagina--site">
@@ -44,9 +45,12 @@
                     <span class="duracion">⏱ {{ pelicula.duracion_minutos }} min</span>
                 </div>
 
-                <div class="tarjeta-pelicula__acciones">
+                <div class="tarjeta-pelicula__acciones" style="flex-direction:column">
                     <a class="boton boton--dorado" href="{{ url_for('web.site.peliculas.detalle', pelicula_id=pelicula.id) }}">
                         🎟️ Ver Funciones
+                    </a>
+                    <a class="boton boton--secundario" href="{{ url_for('web.admin.peliculas.editar_poster', pelicula_id=pelicula.id) }}">
+                        <span>Editar póster</span>
                     </a>
                 </div>
             </div>

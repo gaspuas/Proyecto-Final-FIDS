@@ -31,7 +31,7 @@ def insertar_pelicula_db(titulo, sinopsis, duracion_minutos, poster_url, api_id=
         if conn:
             conn.close()
 
-def insertar_funcion_db(pelicula_id, sala_id, fecha_hora, precio_base, idioma="Español", formato="2D"):
+def insertar_funcion_db(pelicula_id, sala_id, fecha_hora, precio_base, idioma="Español", formato="2D", imagen_url=None):
     conn = get_db_connection()
     if not conn:
         return None
@@ -40,10 +40,10 @@ def insertar_funcion_db(pelicula_id, sala_id, fecha_hora, precio_base, idioma="E
     try:
         cursor = conn.cursor()
         query = """
-            INSERT INTO funciones (pelicula_id, sala_id, fecha_hora, precio_base, idioma, formato)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            INSERT INTO funciones (pelicula_id, sala_id, fecha_hora, precio_base, idioma, formato, imagen_url)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
-        valores = (pelicula_id, sala_id, fecha_hora, precio_base, idioma, formato)
+        valores = (pelicula_id, sala_id, fecha_hora, precio_base, idioma, formato, imagen_url)
         
         cursor.execute(query, valores)
         conn.commit()

@@ -7,7 +7,9 @@ from backend.src.services.admin_services import (
     obtener_dashboard_service,
     listar_salas_service,
 )
-from backend.src.services.peliculas_services import procesar_listar_todas_las_peliculas
+from backend.src.services.peliculas_services import (
+    procesar_listar_todas_las_peliculas, procesar_actualizar_poster_pelicula,
+)
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/api/admin')
 
@@ -45,6 +47,19 @@ def listar_todas_las_peliculas():
         resultado['mensaje'],
         500,
     )
+
+
+
+@admin_bp.route('/peliculas/<int:pelicula_id>/poster', methods=['PATCH'])
+def editar_poster_pelicula(pelicula_id):
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return generar_respuesta_error('INVALID_JSON', 'Solicitud inválida', 'Se necesita JSON.', 400)
+    resultado, error = procesar_actualizar_poster_pelicula(pelicula_id, data.get('poster_url'))
+    if error:
+        codigo, mensaje, descripcion, estado = error
+        return generar_respuesta_error(codigo, mensaje, descripcion, estado)
+    return jsonify({'data': resultado}), 200
 
 @admin_bp.route('/peliculas', methods=['POST'])
 def alta_pelicula():

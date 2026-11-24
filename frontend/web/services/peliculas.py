@@ -44,3 +44,9 @@ def crear_pelicula(datos):
 
 def crear_funcion(datos):
     return api_request('POST', '/api/admin/funciones', payload=datos)
+
+
+
+def actualizar_poster_pelicula(pelicula_id, poster_url):
+    return api_request('PATCH', f'/api/admin/peliculas/{pelicula_id}/poster',
+                       payload={'poster_url': poster_url})

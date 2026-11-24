@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Editar póster · Cine Paradiso{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/posters_cartelera.css', v='1') }}">{% endblock %}
+{% block content %}
+<style>
+
+.pelicula-editor{width:min(100% - 2rem,850px);margin:2.5rem auto 5rem}
+.pelicula-editor__volver{color:#d3af55;text-decoration:none;display:inline-block;margin-bottom:1.1rem}
+.pelicula-editor__etiqueta{color:#dfb84d;font-size:.75rem;letter-spacing:.14em;font-weight:700;text-transform:uppercase}
+.pelicula-editor__titulo{font-family:Georgia,serif;color:#f2cf76;font-size:clamp(1.8rem,3vw,2.5rem);margin:.35rem 0}
+.pelicula-editor__intro{color:#b4afb8;margin:0 0 1.7rem;line-height:1.6}
+.pelicula-editor__form{display:grid;gap:1.25rem}
+.pelicula-editor__seccion{background:#202025;border:1px solid #3c3730;border-radius:16px;padding:clamp(1.2rem,3vw,2rem)}
+.pelicula-editor__cabecera{display:flex;align-items:center;gap:.85rem;border-bottom:1px solid #39353a;padding-bottom:1rem;margin-bottom:1.5rem}
+.pelicula-editor__numero{display:grid;place-items:center;width:2.35rem;height:2.35rem;flex-shrink:0;border-radius:12px;background:#352c1d;color:#e8b84e;font-weight:800}
+.pelicula-editor__cabecera h2{color:#f4e9d1;font-size:1.12rem;margin:0}
+.pelicula-editor__cabecera p{color:#aba8b0;font-size:.85rem;margin:.25rem 0 0}
+.pelicula-editor__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.15rem}
+.pelicula-editor__campo{display:flex;flex-direction:column;gap:.55rem;min-width:0}
+.pelicula-editor__ancho{grid-column:1/-1}
+.pelicula-editor__campo label{font-weight:600;color:#eee7dc;font-size:.88rem}
+.pelicula-editor__campo input,.pelicula-editor__campo textarea{box-sizing:border-box;width:100%;padding:.78rem .9rem;min-height:48px;background:#151519;border:1px solid #504b56;border-radius:9px;color:#f7f5f2;font:inherit;color-scheme:dark}
+.pelicula-editor__campo textarea{min-height:125px;resize:vertical}
+.pelicula-editor__campo input:focus,.pelicula-editor__campo textarea:focus{outline:none;border-color:#e4b84b;box-shadow:0 0 0 3px rgba(224,177,66,.16)}
+.pelicula-editor__ayuda{color:#aaa6b0;font-size:.8rem;line-height:1.5;margin:0}
+.pelicula-editor__check{display:flex;align-items:center;gap:.7rem;color:#f0e6d8;cursor:pointer}
+.pelicula-editor__check input{accent-color:#e5b94f;width:19px;height:19px}
+.pelicula-editor__acciones{display:flex;justify-content:flex-end;gap:.8rem;flex-wrap:wrap}
+.pelicula-editor__acciones .boton{padding:.75rem 1.35rem;border-radius:9px;text-decoration:none;cursor:pointer}
+.pelicula-editor__preview{margin-top:1rem;border-radius:10px;max-height:280px;max-width:100%;object-fit:contain;background:#121216;border:1px solid #47404a}
+@media(max-width:640px){.pelicula-editor__grid{grid-template-columns:1fr}.pelicula-editor__ancho{grid-column:auto}.pelicula-editor__acciones{flex-direction:column-reverse}.pelicula-editor__acciones .boton{width:100%}}
+
+.imagen-unificada{display:grid;gap:1.2rem}
+.imagen-unificada__campo{display:grid;gap:.45rem}
+.imagen-unificada__campo label{color:#f5e7cd;font-weight:650}
+.imagen-unificada__campo p{color:#b2acb5;font-size:.8rem;margin:0;line-height:1.5}
+.imagen-unificada__campo input,.imagen-unificada__campo select{width:100%;box-sizing:border-box;min-height:47px;padding:.72rem .9rem;background:#151519;color:#eee;border:1px solid #514a52;border-radius:9px;font:inherit;color-scheme:dark}
+.imagen-unificada__visor{position:relative;overflow:hidden;background:#16161b;border:1px solid #63502e;border-radius:13px}
+.imagen-unificada__visor canvas{display:block;width:100%;aspect-ratio:auto;height:auto;touch-action:none;cursor:grab}
+.imagen-unificada__vacio{position:absolute;inset:0;display:grid;place-items:center;background:#1b1b21;color:#ccb676;pointer-events:none;padding:1rem;text-align:center}
+.imagen-unificada__vacio[hidden]{display:none}
+.imagen-unificada__herramientas{display:flex;flex-wrap:wrap;align-items:center;gap:.85rem}
+.imagen-unificada__herramientas input{flex:1;accent-color:#ddb65a;min-width:125px}
+.imagen-unificada__herramientas button{cursor:pointer;padding:.6rem .85rem;border-radius:8px}
+.imagen-unificada__estado{color:#d6be80;margin:0;font-size:.84rem}
+/* Misma tarjeta y mismo poster de Cartelera, sin proporciones inventadas. */
+.pelicula-editor__area-cartelera{width:100%;max-width:100%;overflow-x:auto;padding:2px 0 12px}
+.pelicula-editor__tarjeta-preview{width:365px;max-width:none;flex-shrink:0;transition:none}
+.pelicula-editor__tarjeta-preview:hover{transform:none;border-color:var(--color-borde);box-shadow:0 4px 15px rgba(0,0,0,.4)}
+.pelicula-editor__tarjeta-preview .imagen-unificada__visor.tarjeta-pelicula__poster{border:0;border-radius:0;height:300px;min-height:0;flex:none}
+.pelicula-editor__tarjeta-preview .imagen-unificada__visor canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.pelicula-editor__tarjeta-preview .tarjeta-pelicula__cuerpo{padding:1rem}
+
+
+</style>
+<section class="pelicula-editor">
+  <a class="pelicula-editor__volver" href="{{ url_for('web.admin.peliculas.index') }}">← Volver a Cartelera</a>
+  <p class="pelicula-editor__etiqueta">Administración / Cartelera</p>
+  <h1 class="pelicula-editor__titulo">Editar póster</h1>
+  <p class="pelicula-editor__intro">{{ pelicula.titulo }} — Elegí el encuadre que se verá en <strong>/peliculas/</strong>. La imagen original y los datos de la película se conservan.</p>
+  {% if error %}<p class="alerta alerta--error" role="alert">{{ error }}</p>{% endif %}
+  <form method="POST" enctype="multipart/form-data" class="pelicula-editor__form">
+    <div class="pelicula-editor__seccion">
+      <div class="pelicula-editor__cabecera"><span class="pelicula-editor__numero">01</span><div><h2>Imagen y encuadre de Cartelera</h2><p>La vista previa coincide con el póster público.</p></div></div>
+      <div class="imagen-unificada" id="pelicula-encuadre" data-modo="pelicula" data-imagen-actual="{{ pelicula.poster_url or '' }}">
+        <input type="hidden" name="encuadre_aplicado" value="0">
+        <div class="imagen-unificada__campo">
+          <label for="pelicula-imagen-archivo">1. Subir imagen desde tu PC</label>
+          <input id="pelicula-imagen-archivo" name="imagen_archivo" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+          <p>También podés partir del póster actual que se carga automáticamente.</p>
+        </div>
+        <div class="imagen-unificada__campo">
+          <label for="pelicula-imagen-existente">2. O elegir una imagen guardada</label>
+          <select id="pelicula-imagen-existente" name="imagen_existente">
+            <option value="">Mantener la imagen actual</option>
+            {% for grupo in grupos_imagenes %}<optgroup label="{{ grupo.titulo }}">
+            {% for imagen in grupo.imagenes %}<option value="{{ imagen.url }}">{{ imagen.nombre }}</option>{% endfor %}
+            </optgroup>{% endfor %}
+          </select>
+          <p>Podés recuperar las imágenes que recortaste anteriormente en Funciones desde esta lista.</p>
+        </div>
+        <div class="imagen-unificada__campo">
+          <label for="pelicula-imagen-url">3. O pegar una URL</label>
+          <input id="pelicula-imagen-url" name="imagen_url_manual" type="url" placeholder="https://ejemplo.com/poster.jpg">
+        </div>
+        <div class="pelicula-editor__area-cartelera">
+          <article class="tarjeta-pelicula pelicula-editor__tarjeta-preview">
+            <div class="tarjeta-pelicula__poster imagen-unificada__visor">
+              <canvas id="pelicula-encuadre-canvas" width="726" height="600" aria-label="Póster de Cartelera, arrastrá para encuadrar"></canvas>
+              <div class="imagen-unificada__vacio" id="pelicula-encuadre-vacio">Cargando imagen actual…</div>
+            </div>
+            <div class="tarjeta-pelicula__cuerpo">
+              <h2 class="tarjeta-pelicula__titulo">{{ pelicula.titulo }}</h2>
+              <div class="tarjeta-pelicula__meta"><span class="tag-genero">{{ pelicula.genero or 'Clásico' }}</span><span class="duracion">{{ pelicula.duracion_minutos }} min</span></div>
+            </div>
+          </article>
+        </div>
+        <div class="imagen-unificada__herramientas">
+          <label for="pelicula-zoom">Zoom <output id="pelicula-zoom-valor">100%</output></label>
+          <input id="pelicula-zoom" type="range" min="100" max="300" value="100" disabled>
+          <button id="pelicula-centrar" class="boton boton--secundario" type="button" disabled>Centrar</button>
+          <button id="pelicula-aplicar" class="boton boton--dorado" type="button" disabled>Aplicar encuadre</button>
+        </div>
+        <p class="imagen-unificada__estado" id="pelicula-encuadre-estado" role="status">Mové y ampliá la imagen; aplicá el encuadre antes de guardar.</p>
+      </div>
+    </div>
+    <div class="pelicula-editor__acciones">
+      <a class="boton boton--secundario" href="{{ url_for('web.admin.peliculas.index') }}">Cancelar</a>
+      <button class="boton boton--dorado" type="submit">Guardar póster en Cartelera</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+{% block extra_js %}<script src="{{ url_for('static', filename='js/utils/editor_imagen.js', v='10') }}" defer></script>{% endblock %}

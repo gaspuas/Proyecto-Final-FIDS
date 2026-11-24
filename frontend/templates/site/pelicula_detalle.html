@@ -48,6 +48,7 @@
                                         value="{{ funcion.id }}" 
                                         {% if loop.first %}checked{% endif %} 
                                         required>
+                                    {% if funcion.imagen_url %}<img src="{{ funcion.imagen_url }}" alt="Imagen de la función" loading="lazy" style="width:88px;height:55px;object-fit:cover;border-radius:7px;vertical-align:middle;margin-right:.5rem">{% endif %}
                                     <span class="opcion-horario__texto">
                                         {{ funcion.fecha_hora }} hs · {{ funcion.formato }} · ${{ "%.2f"|format(funcion.precio_base) }}
                                     </span>

@@ -1,0 +1,44 @@
+/* Pósteres Cine Paradiso: una única relación de aspecto para la cartelera
+   y el exportador WebP del editor. Valores base: 365 x 300 píxeles.
+   La imagen guarda el recorte definitivo; la cartelera no debe recortarla por segunda vez. */
+:root {
+  --cine-poster-ancho: 365;
+  --cine-poster-alto: 300;
+  --cine-poster-proporcion: 365 / 300;
+}
+/* La altura de la imagen se deriva de su ancho. Antes era 300 px fijos,
+   y por eso se volvía a cortar en otras anchuras de pantalla. */
+.pagina .grilla-peliculas .tarjeta-pelicula__poster {
+  aspect-ratio: var(--cine-poster-proporcion);
+  height: auto;
+  flex-shrink: 0;
+}
+.pagina .grilla-peliculas .tarjeta-pelicula__poster > img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+/* La vista de edición adopta exactamente la misma relación de aspecto,
+   independientemente del ancho real del navegador. */
+.pelicula-editor .pelicula-editor__tarjeta-preview .imagen-unificada__visor.tarjeta-pelicula__poster {
+  position: relative;
+  aspect-ratio: var(--cine-poster-proporcion);
+  height: auto;
+  min-height: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+}
+.pelicula-editor .pelicula-editor__tarjeta-preview .imagen-unificada__visor > canvas {
+  position: absolute;
+  display: block;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: grab;
+}
