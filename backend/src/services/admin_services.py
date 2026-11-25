@@ -51,7 +51,11 @@ def crear_pelicula_service(data):
     }
     return respuesta, None
 
-from backend.src.repositories.admin_repository import insertar_pelicula_db, insertar_funcion_db
+from backend.src.repositories.admin_repository import (
+    FuncionSuperpuestaError,
+    insertar_pelicula_db,
+    insertar_funcion_db,
+)
 
 def crear_funcion_service(data):
 
@@ -74,15 +78,23 @@ def crear_funcion_service(data):
         return None, ("BAD_REQUEST", "Campo faltante", "El campo 'precio' es obligatorio", 400)
 
 
-    id_creado = insertar_funcion_db(
-        pelicula_id=pelicula_id,
-        sala_id=sala_id,
-        fecha_hora=fecha_hora,
-        precio_base=precio_base,
-        idioma=idioma,
-        formato=formato,
-        imagen_url=imagen_url
-    )
+    try:
+        id_creado = insertar_funcion_db(
+            pelicula_id=pelicula_id,
+            sala_id=sala_id,
+            fecha_hora=fecha_hora,
+            precio_base=precio_base,
+            idioma=idioma,
+            formato=formato,
+            imagen_url=imagen_url
+        )
+    except FuncionSuperpuestaError:
+        return None, (
+            "CONFLICT",
+            "Sala ocupada",
+            "La sala ya tiene una función que se superpone con ese horario.",
+            409,
+        )
 
     if not id_creado:
         return None, ("INTERNAL_ERROR", "Error de base de datos", "No se pudo registrar la función", 500)
