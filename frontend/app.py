@@ -41,6 +41,7 @@ def internal_server_error(error):
         '500.html',
         error_title='Ocurrió un error',
         error_message='No pudimos completar la solicitud. Intenta más tarde.',
+        error_status_code=500,
     ), 500
 
 
@@ -50,6 +51,7 @@ def backend_unavailable(error):
         '500.html',
         error_title='No se pudo completar la solicitud',
         error_message=str(error),
+        error_status_code=error.status_code,
     ), error.status_code
 
 

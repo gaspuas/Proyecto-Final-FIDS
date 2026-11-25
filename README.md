@@ -219,6 +219,7 @@ erDiagram
         int funcion_id FK
         string numero_butaca
         decimal precio
+        boolean activa
     }
 
     SERVICIOS {

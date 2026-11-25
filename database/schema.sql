@@ -89,11 +89,11 @@ CREATE TABLE IF NOT EXISTS entradas_detalle (
   funcion_id INT NOT NULL,
   numero_butaca VARCHAR(10) NOT NULL,
   precio DECIMAL(10,2) NOT NULL,
+  activa TINYINT(1) NULL DEFAULT 1,
   CONSTRAINT fk_entradas_compra FOREIGN KEY (compra_id) REFERENCES compras(id) ON DELETE CASCADE,
   CONSTRAINT fk_entradas_funcion FOREIGN KEY (funcion_id) REFERENCES funciones(id) ON DELETE CASCADE,
-  CONSTRAINT uq_funcion_butaca UNIQUE (funcion_id, numero_butaca)
+  CONSTRAINT uq_funcion_butaca_activa UNIQUE (funcion_id, numero_butaca, activa)
 ) ENGINE=InnoDB;
-
 -- -----------------------------------------------------
 -- 7. Tabla: servicios
 -- -----------------------------------------------------
@@ -222,3 +222,12 @@ WHERE NOT EXISTS (
     SELECT 1 FROM novedades WHERE titulo = 'Próximos estrenos'
       AND imagen_url = '/static/img/novedades/estrenos.svg'
 );
+INSERT INTO novedades (titulo, descripcion, imagen_url, tipo, enlace, orden, fecha_inicio, fecha_fin, activo)
+SELECT 'Combo pochoclos + bebida', 'Disfrutá tu película con pochoclos y una bebida bien fría.',
+       '/static/img/novedades/promo_combo_pochoclos_bebida.webp', 'oferta', '/peliculas/', 3, NULL, NULL, 1
+WHERE NOT EXISTS (SELECT 1 FROM novedades WHERE imagen_url = '/static/img/novedades/promo_combo_pochoclos_bebida.webp');
+
+INSERT INTO novedades (titulo, descripcion, imagen_url, tipo, enlace, orden, fecha_inicio, fecha_fin, activo)
+SELECT 'Cine en familia', 'Compartí la magia del cine con quienes más querés.',
+       '/static/img/novedades/promo_cine_en_familia.webp', 'publicidad', '/peliculas/', 4, NULL, NULL, 1
+WHERE NOT EXISTS (SELECT 1 FROM novedades WHERE imagen_url = '/static/img/novedades/promo_cine_en_familia.webp');
