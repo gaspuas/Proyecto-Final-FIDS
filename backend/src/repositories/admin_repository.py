@@ -31,14 +31,41 @@ def insertar_pelicula_db(titulo, sinopsis, duracion_minutos, poster_url, api_id=
         if conn:
             conn.close()
 
+class FuncionSuperpuestaError(Exception):
+    """La sala ya tiene una función en ese horario."""
+
+
 def insertar_funcion_db(pelicula_id, sala_id, fecha_hora, precio_base, idioma="Español", formato="2D", imagen_url=None):
     conn = get_db_connection()
     if not conn:
         return None
-    
+
     cursor = None
     try:
         cursor = conn.cursor()
+        # Bloquea la sala hasta el commit: dos altas simultáneas se controlan de a una.
+        cursor.execute("SELECT id FROM locales_salas WHERE id = %s FOR UPDATE", (sala_id,))
+        cursor.fetchone()
+
+        # Dos funciones se superponen si cada una empieza antes de que termine la otra.
+        cursor.execute(
+            """
+            SELECT f.id
+            FROM funciones AS f
+            INNER JOIN peliculas AS p ON p.id = f.pelicula_id
+            WHERE f.sala_id = %s
+              AND f.fecha_hora < DATE_ADD(%s, INTERVAL (
+                    SELECT duracion_minutos FROM peliculas WHERE id = %s
+                  ) MINUTE)
+              AND DATE_ADD(f.fecha_hora, INTERVAL p.duracion_minutos MINUTE) > %s
+            LIMIT 1
+            """,
+            (sala_id, fecha_hora, pelicula_id, fecha_hora),
+        )
+        if cursor.fetchone():
+            conn.rollback()
+            raise FuncionSuperpuestaError()
+
         query = """
             INSERT INTO funciones (pelicula_id, sala_id, fecha_hora, precio_base, idioma, formato, imagen_url)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
