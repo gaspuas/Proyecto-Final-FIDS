@@ -46,6 +46,7 @@
                                     <input type="radio" 
                                         name="funcion_id" 
                                         value="{{ funcion.id }}" 
+                                        data-precio="{{ funcion.precio_base }}"
                                         {% if loop.first %}checked{% endif %} 
                                         required>
                                     {% if funcion.imagen_url %}<img src="{{ funcion.imagen_url }}" alt="Imagen de la función" loading="lazy" style="width:88px;height:55px;object-fit:cover;border-radius:7px;vertical-align:middle;margin-right:.5rem">{% endif %}
@@ -62,7 +63,7 @@
 
                     <div class="tarjeta-funciones__footer">
                         <p class="tarjeta-funciones__precio">
-                            Entrada: <strong>${{ "%.2f"|format(funciones[0].precio_base if funciones else 0) }}</strong>
+                            Entrada: <strong data-precio-entrada>{{ "%.2f"|format(funciones[0].precio_base if funciones else 0) }}</strong>
                         </p>
                         
                         {% if funciones %}
@@ -95,4 +96,8 @@
 
     </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/detalle_pelicula.js', v='1') }}" defer></script>
 {% endblock %}

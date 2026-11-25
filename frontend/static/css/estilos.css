@@ -562,7 +562,7 @@ body {
     transition: all 0.2s ease-in-out;
 }
 
-.opcion-horario input[type="radio"]:checked + .opcion-horario__texto {
+.opcion-horario input[type="radio"]:checked ~ .opcion-horario__texto {
     background-color: #f39c12;
     color: #121212;
     border-color: #f39c12;
