@@ -1,0 +1,60 @@
+CINE PARADISO - ACTUALIZACION DE TOKENSESSION Y COMPRAS
+======================================================
+
+ESTE ZIP ES UN PARCHE: contiene solo archivos nuevos o modificados respecto
+al ZIP de origen "Proyecto-Final-FIDS-main (4).zip".
+NO incluye imagenes ni reemplaza el carrusel, las peliculas o el estilo visual.
+
+IMPORTANTE: Si en GitHub se modificaron estos mismos archivos DESPUES del ZIP (4),
+no sobrescribir ciegamente. Compara los cambios antes de aplicarlo.
+
+1) Cerrar frontend y backend (Ctrl+C). NO borrar datos de Docker/MySQL.
+2) En Windows/VS Code, hacer copia de seguridad del proyecto y/o git status.
+3) Descomprimir ESTE ZIP directamente DENTRO de:
+      C:\Users\juani\Proyecto-Final-FIDS
+   Aceptar "Reemplazar los archivos existentes". NO crear otra carpeta adentro.
+4) Desde PowerShell dentro de Proyecto-Final-FIDS instalar dependencias:
+      .\.venv\Scripts\python.exe -m pip install -r backend\requirements.txt
+5) Iniciar Docker Desktop y luego:
+      docker compose -f database/docker-compose.yml up -d
+6) Aplicar la migracion 004 a la base YA EXISTENTE (una sola vez; es idempotente):
+      docker cp .\database\migraciones\004_sesiones_token.sql cine_paradiso_db:/tmp/004_sesiones_token.sql
+      docker exec cine_paradiso_db sh -c 'mysql -ucineAdmin -pcinePass1234 cine_paradiso_db < /tmp/004_sesiones_token.sql'
+7) Comprobar tabla:
+      docker exec cine_paradiso_db mysql -ucineAdmin -pcinePass1234 -e "SHOW TABLES LIKE 'sesiones';" cine_paradiso_db
+8) Backend, terminal 1:
+      .\.venv\Scripts\python.exe -m backend.app
+9) Frontend, terminal 2:
+      .\.venv\Scripts\python.exe -m frontend.app
+10) Entrar a http://127.0.0.1:5000 e INICIAR SESION OTRA VEZ.
+    Las cookies anteriores no sirven con el nuevo sistema. Probar:
+    login, compras, historial, cancelar compra propia, QR, novedades admin,
+    alta pelicula y alta funcion, logout y nueva entrada a la web.
+11) Tests (opcionales, sin alterar MySQL):
+      .\.venv\Scripts\python.exe -m unittest discover -s backend/tests -v
+
+CAMBIOS:
+- POST /api/auth/login persiste SHA-256 de token en tabla sesiones.
+- GET /api/auth/me comprueba token y devuelve identidad actual.
+- POST /api/auth/logout revoca el token en la base de datos.
+- Backend exige Authorization: Bearer <token> para compras, admin y novedades admin.
+- Solo se guarda el token sin hash en la sesion del servidor frontend.
+  La cookie del navegador lleva un identificador opaco, no el token.
+- POST /api/compras ya NO admite id_usuario en JSON: lo obtiene del token.
+- GET /api/compras/mis devuelve solo las compras del usuario del token.
+- GET /api/compras/usuario/<id> continua funcionando para el propio usuario;
+  para otro devuelve HTTP 404.
+- PATCH /api/compras/<id>/cancelar verifica propietario y estado.
+- Logout revoca el TokenSession; los tokens vencen a las 2 horas.
+- CSRF añadido a login, logout, formularios admin peliculas y compras.
+
+NOTAS Y LIMITACIONES:
+- La carpeta local .cine_session_cache/ almacena sesiones web; se ignora en Git.
+  Para desarrollo local con un proceso frontend es suficiente. Para varios
+  servidores en produccion, usar Redis o sesiones compartidas persistentes.
+- Por seguridad, SESSION_COOKIE_SECURE debe valer true si se usa HTTPS;
+  para localhost HTTP puede quedar false.
+- La migracion no elimina ninguna compra, usuario ni funcion.
+- Si el backend falla al revocar el token, el navegador cierra la sesion local
+  y avisa que la revocacion remota NO pudo confirmarse.
+- Pruebas de infraestructura real deben ejecutarse EN TU PC con Docker y venv.

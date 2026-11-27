@@ -32,6 +32,7 @@ class BackendAPIErrorTests(unittest.TestCase):
         with client.session_transaction() as state:
             state['usuario'] = {'id': 2, 'nombre': 'Cliente', 'rol': 'cliente'}
             state['checkout'] = {'id_funcion': 1, 'butacas': ['1']}
+            state['csrf_token_global'] = 'testcsrf'
 
         with patch(
             'frontend.web.routes.site.compra.obtener_funcion',
@@ -43,7 +44,7 @@ class BackendAPIErrorTests(unittest.TestCase):
             'frontend.web.services.api_client.requests.request',
             side_effect=requests.Timeout,
         ):
-            response = client.post('/compra/servicios')
+            response = client.post('/compra/servicios', data={'csrf_token': 'testcsrf'})
 
         self.assertEqual(response.status_code, 504)
         self.assertIn('podría haberse registrado'.encode(), response.data)

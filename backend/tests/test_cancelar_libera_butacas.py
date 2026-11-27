@@ -46,7 +46,7 @@ class CancelarLiberaButacasTests(unittest.TestCase):
         with patch.object(
             compras_repository, 'get_db_connection', return_value=conexion
         ):
-            resultado = compras_repository.cancelar_compra_db(5)
+            resultado = compras_repository.cancelar_compra_db(5, 1)
         return resultado, conexion.eventos
 
     def test_al_cancelar_se_liberan_las_butacas_de_la_compra(self):

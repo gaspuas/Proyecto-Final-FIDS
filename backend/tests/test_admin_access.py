@@ -47,19 +47,24 @@ class AdminAccessTests(unittest.TestCase):
         api = self.api_client
         self.assertEqual(api.get('/api/admin/peliculas').status_code, 401)
 
-        self.iniciar_sesion_como('cliente', api)
-        self.assertEqual(api.get('/api/admin/peliculas').status_code, 403)
+        token = 'a' * 43
+        headers = {'Authorization': f'Bearer {token}'}
+        with patch('backend.src.utils.token_auth.buscar_usuario_por_token',
+                   return_value={'id': 1, 'rol': 'cliente', 'nombre': 'Cliente', 'email': 'c@test.test'}):
+            self.assertEqual(api.get('/api/admin/peliculas', headers=headers).status_code, 403)
 
-        self.iniciar_sesion_como('administrador', api)
-        with patch(
+        with patch('backend.src.utils.token_auth.buscar_usuario_por_token',
+                   return_value={'id': 1, 'rol': 'administrador', 'nombre': 'Admin', 'email': 'a@test.test'}), patch(
             'backend.src.routes.admin.procesar_listar_todas_las_peliculas',
             return_value={'exito': True, 'datos': []},
         ):
-            respuesta = api.get('/api/admin/peliculas')
+            respuesta = api.get('/api/admin/peliculas', headers=headers)
 
         self.assertEqual(respuesta.status_code, 200)
 
     def test_login_admin_redirige_al_panel(self):
+        with self.client.session_transaction() as sesion:
+            sesion['csrf_token_global'] = 'testcsrf'
         with patch(
             'frontend.web.routes.site.login.iniciar_sesion',
             return_value={
@@ -68,12 +73,14 @@ class AdminAccessTests(unittest.TestCase):
                     'nombre': 'Administradora',
                     'email': 'admin@example.test',
                     'rol': 'administrador',
+                    'token': 'a' * 43,
                 }
             },
         ):
             respuesta = self.client.post(
                 '/login',
                 data={
+                    'csrf_token': 'testcsrf',
                     'accion': 'login',
                     'email': 'admin@example.test',
                     'password': 'password',

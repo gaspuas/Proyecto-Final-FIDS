@@ -151,6 +151,7 @@ activemq-data/
 
 # Environments
 .env
+.cine_session_cache/
 .envrc
 .venv
 env/

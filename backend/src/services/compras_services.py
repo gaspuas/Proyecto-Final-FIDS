@@ -148,14 +148,14 @@ def listar_compras_usuario_service(id_usuario: int):
     return compras_response, None, 200
 
 
-def cancelar_compra_service(id_compra: int):
+def cancelar_compra_service(id_compra: int, id_usuario: int):
     """
     Comprueba existencia, estado y plazo de cancelación.
     Retorna (compra_actualizada, error_msg, status_code).
     """
     compra = obtener_compra_por_id_db(id_compra)
-    if not compra:
-        return None, f"Compra con ID {id_compra} no encontrada.", 404
+    if not compra or int(compra['usuario_id']) != int(id_usuario):
+        return None, 'Compra no encontrada.', 404
 
     if compra['estado_qr'] != 'activo':
         return None, "La compra no se encuentra activa y no puede cancelarse.", 400
@@ -172,7 +172,7 @@ def cancelar_compra_service(id_compra: int):
         ), 400
 
     try:
-        compra_actualizada, error_msg, status = cancelar_compra_db(id_compra)
+        compra_actualizada, error_msg, status = cancelar_compra_db(id_compra, id_usuario)
         if error_msg:
             return None, error_msg, status
         return compra_actualizada, None, 200

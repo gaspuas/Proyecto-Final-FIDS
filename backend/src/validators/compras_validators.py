@@ -11,7 +11,7 @@ def validar_body_crear_compra(data: dict) -> tuple[dict, str | None]:
     if not data or not isinstance(data, dict):
         return {}, "Debe enviar un objeto JSON válido."
 
-    campos_permitidos = {'id_usuario', 'id_funcion', 'butacas', 'servicios'}
+    campos_permitidos = {'id_funcion', 'butacas', 'servicios'}
     campos_enviados = set(data.keys())
     desconocidos = campos_enviados - campos_permitidos
     if desconocidos:
@@ -20,13 +20,9 @@ def validar_body_crear_compra(data: dict) -> tuple[dict, str | None]:
             + ", ".join(sorted(desconocidos)) + "."
         )
 
-    id_usuario = data.get('id_usuario')
     id_funcion = data.get('id_funcion')
     butacas = data.get('butacas')
     servicios = data.get('servicios', [])
-
-    if not isinstance(id_usuario, int) or isinstance(id_usuario, bool) or id_usuario <= 0:
-        return {}, "El campo 'id_usuario' es obligatorio y debe ser un entero positivo."
 
     if not isinstance(id_funcion, int) or isinstance(id_funcion, bool) or id_funcion <= 0:
         return {}, "El campo 'id_funcion' es obligatorio y debe ser un entero positivo."
@@ -81,7 +77,6 @@ def validar_body_crear_compra(data: dict) -> tuple[dict, str | None]:
         servicios_limpios.append({'id': id_servicio, 'cant': cantidad})
 
     return {
-        'id_usuario': id_usuario,
         'id_funcion': id_funcion,
         'butacas': butacas_limpias,
         'servicios': servicios_limpios

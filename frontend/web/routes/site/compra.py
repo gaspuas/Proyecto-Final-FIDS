@@ -2,6 +2,7 @@
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 
 from frontend.web.services.api_client import BackendAPIError
+from frontend.web.utils.csrf import requerir_csrf
 from frontend.web.services.compras import (
     cancelar_compra,
     crear_compra,
@@ -98,6 +99,7 @@ def servicios():
     if request.method == 'GET':
         return render_template('site/servicios.html', **datos_vista, error=None)
 
+    requerir_csrf()
     servicios_elegidos = []
     cantidades_por_id = {}
     for servicio in servicios_disponibles:
@@ -117,7 +119,6 @@ def servicios():
             servicios_elegidos.append({'id': int(servicio['id']), 'cant': cantidad})
 
     compra = crear_compra(
-        id_usuario=int(session['usuario']['id']),
         id_funcion=int(checkout['id_funcion']),
         butacas=checkout['butacas'],
         servicios=servicios_elegidos,
@@ -147,16 +148,14 @@ def servicios():
 
 @compra_bp.route('/<int:compra_id>/cancelar', methods=['POST'])
 def cancelar(compra_id):
+    requerir_csrf()
     usuario = session.get('usuario')
     if not usuario:
         return redirect(url_for('web.site.login.index'))
     try:
-        compras_usuario = obtener_compras_usuario(int(usuario['id']))
-        if any(compra['id'] == compra_id for compra in compras_usuario):
-            cancelar_compra(compra_id)
-            flash('La compra fue cancelada.', 'success')
-        else:
-            flash(MENSAJE_COMPRA_INEXISTENTE, 'error')
+        # La verificación de propiedad se realiza de forma autoritativa en la API.
+        cancelar_compra(compra_id)
+        flash('La compra fue cancelada.', 'success')
     except BackendAPIError as error:
         flash(_mensaje_error_cancelacion(error), 'error')
     return redirect(url_for('.historial'))
@@ -169,7 +168,7 @@ def historial():
         flash('Iniciá sesión para consultar tus compras.', 'error')
         return redirect(url_for('web.site.login.index', next=request.path))
     try:
-        compras_usuario = obtener_compras_usuario(int(usuario['id']))
+        compras_usuario = obtener_compras_usuario()
     except BackendAPIError as error:
         if error.status_code < 500:
             raise

@@ -58,6 +58,7 @@
   <p class="pelicula-editor__intro">Cargá la información que verá el público en la cartelera.</p>
   {% if error %}<p class="alerta alerta--error" role="alert">{{ error }}</p>{% endif %}
   <form method="POST" enctype="multipart/form-data" class="formulario-admin pelicula-editor__form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token_global() }}">
     <div class="pelicula-editor__seccion">
       <div class="pelicula-editor__cabecera"><span class="pelicula-editor__numero">01</span><div><h2>Información principal</h2><p>Título, historia y duración.</p></div></div>
       <div class="pelicula-editor__grid">

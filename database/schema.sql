@@ -231,3 +231,20 @@ INSERT INTO novedades (titulo, descripcion, imagen_url, tipo, enlace, orden, fec
 SELECT 'Cine en familia', 'Compartí la magia del cine con quienes más querés.',
        '/static/img/novedades/promo_cine_en_familia.webp', 'publicidad', '/peliculas/', 4, NULL, NULL, 1
 WHERE NOT EXISTS (SELECT 1 FROM novedades WHERE imagen_url = '/static/img/novedades/promo_cine_en_familia.webp');
+
+-- -----------------------------------------------------
+-- 11. Tabla: sesiones (TokenSession)
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS sesiones (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    token_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+    creado_en DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    expira_en DATETIME(6) NOT NULL,
+    revocado_en DATETIME(6) NULL,
+    CONSTRAINT uq_sesiones_token_hash UNIQUE (token_hash),
+    INDEX idx_sesiones_usuario (usuario_id),
+    INDEX idx_sesiones_expira (expira_en),
+    CONSTRAINT fk_sesiones_usuario FOREIGN KEY (usuario_id)
+        REFERENCES usuarios(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

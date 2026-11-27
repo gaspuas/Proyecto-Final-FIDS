@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, session
+from flask import Blueprint, jsonify, request
 from backend.src.utils.api_responses import generar_respuesta_error
 from backend.src.services.admin_services import (
     crear_pelicula_service, 
@@ -11,16 +11,15 @@ from backend.src.services.peliculas_services import (
     procesar_listar_todas_las_peliculas, procesar_actualizar_poster_pelicula,
 )
 
+from backend.src.utils.token_auth import autorizar_token
+
 admin_bp = Blueprint('admin', __name__, url_prefix='/api/admin')
 
 
 @admin_bp.before_request
 def requerir_administrador():
-    usuario = session.get('usuario')
-    if not usuario:
-        return jsonify({'error': 'Se requiere iniciar sesión.'}), 401
-    if usuario.get('rol') != 'administrador':
-        return jsonify({'error': 'Se requiere rol de administrador.'}), 403
+    # El rol se consulta a MySQL a partir del Bearer, no desde una cookie del cliente.
+    return autorizar_token('administrador')
 
 
 @admin_bp.route('/salas', methods=['GET'])

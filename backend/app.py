@@ -16,13 +16,8 @@ load_dotenv(ROOT_DIR / '.env')
 app = Flask(__name__)
 app.json.sort_keys = False
 
-# La API admin lee la cookie de sesión firmada por el frontend, por eso
-# ambos procesos DEBEN compartir el mismo SECRET_KEY (definirlo en .env).
-if not os.getenv('SECRET_KEY'):
-    logging.getLogger(__name__).warning(
-        'SECRET_KEY no está definido: las sesiones de administrador no '
-        'funcionarán entre el frontend y el backend.'
-    )
+# La API ahora utiliza TokenSession Bearer validado contra MySQL.
+# Ya no depende de compartir cookies ni SECRET_KEY con el frontend.
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY') or secrets.token_hex(32)
 
 register_api_routes(app)

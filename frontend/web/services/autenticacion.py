@@ -21,3 +21,7 @@ def registrar_usuario(nombre, email, password, password_confirmacion, fecha_naci
             'recibir_promociones': recibir_promociones,
         },
     )
+
+
+def cerrar_sesion_backend():
+    return api_request('POST', '/api/auth/logout')

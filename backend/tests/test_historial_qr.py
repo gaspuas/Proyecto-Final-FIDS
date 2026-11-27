@@ -34,11 +34,13 @@ def _compra(id_compra, estado):
 
 class HistorialApiTests(unittest.TestCase):
     def _listar(self, compras):
-        with patch(
+        with patch('backend.src.utils.token_auth.buscar_usuario_por_token',
+                   return_value={'id': 1, 'nombre': 'Cliente', 'email': 'x@test.test', 'rol': 'cliente'}), patch(
             'backend.src.routes.compras.listar_compras_usuario_service',
             return_value=(compras, None, 200),
         ):
-            return backend_app.test_client().get('/api/compras/usuario/1').get_json()
+            return backend_app.test_client().get('/api/compras/usuario/1',
+                     headers={'Authorization': 'Bearer ' + 'a' * 43}).get_json()
 
     def test_las_compras_activas_incluyen_la_imagen_del_qr(self):
         datos = self._listar([_compra(1, 'activo')])
@@ -137,6 +139,8 @@ class ConfirmacionVistaTests(unittest.TestCase):
         with client.session_transaction() as sesion:
             sesion['usuario'] = {'id': 1, 'nombre': 'Cliente', 'rol': 'cliente'}
             sesion['checkout'] = {'id_funcion': 1, 'butacas': ['A1', 'A2']}
+            # El POST de confirmación requiere un CSRF válido.
+            sesion['csrf_token_global'] = 'csrf-prueba-confirmacion'
 
         with patch(
             'frontend.web.routes.site.compra.obtener_funcion',
@@ -157,7 +161,12 @@ class ConfirmacionVistaTests(unittest.TestCase):
                 'monto_total': 200,
             },
         ):
-            html = client.post('/compra/servicios').get_data(as_text=True)
+            respuesta = client.post(
+                '/compra/servicios',
+                data={'csrf_token': 'csrf-prueba-confirmacion'},
+            )
+            self.assertEqual(respuesta.status_code, 200)
+            html = respuesta.get_data(as_text=True)
 
         self.assertIn('class="compra__tarjeta confirmacion"', html)
         self.assertIn('Compra confirmada', html)

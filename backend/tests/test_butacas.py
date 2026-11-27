@@ -49,7 +49,7 @@ class MapaDeButacasTests(unittest.TestCase):
 
 class ValidadorDeCompraTests(unittest.TestCase):
     def _body(self, butacas):
-        return {'id_usuario': 1, 'id_funcion': 1, 'butacas': butacas}
+        return {'id_funcion': 1, 'butacas': butacas}
 
     def test_acepta_codigos_y_los_normaliza_a_mayusculas(self):
         datos, error = validar_body_crear_compra(self._body(['a1', 'B10']))
@@ -59,8 +59,13 @@ class ValidadorDeCompraTests(unittest.TestCase):
 
     def test_rechaza_numeros_sueltos(self):
         _, error = validar_body_crear_compra(self._body(['13']))
-
         self.assertIsNotNone(error)
+
+    def test_rechaza_id_usuario_enviado_por_cliente(self):
+        body = self._body(['A1'])
+        body['id_usuario'] = 999
+        _, error = validar_body_crear_compra(body)
+        self.assertIn('id_usuario', error)
 
 
 class CompraConButacasTests(unittest.TestCase):

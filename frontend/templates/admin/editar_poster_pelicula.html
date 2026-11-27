@@ -60,6 +60,7 @@
   <p class="pelicula-editor__intro">{{ pelicula.titulo }} — Elegí el encuadre que se verá en <strong>/peliculas/</strong>. La imagen original y los datos de la película se conservan.</p>
   {% if error %}<p class="alerta alerta--error" role="alert">{{ error }}</p>{% endif %}
   <form method="POST" enctype="multipart/form-data" class="pelicula-editor__form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token_global() }}">
     <div class="pelicula-editor__seccion">
       <div class="pelicula-editor__cabecera"><span class="pelicula-editor__numero">01</span><div><h2>Imagen y encuadre de Cartelera</h2><p>La vista previa coincide con el póster público.</p></div></div>
       <div class="imagen-unificada" id="pelicula-encuadre" data-modo="pelicula" data-imagen-actual="{{ pelicula.poster_url or '' }}">

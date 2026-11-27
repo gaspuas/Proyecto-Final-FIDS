@@ -36,6 +36,7 @@
                     <a class="navbar__link {% if request.endpoint and request.endpoint.startswith('web.site.compra') %}navbar__link--active{% endif %}"
                        href="{{ url_for('web.site.compra.historial') }}">Mis compras</a>
                     <form action="{{ url_for('web.site.login.logout') }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token_global() }}">
                         <button class="navbar__link nav__salir" type="submit">Cerrar sesión</button>
                     </form>
                     {% else %}

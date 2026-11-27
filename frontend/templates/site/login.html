@@ -14,6 +14,7 @@
         <h2 class="autenticacion__titulo">Iniciar sesión</h2>
 
         <form method="POST" action="{{ url_for('web.site.login.index', next=request.args.get('next')) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token_global() }}">
             <input type="hidden" name="accion" value="login">
             <div class="autenticacion__campo">
                 <label for="login-email">Email</label>
@@ -36,6 +37,7 @@
         <h2 class="autenticacion__titulo">Crear cuenta</h2>
 
         <form method="POST" action="{{ url_for('web.site.login.index') }}" class="autenticacion__registro">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token_global() }}">
             <input type="hidden" name="accion" value="registro">
             <div class="autenticacion__campo">
                 <label for="registro-nombre">Nombre</label>

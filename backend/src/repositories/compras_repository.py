@@ -232,14 +232,14 @@ def obtener_fecha_funcion_compra_db(id_compra: int):
         connection.close()
 
 
-def cancelar_compra_db(id_compra: int):
+def cancelar_compra_db(id_compra: int, id_usuario: int):
     """Actualiza el QR y marca los detalles como cancelados de forma atómica."""
     connection = get_db_connection()
     try:
         cursor = connection.cursor(dictionary=True)
         cursor.execute(
-            "SELECT id, estado_qr FROM compras WHERE id = %s FOR UPDATE",
-            (id_compra,)
+            "SELECT id, estado_qr FROM compras WHERE id = %s AND usuario_id = %s FOR UPDATE",
+            (id_compra, id_usuario),
         )
         compra = cursor.fetchone()
         if not compra:
@@ -250,8 +250,8 @@ def cancelar_compra_db(id_compra: int):
             return None, "La compra no se encuentra activa.", 400
 
         cursor.execute(
-            "UPDATE compras SET estado_qr = 'cancelado' WHERE id = %s",
-            (id_compra,)
+            "UPDATE compras SET estado_qr = 'cancelado' WHERE id = %s AND usuario_id = %s",
+            (id_compra, id_usuario)
         )
         # Las entradas se conservan para el historial, pero dejan de ocupar la
         # butaca: activa = NULL queda fuera de la restricción UNIQUE.

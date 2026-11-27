@@ -1,9 +1,10 @@
 from urllib.parse import urlparse
 
-from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, request, session, url_for
 
 from frontend.web.services.api_client import BackendAPIError
-from frontend.web.services.autenticacion import iniciar_sesion, registrar_usuario
+from frontend.web.services.autenticacion import iniciar_sesion, registrar_usuario, cerrar_sesion_backend
+from frontend.web.utils.csrf import requerir_csrf
 
 login_bp = Blueprint('login', __name__)
 
@@ -20,6 +21,7 @@ def _safe_next_url(value):
 @login_bp.route('/login', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
+        requerir_csrf()
         accion = request.form.get('accion')
         email = request.form.get('email', '').strip()
         password = request.form.get('password', '')
@@ -38,8 +40,18 @@ def index():
             elif accion == 'login':
                 respuesta = iniciar_sesion(email, password)
                 usuario = respuesta.get('data') if isinstance(respuesta, dict) else None
-                if not isinstance(usuario, dict) or not usuario.get('id'):
-                    raise BackendAPIError('La API no devolvió los datos de sesión.')
+                if (not isinstance(usuario, dict) or not usuario.get('id')
+                        or not isinstance(usuario.get('token'), str) or not usuario.get('token')):
+                    raise BackendAPIError('La API no devolvió un TokenSession válido.')
+                # Renueva sesión para prevenir fijación, conservando solo un checkout pendiente.
+                checkout_pendiente = session.get('checkout')
+                session.clear()
+                session['access_token'] = usuario['token']
+                # Rotar con contenido: Flask-Session regenera solamente sesiones no vacías.
+                current_app.session_interface.regenerate(session)
+                session.permanent = True
+                if checkout_pendiente:
+                    session['checkout'] = checkout_pendiente
                 session['usuario'] = {
                     'id': usuario['id'],
                     'nombre': usuario.get('nombre', ''),
@@ -70,8 +82,16 @@ def index():
 
 @login_bp.route('/logout', methods=['POST'])
 def logout():
-    session.pop('usuario', None)
-    session.pop('checkout', None)
-    session.pop('ultima_compra_id', None)
+    requerir_csrf()
+    if session.get('access_token'):
+        try:
+            cerrar_sesion_backend()
+        except BackendAPIError:
+            # Cerramos la sesión web igualmente; si MySQL está caído, el token
+            # del backend vencerá a las dos horas. No se informa revocación exitosa.
+            session.clear()
+            flash('Se cerró la sesión local. No se pudo confirmar la revocación en el backend.', 'error')
+            return redirect(url_for('web.site.home.index'))
+    session.clear()
     flash('Cerraste sesión.', 'success')
     return redirect(url_for('web.site.home.index'))
